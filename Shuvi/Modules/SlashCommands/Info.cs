@@ -22,12 +22,13 @@ namespace ShardedClient.Modules
         [SlashCommand("info", "Информаиця о боте.")]
         public async Task InfoCommandAsync()
         {
-            string msg = $"Шард №{Context.Client.GetShardFor(Context.Guild).ShardId}\n" +
-                $"Серверов: {Context.Client.Guilds.Count}\n";
+            Embed embed = new EmbedBuilder()
+                .WithDescription($"Шард №{Context.Client.GetShardFor(Context.Guild).ShardId}\nСерверов: {Context.Client.Guilds.Count}\n")
+                .Build();
             ComponentBuilder components = new ComponentBuilder()
                 .WithButton("Предметы", "AllItems", ButtonStyle.Primary);
 
-            await RespondAsync(msg, components: components.Build());
+            await RespondAsync(embed: embed, components: components.Build());
             IUserMessage botMessage = await GetOriginalResponseAsync();
             SocketMessageComponent interaction = await WaitFor.UserButtonInteraction(_client, botMessage, Context.User.Id);
             if (interaction == null) return;
