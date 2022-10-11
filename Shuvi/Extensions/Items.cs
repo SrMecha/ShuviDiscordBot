@@ -46,6 +46,14 @@ namespace ShuviBot.Extensions.Items
         {
             get { return _description; }
         }
+        public ItemType Type
+        {
+            get { return _type; }
+        }
+        public Ranks Rank
+        {
+            get { return _rank; }
+        }
         public int Max
         {
             get { return _max; }
