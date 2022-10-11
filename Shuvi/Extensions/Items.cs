@@ -1,4 +1,6 @@
 using MongoDB.Bson;
+using ShuviBot.Enums.Characteristics;
+using ShuviBot.Enums.ItemNeeds;
 using ShuviBot.Enums.ItemType;
 using ShuviBot.Enums.Ranks;
 using ShuviBot.Extensions.MongoDocuments;
@@ -23,47 +25,78 @@ namespace ShuviBot.Extensions.Items
             _name = data.Name;
             _description = data.Description;
             _type = data.Type;
-            _rank = (Ranks)data.Rank;
+            _rank = data.Rank;
             _canTrade = data.CanTrade;
             _max = data.Max;
             _amount = amount;
         }
-
-        public ObjectId GetId
+        public ObjectId Id
         {
             get { return _id; }
         }
-
-        public int GetAmount
+        public int Amount
         {
             get { return _amount; }
         }
-
-        public string GetName
+        public string Name
         {
             get { return _name; }
         }
-
-        public string GetDescription
+        public string Description
         {
             get { return _description; }
         }
-
         public int Max
         {
             get { return _max; }
+        }
+        public virtual string GetBonusesInfo()
+        {
+            return "Нету бонусов.";
+        }
+        public virtual string GetNeedsInfo()
+        {
+            return "Нету требований.";
         }
     }
 
     public sealed class EquipmentItem : BaseItem, IItem
     {
-        private readonly Dictionary<string, int> _bonuses;
-        private readonly Dictionary<string, int> _needs;
+        private readonly Dictionary<Characteristics, int> _bonuses;
+        private readonly Dictionary<ItemNeeds, int> _needs;
 
         public EquipmentItem(ItemDocument data, int amount) : base(data, amount)
         {
-            _bonuses = data.Bonuses ?? new Dictionary<string, int>();
-            _needs = data.Needs ?? new Dictionary<string, int>();
+            _bonuses = data.Bonuses;
+            _needs = data.Needs;
+        }
+
+        public override string GetBonusesInfo()
+        {
+            string result = "";
+            foreach (KeyValuePair<Characteristics, int> bonus in _bonuses)
+            {
+                result += $"\n{bonus.Key.ToRusString()} +{bonus.Value}";
+            }
+            if (result == "")
+            {
+                result = "Нету бонусов.";
+            }
+            return result;
+        }
+
+        public override string GetNeedsInfo()
+        {
+            string result = "";
+            foreach (KeyValuePair<ItemNeeds, int> need in _needs)
+            {
+                result += $"\n{need.Key.ToRusString()} {need.Value}+";
+            }
+                if (result == "")
+                {
+                result = "Нету требований.";
+                }
+            return result;
         }
     }
 
@@ -91,18 +124,18 @@ namespace ShuviBot.Extensions.Items
     {
         public static IItem CreateItem(ItemDocument itemDocument, int amount)
         {
-            switch (itemDocument.Type)
+            return itemDocument.Type switch
             {
-                case ItemType.Weapon: return new EquipmentItem(itemDocument, amount);
-                case ItemType.Helmet: return new EquipmentItem(itemDocument, amount);
-                case ItemType.Armor: return new EquipmentItem(itemDocument, amount);
-                case ItemType.Leggings: return new EquipmentItem(itemDocument, amount);
-                case ItemType.Boots: return new EquipmentItem(itemDocument, amount);
-                case ItemType.Simple: return new SimpleItem(itemDocument, amount);
-                case ItemType.Potion: return new UsefullItem(itemDocument, amount);
-                case ItemType.Chest: return new UsefullItem(itemDocument, amount);
-                default: return new SimpleItem(itemDocument, amount);
-            }
+                ItemType.Weapon => new EquipmentItem(itemDocument, amount),
+                ItemType.Helmet => new EquipmentItem(itemDocument, amount),
+                ItemType.Armor => new EquipmentItem(itemDocument, amount),
+                ItemType.Leggings => new EquipmentItem(itemDocument, amount),
+                ItemType.Boots => new EquipmentItem(itemDocument, amount),
+                ItemType.Simple => new SimpleItem(itemDocument, amount),
+                ItemType.Potion => new UsefullItem(itemDocument, amount),
+                ItemType.Chest => new UsefullItem(itemDocument, amount),
+                _ => new SimpleItem(itemDocument, amount)
+            };
         }
     }
 }
