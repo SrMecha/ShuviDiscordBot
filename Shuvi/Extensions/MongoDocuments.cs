@@ -4,6 +4,8 @@ using ShuviBot.Enums.ItemType;
 using ShuviBot.Enums.Ranks;
 using ShuviBot.Enums.UserProfessions;
 using ShuviBot.Enums.UserRaces;
+using ShuviBot.Enums.Characteristics;
+using ShuviBot.Enums.ItemNeeds;
 
 namespace ShuviBot.Extensions.MongoDocuments
 {
@@ -94,9 +96,9 @@ namespace ShuviBot.Extensions.MongoDocuments
         public int Max { get; set; } = -1;
 
         [BsonElement("bonuses")]
-        public Dictionary<string, int> Bonuses { get; set; } = new();
+        public Dictionary<Characteristics, int> Bonuses { get; set; } = new();
 
         [BsonElement("needs")]
-        public Dictionary<string, int> Needs { get; set; } = new();
+        public Dictionary<ItemNeeds, int> Needs { get; set; } = new();
     }
 }
