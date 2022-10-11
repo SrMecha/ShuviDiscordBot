@@ -4,6 +4,8 @@ using ShuviBot.Interfaces.Item;
 using ShuviBot.Extensions.Items;
 using ShuviBot.Extensions.MongoDocuments;
 using System.Collections.Immutable;
+using ShuviBot.Enums.ItemType;
+using ShuviBot.Enums.Ranks;
 
 namespace ShuviBot.Extensions.Inventory
 {
@@ -107,7 +109,7 @@ namespace ShuviBot.Extensions.Inventory
             IItem item = ItemFactory.CreateItem(_itemsData.GetValueOrDefault(id, new ItemDocument()), 0);
             return new EmbedBuilder()
                     .WithAuthor(item.Name)
-                    .WithDescription(item.Description)
+                    .WithDescription($"{item.Description}\nТип: {item.Type.ToRusString()}\nРанг: {item.Rank.ToRusString()}")
                     .AddField("Бонусы:", item.GetBonusesInfo())
                     .AddField("Требования:", item.GetNeedsInfo())
                     .WithFooter(item.Id.ToString())
