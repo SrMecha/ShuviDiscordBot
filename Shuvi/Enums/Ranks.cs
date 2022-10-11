@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
 
 namespace ShuviBot.Enums.Ranks
 {
@@ -16,5 +12,25 @@ namespace ShuviBot.Enums.Ranks
         S,
         SS,
         SSS
+    }
+
+    public static class RanksEnumExtension
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+        public static string ToRusString(this Ranks target)
+        {
+            return target switch
+            {
+                Ranks.E => nameof(Ranks.E),
+                Ranks.D => nameof(Ranks.D),
+                Ranks.C => nameof(Ranks.C),
+                Ranks.B => nameof(Ranks.B),
+                Ranks.A => nameof(Ranks.A),
+                Ranks.S => nameof(Ranks.S),
+                Ranks.SS => nameof(Ranks.SS),
+                Ranks.SSS => nameof(Ranks.SSS),
+                _ => "Error"
+            };
+        }
     }
 }

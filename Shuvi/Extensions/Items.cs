@@ -76,7 +76,7 @@ namespace ShuviBot.Extensions.Items
             string result = "";
             foreach (KeyValuePair<Characteristics, int> bonus in _bonuses)
             {
-                result += $"\n{bonus.Key.ToRusString()} +{bonus.Value}";
+                result += $"\n{bonus.Key.ToRusString()}: {bonus.Value}";
             }
             if (result == "")
             {
@@ -90,7 +90,7 @@ namespace ShuviBot.Extensions.Items
             string result = "";
             foreach (KeyValuePair<ItemNeeds, int> need in _needs)
             {
-                result += $"\n{need.Key.ToRusString()} {need.Value}+";
+                result += $"\n{need.Key.ToRusString()}: {need.Key.GetFormatString(need.Value)}";
             }
                 if (result == "")
                 {

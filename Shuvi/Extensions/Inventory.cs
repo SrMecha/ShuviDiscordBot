@@ -20,7 +20,7 @@ namespace ShuviBot.Extensions.Inventory
 
         public void AddItem(IItem item)
         {
-            _localInventory.Add(item.GetId, item.GetAmount);
+            _localInventory.Add(item.Id, item.Amount);
         }
 
         public IItem GetItem(ObjectId id)
@@ -106,9 +106,11 @@ namespace ShuviBot.Extensions.Inventory
         {
             IItem item = ItemFactory.CreateItem(_itemsData.GetValueOrDefault(id, new ItemDocument()), 0);
             return new EmbedBuilder()
-                    .WithAuthor(item.GetName)
-                    .WithDescription(item.GetDescription)
-                    .WithFooter(item.GetId.ToString())
+                    .WithAuthor(item.Name)
+                    .WithDescription(item.Description)
+                    .AddField("Бонусы:", item.GetBonusesInfo())
+                    .AddField("Требования:", item.GetNeedsInfo())
+                    .WithFooter(item.Id.ToString())
                     .Build();
         }
 

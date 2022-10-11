@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using ShuviBot.Enums.Ranks;
 
 namespace ShuviBot.Enums.ItemNeeds
 {
@@ -26,6 +27,20 @@ namespace ShuviBot.Enums.ItemNeeds
                 ItemNeeds.Endurance => "Выносливость",
                 ItemNeeds.Rank => "Ранг",
                 _ => "Error"
+            };
+        }
+
+        public static string GetFormatString(this ItemNeeds target, int amount)
+        {
+            return target switch
+            {
+                ItemNeeds.Strange => amount.ToString(),
+                ItemNeeds.Agility => amount.ToString(),
+                ItemNeeds.Luck => amount.ToString(),
+                ItemNeeds.Intellect => amount.ToString(),
+                ItemNeeds.Endurance => amount.ToString(),
+                ItemNeeds.Rank => ((Ranks.Ranks)amount).ToRusString(),
+                _ => amount.ToString()
             };
         }
     }
