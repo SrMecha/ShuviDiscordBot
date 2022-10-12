@@ -4,7 +4,7 @@ namespace ShuviBot.Enums.ItemType
 {
     public enum ItemType
     {
-        Unknown,
+        Test,
         Weapon,
         Helmet,
         Armor,
@@ -22,7 +22,7 @@ namespace ShuviBot.Enums.ItemType
         {
             return target switch
             {
-                ItemType.Unknown => "Предмет Шуви (Test)",
+                ItemType.Test => "Предмет Шуви (Test)",
                 ItemType.Weapon => "Оружие",
                 ItemType.Helmet => "Шлем",
                 ItemType.Armor => "Броня",
@@ -32,6 +32,22 @@ namespace ShuviBot.Enums.ItemType
                 ItemType.Potion => "Зелье",
                 ItemType.Chest => "Сундук",
                 _ => "Предмет Шуви (Unknown)"
+            };
+        }
+        public static bool WithBonuses(this ItemType target)
+        {
+            return target switch
+            {
+                ItemType.Test => false,
+                ItemType.Weapon => true,
+                ItemType.Helmet => true,
+                ItemType.Armor => true,
+                ItemType.Leggings => true,
+                ItemType.Boots => true,
+                ItemType.Simple => false,
+                ItemType.Potion => false,
+                ItemType.Chest => false,
+                _ => false
             };
         }
     }

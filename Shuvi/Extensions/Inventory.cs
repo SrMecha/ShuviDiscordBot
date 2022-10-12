@@ -11,8 +11,8 @@ namespace ShuviBot.Extensions.Inventory
 {
     public struct UserInventory
     {
-        private Dictionary<ObjectId, int> _localInventory;
-        private AllItemsData _itemsConfig;
+        private readonly Dictionary<ObjectId, int> _localInventory;
+        private readonly AllItemsData _itemsConfig;
 
         public UserInventory(Dictionary<ObjectId, int> inventoryData, AllItemsData itemsConfig)
         {
@@ -38,8 +38,8 @@ namespace ShuviBot.Extensions.Inventory
 
     public class AllItemsData
     {
-        private Dictionary<ObjectId, ItemDocument> _itemsData;
-        private List<ItemDocument> _itemsDataArray;
+        private readonly Dictionary<ObjectId, ItemDocument> _itemsData;
+        private readonly List<ItemDocument> _itemsDataArray;
 
         public AllItemsData () 
         { 
@@ -107,12 +107,21 @@ namespace ShuviBot.Extensions.Inventory
         public Embed GetItemEmbed(ObjectId id) 
         {
             IItem item = ItemFactory.CreateItem(_itemsData.GetValueOrDefault(id, new ItemDocument()), 0);
+            string bonuses = "";
+            string needs = "";
+            if (item.Type.WithBonuses())
+            {
+                bonuses = $"**Бонусы:**\n{item.GetBonusesInfo()}";
+                needs = $"**Требования:**\n{item.GetNeedsInfo()}";
+            }
+
             return new EmbedBuilder()
-                    .WithAuthor(item.Name)
-                    .WithDescription($"{item.Description}\nТип: {item.Type.ToRusString()}\nРанг: {item.Rank.ToRusString()}")
-                    .AddField("Бонусы:", item.GetBonusesInfo())
-                    .AddField("Требования:", item.GetNeedsInfo())
-                    .WithFooter(item.Id.ToString())
+                    .WithAuthor("Просмотр предмета")
+                    .WithDescription($"**Название:** {item.Name}\n**Тип:** {item.Type.ToRusString()}\n" +
+                    $"**Ранг:** {item.Rank.ToRusString()}\n**Максимум в инвентаре:** {(item.Max < 0 ? "бесконечно" : item.Max)}\n\n" +
+                    $"**Описание:**\n{item.Description}\n{(item.CanTrade ? "Можно обменять" : "Нельзя обменять")}\n\n{bonuses}\n{needs}")
+                    .WithFooter($"ID: {item.Id}")
+                    .WithColor(item.Rank.GetColor())
                     .Build();
         }
 

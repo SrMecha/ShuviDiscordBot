@@ -4,12 +4,6 @@ using ShuviBot.Enums.Ranks;
 
 namespace ShuviBot.Interfaces.Item
 {
-    public interface IBaseItem
-    {
-        public ObjectId Id { get; }
-        public int Amount { get; }
-    }
-
     public interface IItem
     {
         public ObjectId Id { get; }
@@ -18,6 +12,7 @@ namespace ShuviBot.Interfaces.Item
         public string Description { get; }
         public ItemType Type { get; }
         public Ranks Rank { get; }
+        public bool CanTrade { get; }
         public int Max { get; }
         public string GetBonusesInfo();
         public string GetNeedsInfo();
