@@ -8,7 +8,7 @@ using ShuviBot.Interfaces.Item;
 
 namespace ShuviBot.Extensions.Items
 {
-    public class BaseItem : IBaseItem
+    public class BaseItem : IItem
     {
         protected readonly ObjectId _id;
         protected readonly string _name;
@@ -54,6 +54,10 @@ namespace ShuviBot.Extensions.Items
         {
             get { return _rank; }
         }
+        public bool CanTrade
+        {
+            get { return _canTrade; }
+        }
         public int Max
         {
             get { return _max; }
@@ -84,7 +88,7 @@ namespace ShuviBot.Extensions.Items
             string result = "";
             foreach (KeyValuePair<Characteristics, int> bonus in _bonuses)
             {
-                result += $"\n{bonus.Key.ToRusString()}: {bonus.Value}";
+                result += $"{bonus.Key.ToRusString()}: {bonus.Value}\n";
             }
             if (result == "")
             {
@@ -98,7 +102,7 @@ namespace ShuviBot.Extensions.Items
             string result = "";
             foreach (KeyValuePair<ItemNeeds, int> need in _needs)
             {
-                result += $"\n{need.Key.ToRusString()}: {need.Key.GetFormatString(need.Value)}";
+                result += $"{need.Key.ToRusString()}: {need.Key.GetFormatString(need.Value)}\n";
             }
                 if (result == "")
                 {
