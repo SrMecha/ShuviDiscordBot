@@ -30,38 +30,14 @@ namespace ShuviBot.Extensions.Items
             _max = data.Max;
             _amount = amount;
         }
-        public ObjectId Id
-        {
-            get { return _id; }
-        }
-        public int Amount
-        {
-            get { return _amount; }
-        }
-        public string Name
-        {
-            get { return _name; }
-        }
-        public string Description
-        {
-            get { return _description; }
-        }
-        public ItemType Type
-        {
-            get { return _type; }
-        }
-        public Ranks Rank
-        {
-            get { return _rank; }
-        }
-        public bool CanTrade
-        {
-            get { return _canTrade; }
-        }
-        public int Max
-        {
-            get { return _max; }
-        }
+        public ObjectId Id => _id;
+        public int Amount => _amount;
+        public string Name => _name;
+        public string Description => _description;
+        public ItemType Type => _type;
+        public Ranks Rank => _rank;
+        public bool CanTrade => _canTrade;
+        public int Max => _max;
         public virtual string GetBonusesInfo()
         {
             return "Нету бонусов.";
