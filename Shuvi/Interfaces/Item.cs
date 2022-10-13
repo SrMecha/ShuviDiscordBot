@@ -11,7 +11,7 @@ namespace ShuviBot.Interfaces.Item
         public string Name { get; }
         public string Description { get; }
         public ItemType Type { get; }
-        public Ranks Rank { get; }
+        public Rank Rank { get; }
         public bool CanTrade { get; }
         public int Max { get; }
         public string GetBonusesInfo();

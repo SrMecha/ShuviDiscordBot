@@ -15,7 +15,7 @@ namespace ShuviBot.Extensions.MongoDocuments
         public ulong Id { get; set; } = 0;
 
         [BsonElement("rating")]
-        public Ranks Rating { get; set; } = Ranks.E;
+        public int Rating { get; set; } = 0;
 
         [BsonElement("money")]
         public int Money { get; set; } = 0;
@@ -87,7 +87,7 @@ namespace ShuviBot.Extensions.MongoDocuments
         public ItemType Type { get; set; } = ItemType.Simple;
 
         [BsonElement("rank")]
-        public Ranks Rank { get; set; } = Ranks.E;
+        public Rank Rank { get; set; } = Rank.E;
 
         [BsonElement("canTrade")]
         public bool CanTrade { get; set; } = false;

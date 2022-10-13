@@ -55,7 +55,7 @@ namespace ShuviBot.Services
                 Id = userId,
                 Rating = 0,
                 Money = 0,
-                Race = User.GenerateRandomUserRace(),
+                Race = UserFactory.GenerateRandomUserRace(),
                 Profession = 0,
                 Inventory = new Dictionary<ObjectId, int>(),
                 Weapon = null,

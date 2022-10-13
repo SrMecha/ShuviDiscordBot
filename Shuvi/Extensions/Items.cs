@@ -14,7 +14,7 @@ namespace ShuviBot.Extensions.Items
         protected readonly string _name;
         protected readonly string _description;
         protected readonly ItemType _type;
-        protected readonly Ranks _rank;
+        protected readonly Rank _rank;
         protected readonly bool _canTrade;
         protected readonly int _max;
         protected readonly int _amount;
@@ -35,7 +35,7 @@ namespace ShuviBot.Extensions.Items
         public string Name => _name;
         public string Description => _description;
         public ItemType Type => _type;
-        public Ranks Rank => _rank;
+        public Rank Rank => _rank;
         public bool CanTrade => _canTrade;
         public int Max => _max;
         public virtual string GetBonusesInfo()
