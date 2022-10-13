@@ -39,7 +39,7 @@ namespace ShuviBot.Enums.ItemNeeds
                 ItemNeeds.Luck => amount.ToString(),
                 ItemNeeds.Intellect => amount.ToString(),
                 ItemNeeds.Endurance => amount.ToString(),
-                ItemNeeds.Rank => ((Ranks.Ranks)amount).ToRusString(),
+                ItemNeeds.Rank => ((Ranks.Rank)amount).ToRusString(),
                 _ => amount.ToString()
             };
         }

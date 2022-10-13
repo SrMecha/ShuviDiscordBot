@@ -27,12 +27,12 @@ namespace ShuviBot.Extensions.Inventory
 
         public IItem GetItem(ObjectId id)
         {
-            throw new NotImplementedException();
+            return ItemFactory.CreateItem(_itemsConfig.GetItemData(id), _localInventory.GetValueOrDefault(id, 0));
         }
 
         public void RemoveItem(ObjectId id)
         {
-            throw new NotImplementedException();
+            _localInventory.Remove(id);
         }
     }
 
