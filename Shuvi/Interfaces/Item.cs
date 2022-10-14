@@ -1,4 +1,6 @@
 using MongoDB.Bson;
+using ShuviBot.Enums.Characteristics;
+using ShuviBot.Enums.ItemNeeds;
 using ShuviBot.Enums.ItemType;
 using ShuviBot.Enums.Ranks;
 
@@ -14,6 +16,8 @@ namespace ShuviBot.Interfaces.Item
         public Rank Rank { get; }
         public bool CanTrade { get; }
         public int Max { get; }
+        public Dictionary<Characteristics, int> Bonuses { get; }
+        public Dictionary<ItemNeeds, int> Needs { get; }
         public string GetBonusesInfo();
         public string GetNeedsInfo();
     }

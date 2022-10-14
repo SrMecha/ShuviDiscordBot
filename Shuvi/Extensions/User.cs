@@ -1,9 +1,12 @@
 using MongoDB.Bson;
+using ShuviBot.Enums.Characteristics;
 using ShuviBot.Enums.Ranks;
 using ShuviBot.Enums.UserProfessions;
 using ShuviBot.Enums.UserRaces;
 using ShuviBot.Extensions.Inventory;
+using ShuviBot.Extensions.Items;
 using ShuviBot.Extensions.MongoDocuments;
+using ShuviBot.Interfaces.Item;
 
 namespace ShuviBot.Extensions.User
 {
@@ -143,5 +146,24 @@ namespace ShuviBot.Extensions.User
                 >= 2000 => (Rank)7
             };
         }
+        public Dictionary<Characteristics, int> GetBonuses()
+        {
+            Dictionary<Characteristics, int> result = new();
+            List<ObjectId?> list = new() { Weapon, Head, Body, Legs, Foots};
+            foreach(ObjectId? itemId in list)
+            {
+                if (itemId == null) continue;
+                foreach (KeyValuePair<Characteristics, int> bonus in Inventory.GetItem((ObjectId)itemId).Bonuses)
+                {
+                    if (!result.TryAdd(bonus.Key, bonus.Value)) result[bonus.Key] += bonus.Value;
+                }
+            }
+            return result;
+        }
+        public EquipmentItem GetEquipment(ObjectId itemId)
+        {
+            return (EquipmentItem)Inventory.GetItem(itemId);
+        }
+
     }
 }
