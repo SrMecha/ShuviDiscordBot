@@ -22,20 +22,11 @@ namespace ShuviBot.Services
             _userDatabase = new UserDatabase(_mongo.GetDatabase("Shuvi").GetCollection<UserDocument>("Users"), _allItemsData);
         }
 
-        public UserDatabase Users 
-        {
-            get { return _userDatabase; }
-        }
+        public UserDatabase Users => _userDatabase;
 
-        public ItemDatabase Items
-        {
-            get { return _itemDatabase; }
-        }
+        public ItemDatabase Items => _itemDatabase;
 
-        public AllItemsData AllItemsData
-        {
-            get { return _allItemsData; }
-        }
+        public AllItemsData AllItemsData => _allItemsData;
     }
     public sealed class UserDatabase
     {
