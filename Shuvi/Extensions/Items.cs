@@ -38,6 +38,8 @@ namespace ShuviBot.Extensions.Items
         public Rank Rank => _rank;
         public bool CanTrade => _canTrade;
         public int Max => _max;
+        public virtual Dictionary<Characteristics, int> Bonuses => new();
+        public virtual Dictionary<ItemNeeds, int> Needs => new();
         public virtual string GetBonusesInfo()
         {
             return "Нету бонусов.";
@@ -59,6 +61,9 @@ namespace ShuviBot.Extensions.Items
             _needs = data.Needs;
         }
 
+        public override Dictionary<Characteristics, int> Bonuses => _bonuses;
+        public override Dictionary<ItemNeeds, int> Needs => _needs;
+
         public override string GetBonusesInfo()
         {
             string result = "";
@@ -72,7 +77,6 @@ namespace ShuviBot.Extensions.Items
             }
             return result;
         }
-
         public override string GetNeedsInfo()
         {
             string result = "";
