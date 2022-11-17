@@ -3,6 +3,7 @@ using Discord.Commands;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
+using Shuvi.Extensions.EmojiList;
 using ShuviBot.Services;
 
 namespace ShuviBot
@@ -35,6 +36,7 @@ namespace ShuviBot
 
             await services.GetRequiredService<InteractionHandlingService>()
                 .InitializeAsync();
+            EmojiList.Init();
 
             await client.LoginAsync(TokenType.Bot, botToken);
             await client.StartAsync();

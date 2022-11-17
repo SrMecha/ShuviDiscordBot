@@ -6,7 +6,7 @@ using ShuviBot.Enums.UserRaces;
 using ShuviBot.Extensions.Inventory;
 using ShuviBot.Extensions.Items;
 using ShuviBot.Extensions.MongoDocuments;
-using ShuviBot.Interfaces.Item;
+using ShuviBot.Extensions.Bonuses;
 
 namespace ShuviBot.Extensions.User
 {
@@ -15,12 +15,18 @@ namespace ShuviBot.Extensions.User
         private const int _healthPointRegenTime = 60;
         private const int _energyPointRegenTime = 180;
         private const int _endurancePerEnergy = 10;
-        private const int _standartEnergy = 7;
+        private const int _standartEnergy = 10;
+        private const int _energyDisplayMax = 5;
+        private const int _healthDisplayMax = 5;
+        private const int _healthMax = 100;
 
         public static int HealthPointRegenTime => _healthPointRegenTime;
         public static int EnergyPointRegenTime => _energyPointRegenTime;
         public static int EndurancePerEnergy => _endurancePerEnergy;
         public static int StandartEnergy => _standartEnergy;
+        public static int HealthDisplayMax => _healthDisplayMax;
+        public static int EnergyDisplayMax => _energyDisplayMax;
+        public static int HealthMax => _healthMax;
     }
 
     public sealed class UserFactory
@@ -58,6 +64,7 @@ namespace ShuviBot.Extensions.User
         private readonly long _energyRegenTime;
         private readonly long _createdAt;
         private readonly long _liveTime;
+        private readonly UserBonuses _bonuses;
 
         public User(UserDocument userData, AllItemsData itemsConfig)
         {
@@ -82,6 +89,7 @@ namespace ShuviBot.Extensions.User
             _energyRegenTime = userData.EnergyRegenTime;
             _createdAt = userData.CreatedAt;
             _liveTime = userData.LiveTime;
+            _bonuses = GetBonuses();
         }
 
         public ulong Id => _id;
@@ -96,6 +104,7 @@ namespace ShuviBot.Extensions.User
         public ObjectId? Body => _body;
         public ObjectId? Legs => _legs;
         public ObjectId? Foots => _foots;
+        public UserBonuses Bonuses => _bonuses;
         public int Strength => _strength;
         public int Agility => _agility;
         public int Luck => _luck;
@@ -146,19 +155,16 @@ namespace ShuviBot.Extensions.User
                 >= 2000 => (Rank)7
             };
         }
-        public Dictionary<Characteristics, int> GetBonuses()
+        public UserBonuses GetBonuses()
         {
-            Dictionary<Characteristics, int> result = new();
+            List<EquipmentItem> items = new();
             List<ObjectId?> list = new() { Weapon, Head, Body, Legs, Foots};
             foreach(ObjectId? itemId in list)
             {
                 if (itemId == null) continue;
-                foreach (KeyValuePair<Characteristics, int> bonus in Inventory.GetItem((ObjectId)itemId).Bonuses)
-                {
-                    if (!result.TryAdd(bonus.Key, bonus.Value)) result[bonus.Key] += bonus.Value;
-                }
+                items.Append((EquipmentItem)Inventory.GetItem((ObjectId)itemId));
             }
-            return result;
+            return new UserBonuses(items);
         }
         public EquipmentItem GetEquipment(ObjectId itemId)
         {

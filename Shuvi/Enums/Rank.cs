@@ -1,4 +1,4 @@
-using Discord;
+﻿using Discord;
 using System.Runtime.CompilerServices;
 
 namespace ShuviBot.Enums.Ranks
@@ -48,6 +48,25 @@ namespace ShuviBot.Enums.Ranks
                 Rank.SSS => new Color((byte)255, (byte)215, (byte)0),
                 _ => new Color((byte)255, (byte)255, (byte)255)
             };
+        }
+        public static int GetNeedRating(this Rank target)
+        {
+            return target switch
+            {
+                Rank.E => 0,
+                Rank.D => 100,
+                Rank.C => 300,
+                Rank.B => 600,
+                Rank.A => 1000,
+                Rank.S => 2000,
+                Rank.SS => 3500,
+                Rank.SSS => 5000,
+                _ => -1
+            };
+        }
+        public static bool CanRankUp(this Rank target)
+        {
+            return target != Rank.SSS;
         }
     }
 }

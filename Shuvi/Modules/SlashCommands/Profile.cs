@@ -1,4 +1,4 @@
-using Discord;
+Ôªøusing Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,6 +9,9 @@ using ShuviBot.Enums.UserRaces;
 using ShuviBot.Enums.UserProfessions;
 using SummaryAttribute = Discord.Interactions.SummaryAttribute;
 using ShuviBot.Extensions.Interactions;
+using Shuvi.Extensions.EmojiList;
+using ShuviBot.Extensions.String;
+using MongoDB.Bson;
 
 namespace ShardedClient.Modules
 {
@@ -23,58 +26,144 @@ namespace ShardedClient.Modules
             _client = provider.GetRequiredService<DiscordShardedClient>();
         }
 
-        [SlashCommand("profile", "»ÌÙÓÏ‡Ëˆˇ Ó Ë„ÓÍÂ")]
-        public async Task ProfileCommandAsync([Summary("user", "¬˚·ÂËÚÂ ÔÓÎ¸ÁÓ‚‡ÚÂÎˇ.")] IUser? paramUser = null)
+        [SlashCommand("profile", "–ò–Ω—Ñ–æ—Ä–º–∞–∏—Ü—è –æ –∏–≥—Ä–æ–∫–µ")]
+        public async Task ProfileCommandAsync([Summary("user", "–í—ã–±–µ—Ä–∏—Ç–µ –ø–æ–ª—å–∑–æ–≤–∞—Ç–µ–ª—è.")] IUser? paramUser = null)
         {
             IUser discordUser = paramUser ?? Context.User;
             User dbUser = await _database.Users.GetUser(discordUser.Id);
             SocketMessageComponent? interaction = null;
-            Embed embed = new EmbedBuilder()
-                .WithAuthor(discordUser.Username, discordUser.GetAvatarUrl())
-                .WithDescription($"**–‡Ì„:** {dbUser.Rank.ToRusString()}\n**–ÂÈÚËÌ„:** {dbUser.Rating}\n**–‡Ò‡:** {dbUser.Race.ToRusString()}\n" +
-                $"**œÓÙÂÒÒËˇ:** {dbUser.Profession.ToRusString()}")
-                .WithFooter($"ID: {discordUser.Id}")
-                .WithColor(dbUser.Rank.GetColor())
-            .Build();
+            Embed embed;
             MessageComponent components;
+            IUserMessage? botMessage = null;
+            byte healthFullEmojiCount;
+            byte energyFullEmojiCount;
             if (discordUser.Id == Context.User.Id)
             {
                 components = new ComponentBuilder()
-                    .WithButton("›ÍËÔËÓ‚Í‡", "equipment", ButtonStyle.Primary, row: 0)
-                    .WithButton("ÀÓÍ‡ˆËˇ", "location", ButtonStyle.Primary, row: 0)
-                    .WithButton("—Ú‡ÚËÒÚËÍ‡", "statistics", ButtonStyle.Primary, row: 0)
-                    .WithButton("»Ì‚ÂÌÚ‡¸", "inventory", ButtonStyle.Primary, row: 1)
-                    .WithButton("”ÎÛ˜¯ÂÌËˇ", "upgrade", ButtonStyle.Primary, row: 1)
+                    .WithButton("–≠–∫–∏–ø–∏—Ä–æ–≤–∫–∞", "equipment", ButtonStyle.Primary, row: 0)
+                    .WithButton("–õ–æ–∫–∞—Ü–∏—è", "location", ButtonStyle.Primary, row: 0)
+                    .WithButton("–°—Ç–∞—Ç–∏—Å—Ç–∏–∫–∞", "statistics", ButtonStyle.Primary, row: 0)
+                    .WithButton("–ò–Ω–≤–µ–Ω—Ç–∞—Ä—å", "inventory", ButtonStyle.Primary, row: 1)
+                    .WithButton("–£–ª—É—á—à–µ–Ω–∏—è", "upgrade", ButtonStyle.Primary, row: 1)
                     .Build();
             }
             else
             {
                 components = new ComponentBuilder()
-                    .WithButton("›ÍËÔËÓ‚Í‡", "equipment", ButtonStyle.Primary, row: 0)
-                    .WithButton("ÀÓÍ‡ˆËˇ", "location", ButtonStyle.Primary, row: 0)
-                    .WithButton("—Ú‡ÚËÒÚËÍ‡", "statistics", ButtonStyle.Primary, row: 0)
+                    .WithButton("–≠–∫–∏–ø–∏—Ä–æ–≤–∫–∞", "equipment", ButtonStyle.Primary, row: 0)
+                    .WithButton("–õ–æ–∫–∞—Ü–∏—è", "location", ButtonStyle.Primary, row: 0)
+                    .WithButton("–°—Ç–∞—Ç–∏—Å—Ç–∏–∫–∞", "statistics", ButtonStyle.Primary, row: 0)
                     .Build();
             }
-
-            await RespondAsync(embed: embed, components: components);
-            IUserMessage botMessage = await GetOriginalResponseAsync();
-            interaction = await WaitFor.UserButtonInteraction(_client, botMessage, dbUser.Id);
-            switch (interaction.Data.CustomId)
+            do 
             {
-                case "equipment":
-                    break;
-                case "location":
-                    break;
-                case "statistics":
-                    break;
-                case "inventory":
-                    await InventoryCommandModule.ViewAllItemsAsync(_client, dbUser, botMessage, interaction);
-                    break;
-                case "upgrade":
-                    break;
-                default:
-                    break;
-            }
+                healthFullEmojiCount = (byte)(dbUser.GetCurrentHealth() / (UserSettings.HealthMax / UserSettings.HealthDisplayMax));
+                energyFullEmojiCount = (byte)(dbUser.GetCurrentEnergy() / (dbUser.GetMaxEnergy() / UserSettings.EnergyDisplayMax));
+                embed = new EmbedBuilder()
+                    .AddField($"**–†–∞–Ω–≥:** {dbUser.Rank.ToRusString()}",
+                    $"**–†–µ–π—Ç–∏–Ω–≥:** {dbUser.Rating}{(dbUser.Rank.CanRankUp() ? "/" + (global::ShuviBot.Enums.Ranks.Rank)(dbUser.Rank + 1).GetNeedRating() : ' ')}\n" +
+                    $"**–†–∞—Å–∞:** {dbUser.Race.ToRusString()}\n**–ü—Ä–æ—Ñ–µ—Å—Å–∏—è:** {dbUser.Profession.ToRusString()}\n" +
+                    $"**–î–∏—Å–ø–æ–∏–Ω—Ç—ã:** {dbUser.Money:n} {EmojiList.Get("money")}",
+                    true)
+                    .AddField("–•–∞—Ä–∞–∫—Ç–µ—Ä–∏—Å—Ç–∏–∫–∏:",
+                    $"**–°–∏–ª–∞:** {dbUser.Strength} {(dbUser.Bonuses.Strength >= 0 ? "| +" + dbUser.Bonuses.Strength : dbUser.Bonuses.Strength)}\n" +
+                    $"**–õ–æ–≤–∫–æ—Å—Ç—å:** {dbUser.Agility} {(dbUser.Bonuses.Agility >= 0 ? "| +" + dbUser.Bonuses.Agility : dbUser.Bonuses.Agility)}\n" +
+                    $"**–£–¥–∞—á–∞:** {dbUser.Luck} {(dbUser.Bonuses.Luck >= 0 ? "| +" + dbUser.Bonuses.Luck : dbUser.Bonuses.Luck)}\n" +
+                    $"**–ò–Ω—Ç–µ–ª–ª–µ–∫—Ç:** {dbUser.Intellect} {(dbUser.Bonuses.Intellect >= 0 ? "| +" + dbUser.Bonuses.Intellect : dbUser.Bonuses.Intellect)}\n" +
+                    $"**–í—ã–Ω–æ—Å–ª–∏–≤–æ—Å—Ç—å:** {dbUser.Endurance} {(dbUser.Bonuses.Endurance >= 0 ? "| +" + dbUser.Bonuses.Endurance : "| " + dbUser.Bonuses.Endurance)}",
+                    true)
+                    .AddField("** **",
+                    $"[{EmojiList.Get("energyFull").ToString()!.Multiple(energyFullEmojiCount)}" +
+                    $"{EmojiList.Get("energyEmpty").ToString()!.Multiple((byte)(UserSettings.EnergyDisplayMax - energyFullEmojiCount))}] " +
+                    $"{dbUser.GetCurrentEnergy()}/{dbUser.GetMaxEnergy()}\n" +
+                    $"{(dbUser.GetRemainingEnergyRegenTime() == 0 ? "" : $"[–í–æ—Å—Å—Ç–∞–Ω–æ–≤–∏—Ç—Å—è <t:{dbUser.EnergyRegenTime}:R>]\n")}\n" +
+                    $"[{EmojiList.Get("healthFull").ToString()!.Multiple(healthFullEmojiCount)}" +
+                    $"{EmojiList.Get("healthEmpty").ToString()!.Multiple((byte)(UserSettings.HealthDisplayMax - healthFullEmojiCount))}] " +
+                    $"{dbUser.GetCurrentHealth()}/100\n" +
+                    $"{(dbUser.GetRemainingHealthRegenTime() == 0 ? "" : $"[–í–æ—Å—Å—Ç–∞–Ω–æ–≤–∏—Ç—Å—è <t:{dbUser.HealthRegenTime}:R>]")}",
+                    false)
+                    .WithAuthor(discordUser.Username, discordUser.GetAvatarUrl())
+                    .WithFooter($"ID: {discordUser.Id}")
+                    .WithColor(dbUser.Rank.GetColor())
+                .Build();
+                if (botMessage == null)
+                {
+                    await RespondAsync(embed: embed, components: components);
+                    botMessage = await GetOriginalResponseAsync();
+                }
+                else
+                    await botMessage.ModifyAsync(msg => { msg.Embed = embed; msg.Components = components; });
+                if (interaction != null)
+                    await interaction.DeferAsync();
+                interaction = await WaitFor.UserButtonInteraction(_client, botMessage, dbUser.Id);
+                switch (interaction.Data.CustomId)
+                {
+                    case "equipment":
+                        break;
+                    case "location":
+                        break;
+                    case "statistics":
+                        break;
+                    case "inventory":
+                        interaction = await InventoryPartAsync(dbUser, interaction, botMessage);
+                        break;
+                    case "upgrade":
+                        break;
+                    default:
+                        break;
+                }
+            } while (interaction != null);
+        }
+        public async Task<SocketMessageComponent?> InventoryPartAsync(User dbUser, SocketMessageComponent? interaction, IUserMessage message)
+        {
+            int maxPage = dbUser.Inventory.GetTotalEmbeds();
+            int pageNow = 0;
+            do
+            {
+                await message.ModifyAsync(msg =>
+                {
+                    msg.Content = "";
+                    msg.Embed = dbUser.Inventory.GetItemsEmbed(pageNow);
+                    msg.Components = new ComponentBuilder()
+                        .WithButton("<", "<", ButtonStyle.Primary, disabled: pageNow <= 0)
+                        .WithButton("–í—ã–π—Ç–∏", "exit", ButtonStyle.Danger)
+                        .WithButton(">", ">", ButtonStyle.Primary, disabled: pageNow >= maxPage - 1)
+                        .WithSelectMenu("choose", dbUser.Inventory.GetItemsSelectMenu(pageNow),
+                        "–í—ã–±–µ—Ä–∏—Ç–µ –ø—Ä–µ–¥–º–µ—Ç –¥–ª—è –ø—Ä–æ—Å–º–æ—Ç—Ä–∞", disabled: dbUser.Inventory.Count == 0)
+                        .Build();
+                });
+                if (interaction != null) await interaction.DeferAsync();
+                interaction = await WaitFor.UserButtonInteraction(_client, message, dbUser.Id);
+                switch (interaction.Data.CustomId)
+                {
+                    case "<":
+                        pageNow--;
+                        break;
+                    case "exit":
+                        return interaction;
+                    case "choose":
+                        interaction = await ItemPartAsync(interaction, message, dbUser, new ObjectId(interaction.Data.Values.First()));
+                        break;
+                    case ">":
+                        pageNow++;
+                        break;
+                    default:
+                        break;
+                }
+            } while (interaction != null);
+            return interaction;
+        }
+        public async Task<SocketMessageComponent?> ItemPartAsync(SocketInteraction interaction, IUserMessage message, User dbUser, ObjectId itemId)
+        {
+            await message.ModifyAsync(msg =>
+            {
+                msg.Embed = dbUser.Inventory.GetItemEmbed(itemId);
+                msg.Components = new ComponentBuilder()
+                    .WithButton("–ù–∞–∑–∞–¥", "back", ButtonStyle.Danger)
+                    .Build();
+            });
+            await interaction.DeferAsync();
+            return await WaitFor.UserButtonInteraction(_client, message, interaction.User.Id);
         }
     }
 }

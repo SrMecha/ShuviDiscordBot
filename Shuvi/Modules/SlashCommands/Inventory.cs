@@ -23,45 +23,50 @@ namespace ShardedClient.Modules
         [SlashCommand("inventory", "Посмотреть инвентарь")]
         public async Task InventoryCommandAsync()
         {
-            await RespondAsync("** **");
-            IUserMessage botMessage = await GetOriginalResponseAsync();
             User dbUser = await _database.Users.GetUser(Context.User.Id);
-            await ViewAllItemsAsync(_client, dbUser, botMessage);
+            await ViewAllItemsAsync(dbUser);
         }
 
-        public static async Task ViewAllItemsAsync(DiscordShardedClient client, User dbUser, IUserMessage botMessage, SocketInteraction? originalInteraction = null)
+        public async Task ViewAllItemsAsync(User dbUser)
         {
             int maxPage = dbUser.Inventory.GetTotalEmbeds();
             int pageNow = 0;
+            Embed embed;
+            MessageComponent components;
+            IUserMessage? message = null;
             SocketMessageComponent? interaction = null;
-            if (originalInteraction != null) interaction = (SocketMessageComponent)originalInteraction;
             do
             {
-                await botMessage.ModifyAsync(msg =>
-                {
-                    msg.Content = "";
-                    msg.Embed = dbUser.Inventory.GetItemsEmbed(pageNow);
-                    msg.Components = new ComponentBuilder()
+                embed = dbUser.Inventory.GetItemsEmbed(pageNow);
+                components = new ComponentBuilder()
                         .WithButton("<", "<", ButtonStyle.Primary, disabled: pageNow <= 0)
                         .WithButton("Выйти", "exit", ButtonStyle.Danger)
                         .WithButton(">", ">", ButtonStyle.Primary, disabled: pageNow >= maxPage - 1)
-                        .WithSelectMenu("choose", dbUser.Inventory.GetItemsSelectMenu(pageNow), 
+                        .WithSelectMenu("choose", dbUser.Inventory.GetItemsSelectMenu(pageNow),
                         "Выберите предмет для просмотра", disabled: dbUser.Inventory.Count == 0)
                         .Build();
-                });
-                if (interaction != null) await interaction.DeferAsync();
-                interaction = await WaitFor.UserButtonInteraction(client, botMessage, dbUser.Id);
+                if (message == null)
+                {
+                    await RespondAsync(embed: embed, components: components);
+                    message = await GetOriginalResponseAsync();
+                }
+                else
+                {
+                    await message.ModifyAsync(msg => { msg.Embed = embed; msg.Components = components; });
+                }
+                if (interaction != null) 
+                    await interaction.DeferAsync();
+                interaction = await WaitFor.UserButtonInteraction(_client, message, dbUser.Id);
                 switch (interaction.Data.CustomId)
                 {
                     case "<":
                         pageNow--;
                         break;
                     case "exit":
-                        await botMessage.DeleteAsync();
-                        interaction = null;
-                        break;
+                        await message.DeleteAsync();
+                        return;
                     case "choose":
-                        interaction = await ViewItemAsync(client, interaction, botMessage, dbUser, new ObjectId(interaction.Data.Values.First()));
+                        interaction = await ViewItemAsync(interaction, message, dbUser, new ObjectId(interaction.Data.Values.First()));
                         break;
                     case ">":
                         pageNow++;
@@ -72,7 +77,7 @@ namespace ShardedClient.Modules
             } while (interaction != null);
         }
 
-        public static async Task<SocketMessageComponent> ViewItemAsync(DiscordShardedClient client, SocketInteraction originalInteraction, IUserMessage message, User dbUser, ObjectId itemId)
+        public async Task<SocketMessageComponent> ViewItemAsync(SocketInteraction interaction, IUserMessage message, User dbUser, ObjectId itemId)
         {
             await message.ModifyAsync(msg =>
             {
@@ -81,8 +86,8 @@ namespace ShardedClient.Modules
                     .WithButton("Назад", "back", ButtonStyle.Danger)
                     .Build();
             });
-            await originalInteraction.DeferAsync();
-            return await WaitFor.UserButtonInteraction(client, message, originalInteraction.User.Id);
+            await interaction.DeferAsync();
+            return await WaitFor.UserButtonInteraction(_client, message, interaction.User.Id);
         }
     }
 }
