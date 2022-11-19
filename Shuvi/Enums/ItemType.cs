@@ -2,6 +2,13 @@
 
 namespace ShuviBot.Enums.ItemType
 {
+    public enum EquipmentType
+    {
+        Helmet,
+        Armor,
+        Leggings,
+        Boots
+    }
     public enum ItemType
     {
         Test,

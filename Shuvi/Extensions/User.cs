@@ -1,6 +1,6 @@
 using MongoDB.Bson;
-using ShuviBot.Enums.Characteristics;
 using ShuviBot.Enums.Ranks;
+using ShuviBot.Enums.ItemType;
 using ShuviBot.Enums.UserProfessions;
 using ShuviBot.Enums.UserRaces;
 using ShuviBot.Extensions.Inventory;
@@ -166,9 +166,16 @@ namespace ShuviBot.Extensions.User
             }
             return new UserBonuses(items);
         }
-        public EquipmentItem GetEquipment(ObjectId itemId)
+        public EquipmentItem? GetEquipment(EquipmentType type)
         {
-            return (EquipmentItem)Inventory.GetItem(itemId);
+            return type switch
+            {
+                EquipmentType.Helmet => Head == null ? null : (EquipmentItem)Inventory.GetItem((ObjectId)Head),
+                EquipmentType.Armor => Body == null ? null : (EquipmentItem)Inventory.GetItem((ObjectId)Body),
+                EquipmentType.Leggings => Legs == null ? null : (EquipmentItem)Inventory.GetItem((ObjectId)Legs),
+                EquipmentType.Boots => Foots == null ? null : (EquipmentItem)Inventory.GetItem((ObjectId)Foots),
+                _ => null
+            };
         }
 
     }

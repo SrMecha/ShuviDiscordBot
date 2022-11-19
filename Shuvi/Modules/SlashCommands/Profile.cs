@@ -7,11 +7,13 @@ using ShuviBot.Extensions.User;
 using ShuviBot.Enums.Ranks;
 using ShuviBot.Enums.UserRaces;
 using ShuviBot.Enums.UserProfessions;
+using ShuviBot.Enums.ItemType;
 using SummaryAttribute = Discord.Interactions.SummaryAttribute;
 using ShuviBot.Extensions.Interactions;
 using Shuvi.Extensions.EmojiList;
 using ShuviBot.Extensions.String;
 using MongoDB.Bson;
+using ShuviBot.Extensions.Items;
 
 namespace ShardedClient.Modules
 {
@@ -85,7 +87,7 @@ namespace ShardedClient.Modules
                     .WithAuthor(discordUser.Username, discordUser.GetAvatarUrl())
                     .WithFooter($"ID: {discordUser.Id}")
                     .WithColor(dbUser.Rank.GetColor())
-                .Build();
+                    .Build();
                 if (botMessage == null)
                 {
                     await RespondAsync(embed: embed, components: components);
@@ -99,13 +101,14 @@ namespace ShardedClient.Modules
                 switch (interaction.Data.CustomId)
                 {
                     case "equipment":
+                        interaction = await EquipmnetPartAsync(interaction, botMessage, dbUser, discordUser);
                         break;
                     case "location":
                         break;
                     case "statistics":
                         break;
                     case "inventory":
-                        interaction = await InventoryPartAsync(dbUser, interaction, botMessage);
+                        interaction = await InventoryPartAsync(dbUser, interaction, botMessage, discordUser);
                         break;
                     case "upgrade":
                         break;
@@ -114,7 +117,7 @@ namespace ShardedClient.Modules
                 }
             } while (interaction != null);
         }
-        public async Task<SocketMessageComponent?> InventoryPartAsync(User dbUser, SocketMessageComponent? interaction, IUserMessage message)
+        public async Task<SocketMessageComponent?> InventoryPartAsync(User dbUser, SocketMessageComponent? interaction, IUserMessage message, IUser discordUser)
         {
             int maxPage = dbUser.Inventory.GetTotalEmbeds();
             int pageNow = 0;
@@ -123,7 +126,10 @@ namespace ShardedClient.Modules
                 await message.ModifyAsync(msg =>
                 {
                     msg.Content = "";
-                    msg.Embed = dbUser.Inventory.GetItemsEmbed(pageNow);
+                    msg.Embed = dbUser.Inventory.GetItemsEmbed(pageNow).ToEmbedBuilder()
+                    .WithAuthor($"{discordUser.Username} | Инвентарь", discordUser.GetAvatarUrl())
+                    .WithColor(dbUser.Rank.GetColor())
+                    .Build();
                     msg.Components = new ComponentBuilder()
                         .WithButton("<", "<", ButtonStyle.Primary, disabled: pageNow <= 0)
                         .WithButton("Выйти", "exit", ButtonStyle.Danger)
@@ -142,7 +148,7 @@ namespace ShardedClient.Modules
                     case "exit":
                         return interaction;
                     case "choose":
-                        interaction = await ItemPartAsync(interaction, message, dbUser, new ObjectId(interaction.Data.Values.First()));
+                        interaction = await ItemPartAsync(interaction, message, dbUser, discordUser, new ObjectId(interaction.Data.Values.First()));
                         break;
                     case ">":
                         pageNow++;
@@ -153,11 +159,40 @@ namespace ShardedClient.Modules
             } while (interaction != null);
             return interaction;
         }
-        public async Task<SocketMessageComponent?> ItemPartAsync(SocketInteraction interaction, IUserMessage message, User dbUser, ObjectId itemId)
+        public async Task<SocketMessageComponent?> ItemPartAsync(SocketInteraction interaction, IUserMessage message, User dbUser, IUser discordUser, ObjectId itemId)
         {
             await message.ModifyAsync(msg =>
             {
-                msg.Embed = dbUser.Inventory.GetItemEmbed(itemId);
+                msg.Embed = dbUser.Inventory.GetItemEmbed(itemId).ToEmbedBuilder()
+                .WithAuthor($"{discordUser.Username} | Просмотр предмета", discordUser.GetAvatarUrl())
+                .WithColor(dbUser.Rank.GetColor())
+                .Build();
+                msg.Components = new ComponentBuilder()
+                    .WithButton("Назад", "back", ButtonStyle.Danger)
+                    .Build();
+            });
+            await interaction.DeferAsync();
+            return await WaitFor.UserButtonInteraction(_client, message, interaction.User.Id);
+        }
+        public async Task<SocketMessageComponent> EquipmnetPartAsync(SocketInteraction interaction, IUserMessage message, User dbUser, IUser discordUser)
+        {
+            EquipmentItem? helmet = dbUser.GetEquipment(EquipmentType.Helmet);
+            EquipmentItem? armor = dbUser.GetEquipment(EquipmentType.Armor);
+            EquipmentItem? leggings = dbUser.GetEquipment(EquipmentType.Leggings);
+            EquipmentItem? boots = dbUser.GetEquipment(EquipmentType.Boots);
+            Embed embed = new EmbedBuilder()
+                .WithAuthor($"{discordUser.Username} | Экипировка", discordUser.GetAvatarUrl())
+                .AddField($"Шлем: {(helmet == null ? "Нету": helmet.Name)}", $"{(helmet == null ? "** **": helmet.GetBonusesInfo())}", true)
+                .AddField($"Шлем: {(armor == null ? "Нету" : armor.Name)}", $"{(armor == null ? "** **" : armor.GetBonusesInfo())}", true)
+                .AddField("** **", "** **", false)
+                .AddField($"Шлем: {(leggings == null ? "Нету" : leggings.Name)}", $"{(leggings == null ? "** **" : leggings.GetBonusesInfo())}", true)
+                .AddField($"Шлем: {(boots == null ? "Нету" : boots.Name)}", $"{(boots == null ? "** **" : boots.GetBonusesInfo())}", true)
+                .WithFooter($"ID: {discordUser.Id}")
+                .WithColor(dbUser.Rank.GetColor())
+                .Build();
+            await message.ModifyAsync(msg =>
+            {
+                msg.Embed = embed;
                 msg.Components = new ComponentBuilder()
                     .WithButton("Назад", "back", ButtonStyle.Danger)
                     .Build();
