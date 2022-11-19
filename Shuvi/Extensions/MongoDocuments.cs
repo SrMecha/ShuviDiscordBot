@@ -70,6 +70,18 @@ namespace ShuviBot.Extensions.MongoDocuments
 
         [BsonElement("liveTime")]
         public long LiveTime { get; set; } = 1;
+
+        [BsonElement("deathCount")]
+        public int DeathCount { get; set; } = 0;
+
+        [BsonElement("dungeonComplite")]
+        public int DungeonComplite { get; set; } = 0;
+
+        [BsonElement("enemyKilled")]
+        public int EnemyKilled { get; set; } = 0;
+
+        [BsonElement("maxRating")]
+        public int MaxRating { get; set; } = 0;
     }
 
     public sealed class ItemDocument

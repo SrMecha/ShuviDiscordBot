@@ -14,6 +14,8 @@ using Shuvi.Extensions.EmojiList;
 using ShuviBot.Extensions.String;
 using MongoDB.Bson;
 using ShuviBot.Extensions.Items;
+using DnsClient;
+using static System.Reflection.Metadata.BlobBuilder;
 
 namespace ShardedClient.Modules
 {
@@ -106,6 +108,7 @@ namespace ShardedClient.Modules
                     case "location":
                         break;
                     case "statistics":
+                        interaction = await StatisticsPartAsync(interaction, botMessage, dbUser, discordUser);
                         break;
                     case "inventory":
                         interaction = await InventoryPartAsync(dbUser, interaction, botMessage, discordUser);
@@ -195,6 +198,31 @@ namespace ShardedClient.Modules
                 msg.Embed = embed;
                 msg.Components = new ComponentBuilder()
                     .WithButton("Назад", "back", ButtonStyle.Danger)
+                    .Build();
+            });
+            await interaction.DeferAsync();
+            return await WaitFor.UserButtonInteraction(_client, message, interaction.User.Id);
+        }
+        public async Task<SocketMessageComponent> StatisticsPartAsync(SocketInteraction interaction, IUserMessage message, User dbUser, IUser discordUser)
+        {
+            TimeSpan created = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(dbUser.CreatedAt);
+            TimeSpan live = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(dbUser.LiveTime);
+            Embed embed = new EmbedBuilder()
+                .WithAuthor($"{discordUser.Username} | Статистика", discordUser.GetAvatarUrl())
+                .WithDescription($"**Максимальный рейтинг:** {dbUser.MaxRating}\n" +
+                $"**Всего врагов убито:** {dbUser.EnemyKilled}\n" +
+                $"**Всего подземелий пройдено:** {dbUser.DungeonComplite}\n" +
+                $"**Всего смертей:** {dbUser.DeathCount}\n\n" +
+                $"**Время жизни:** {created:dd} дней | с {new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(dbUser.CreatedAt):f}\n\n" +
+                $"**Аккаунт создан:** {new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(dbUser.LiveTime):f} | {live:dd} дней назад")
+                .WithFooter($"ID: {discordUser.Id}")
+                .WithColor(dbUser.Rank.GetColor())
+                .Build();
+            await message.ModifyAsync(msg =>
+            {
+                msg.Embed = embed;
+                msg.Components = new ComponentBuilder()
+                .WithButton("Назад", "back", ButtonStyle.Danger)
                     .Build();
             });
             await interaction.DeferAsync();
