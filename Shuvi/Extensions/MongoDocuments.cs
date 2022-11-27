@@ -13,74 +13,28 @@ namespace ShuviBot.Extensions.MongoDocuments
     {
         [BsonElement("_id")]
         public ulong Id { get; set; } = 0;
-
-        [BsonElement("rating")]
         public int Rating { get; set; } = 0;
-
-        [BsonElement("money")]
         public int Money { get; set; } = 0;
-
-        [BsonElement("race")]
         public UserRaces Race { get; set; } = UserRaces.ExMachina;
-
-        [BsonElement("profession")]
         public UserProfessions Profession { get; set; } = UserProfessions.NoProfession;
-
-        [BsonElement("inventory")]
         public Dictionary<ObjectId, int> Inventory { get; set; } = new();
-
-        [BsonElement("weapon")]
         public ObjectId? Weapon { get; set; } = null;
-
-        [BsonElement("head")]
         public ObjectId? Head { get; set; } = null;
-
-        [BsonElement("body")]
         public ObjectId? Body { get; set; } = null;
-
-        [BsonElement("legs")]
         public ObjectId? Legs { get; set; } = null;
-
-        [BsonElement("foots")]
         public ObjectId? Foots { get; set; } = null;
-
-        [BsonElement("strength")]
         public int Strength { get; set; } = 1;
-
-        [BsonElement("agility")]
         public int Agility { get; set; } = 1;
-
-        [BsonElement("luck")]
         public int Luck { get; set; } = 1;
-
-        [BsonElement("intellect")]
         public int Intellect { get; set; } = 1;
-
-        [BsonElement("endurance")]
         public int Endurance { get; set; } = 1;
-
-        [BsonElement("healthRegenTime")]
         public long HealthRegenTime { get; set; } = 1;
-
-        [BsonElement("energyRegenTime")]
         public long EnergyRegenTime { get; set; } = 1;
-
-        [BsonElement("createdAt")]
         public long CreatedAt { get; set; } = 1;
-
-        [BsonElement("liveTime")]
         public long LiveTime { get; set; } = 1;
-
-        [BsonElement("deathCount")]
         public int DeathCount { get; set; } = 0;
-
-        [BsonElement("dungeonComplite")]
         public int DungeonComplite { get; set; } = 0;
-
-        [BsonElement("enemyKilled")]
         public int EnemyKilled { get; set; } = 0;
-
-        [BsonElement("maxRating")]
         public int MaxRating { get; set; } = 0;
     }
 
@@ -88,29 +42,35 @@ namespace ShuviBot.Extensions.MongoDocuments
     {
         [BsonElement("_id")]
         public ObjectId Id { get; set; } = ObjectId.Empty;
-
-        [BsonElement("name")]
         public string Name { get; set; } = "Хуйня без имени";
-
-        [BsonElement("description")]
         public string Description { get; set; } = "Долбаеб блять добавь описание предмету!!!";
-
-        [BsonElement("type")]
         public ItemType Type { get; set; } = ItemType.Simple;
-
-        [BsonElement("rank")]
         public Rank Rank { get; set; } = Rank.E;
-
-        [BsonElement("canTrade")]
         public bool CanTrade { get; set; } = false;
-
-        [BsonElement("max")]
         public int Max { get; set; } = -1;
-
-        [BsonElement("bonuses")]
         public Dictionary<Characteristics, int> Bonuses { get; set; } = new();
-
-        [BsonElement("needs")]
         public Dictionary<ItemNeeds, int> Needs { get; set; } = new();
+    }
+
+    public sealed class EnemyDocument
+    {
+        [BsonElement("_id")]
+        public ObjectId Id { get; set; } = ObjectId.Empty;
+        public string Name { get; set; } = "Джибрил блять";
+        public string Description { get; set; } = "Ща она тебе пизды даст. Шуви сразу Ислам примет.";
+    }
+
+    public sealed class ShopDocument
+    {
+        [BsonElement("_id")]
+        public ObjectId Id { get; set; } = ObjectId.Empty;
+        public string Name { get; set; } = "Икея";
+    }
+
+    public sealed class DungeonDocument
+    {
+        [BsonElement("_id")]
+        public ObjectId Id { get; set; } = ObjectId.Empty;
+        public string Name { get; set; } = "Икея";
     }
 }
