@@ -69,6 +69,7 @@ namespace ShuviBot.Extensions.User
         private readonly int _dungeonComplite;
         private readonly int _enemyKilled;
         private readonly int _maxRating;
+        private readonly int _mapLocation;
 
         public User(UserDocument userData, AllItemsData itemsConfig)
         {
@@ -98,6 +99,7 @@ namespace ShuviBot.Extensions.User
             _dungeonComplite = userData.DungeonComplite;
             _enemyKilled = userData.EnemyKilled;
             _maxRating = userData.MaxRating;
+            _mapLocation = userData.MapLocation;
         }
 
         public ulong Id => _id;
@@ -126,6 +128,7 @@ namespace ShuviBot.Extensions.User
         public int DungeonComplite => _dungeonComplite;
         public int EnemyKilled => _enemyKilled;
         public int MaxRating => _maxRating;
+        public int MapLocation => _mapLocation;
 
         public int GetRemainingHealthRegenTime()
         {

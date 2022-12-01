@@ -36,6 +36,7 @@ namespace ShuviBot.Extensions.MongoDocuments
         public int DungeonComplite { get; set; } = 0;
         public int EnemyKilled { get; set; } = 0;
         public int MaxRating { get; set; } = 0;
+        public int MapLocation { get; set; } = 0;
     }
 
     public sealed class ItemDocument
@@ -58,6 +59,14 @@ namespace ShuviBot.Extensions.MongoDocuments
         public ObjectId Id { get; set; } = ObjectId.Empty;
         public string Name { get; set; } = "Джибрил блять";
         public string Description { get; set; } = "Ща она тебе пизды даст. Шуви сразу Ислам примет.";
+        public List<EnemyDrop> Drop { get; set; } = new();
+    }
+
+    public class EnemyDrop
+    {
+        public ObjectId Id { get; set; } = new();
+        public int Chance { get; set; } = 0;
+        public int Max { get; set; } = 1;
     }
 
     public sealed class ShopDocument
