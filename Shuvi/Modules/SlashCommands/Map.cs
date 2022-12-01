@@ -38,11 +38,12 @@ namespace ShardedClient.Modules
             MessageComponent components;
             IUserMessage? message = null;
             SocketMessageComponent? interaction = null;
+            MapRegion currentRegion = _map.GetRegion(dbUser.MapRegion);
             do
             {
                 embed = new EmbedBuilder()
                     .WithAuthor("Карта Дисборда")
-                    .WithDescription($"Ваше местоположение: **{_map.GetRegion(dbUser.MapLocation).Name}**\n")
+                    .WithDescription($"Ваше местоположение: **{currentRegion.Name}**\n**Локация:** {currentRegion.GetLocation(dbUser.MapLocation)}")
                     .WithImageUrl(_map.Settings.PictureURL)
                     .WithFooter(discordUser.Username, discordUser.GetAvatarUrl())
                     .Build();

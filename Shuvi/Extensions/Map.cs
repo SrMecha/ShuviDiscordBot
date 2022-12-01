@@ -2,8 +2,6 @@ using Discord;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using ShuviBot.Enums.Ranks;
-using ShuviBot.Extensions.MongoDocuments;
-using System;
 
 namespace ShuviBot.Extensions.Map
 {
