@@ -58,6 +58,13 @@ namespace ShuviBot.Extensions.Map
         public List<ObjectId> Shops { get; set; } = new();
         public List<ObjectId> Dungeons { get; set; } = new();
         public string PictureURL { get; set; } = "https://i.imgur.com/otCYNya.jpg";
+
+        public RegionLocation GetLocation(int index)
+        {
+            if (Locations.Count - 1 > index)
+                return new RegionLocation { };
+            return Locations[index];
+        }
     }
 
     public class RegionLocation
