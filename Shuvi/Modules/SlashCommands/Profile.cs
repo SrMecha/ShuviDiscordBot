@@ -109,6 +109,7 @@ namespace ShardedClient.Modules
                         interaction = await EquipmnetPartAsync(interaction, botMessage, dbUser, discordUser);
                         break;
                     case "location":
+                        interaction = await MapPartAsync(interaction, botMessage, dbUser, discordUser);
                         break;
                     case "statistics":
                         interaction = await StatisticsPartAsync(interaction, botMessage, dbUser, discordUser);

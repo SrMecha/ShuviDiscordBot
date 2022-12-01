@@ -43,7 +43,7 @@ namespace ShardedClient.Modules
             {
                 embed = new EmbedBuilder()
                     .WithAuthor("Карта Дисборда")
-                    .WithDescription($"Ваше местоположение: **{currentRegion.Name}**\n**Локация:** {currentRegion.GetLocation(dbUser.MapLocation).Name}")
+                    .WithDescription($"**Ваше местоположение:** {currentRegion.Name}\n**Локация:** {currentRegion.GetLocation(dbUser.MapLocation).Name}")
                     .WithImageUrl(_map.Settings.PictureURL)
                     .WithFooter(discordUser.Username, discordUser.GetAvatarUrl())
                     .Build();
@@ -69,10 +69,10 @@ namespace ShardedClient.Modules
         {
             Embed embed;
             MessageComponent components;
-
             embed = new EmbedBuilder()
                    .WithAuthor(region.Name)
-                   .WithDescription($"Открывается с ранга {region.NeededRank.ToRusString()}\n**Описание:**\n{region.Description}")
+                   .WithDescription($"Открывается с ранга {region.NeededRank.ToRusString()}\n**Описание:**\n{region.Description}\n\n" +
+                   $"**Локации:**\n```{string.Join("\n", region.Locations.Select(location => location.Name))}```")
                    .WithImageUrl(region.PictureURL)
                    .WithFooter(discordUser.Username, discordUser.GetAvatarUrl())
                    .Build();
