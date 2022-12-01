@@ -37,6 +37,7 @@ namespace ShuviBot.Extensions.MongoDocuments
         public int EnemyKilled { get; set; } = 0;
         public int MaxRating { get; set; } = 0;
         public int MapLocation { get; set; } = 0;
+        public int MapRegion { get; set; } = 0;
     }
 
     public sealed class ItemDocument

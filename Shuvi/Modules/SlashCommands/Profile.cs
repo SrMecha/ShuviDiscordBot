@@ -16,6 +16,7 @@ using MongoDB.Bson;
 using ShuviBot.Extensions.Items;
 using DnsClient;
 using static System.Reflection.Metadata.BlobBuilder;
+using ShuviBot.Extensions.Map;
 
 namespace ShardedClient.Modules
 {
@@ -23,11 +24,13 @@ namespace ShardedClient.Modules
     {
         private readonly DatabaseManager _database;
         private readonly DiscordShardedClient _client;
+        private readonly WorldMap _map;
 
         public ProfileCommandModule(IServiceProvider provider)
         {
             _database = provider.GetRequiredService<DatabaseManager>();
             _client = provider.GetRequiredService<DiscordShardedClient>();
+            _map = provider.GetRequiredService<WorldMap>();
         }
 
         [SlashCommand("profile", "Информаиця о игроке")]
@@ -215,6 +218,26 @@ namespace ShardedClient.Modules
                 $"**Всего смертей:** {dbUser.DeathCount}\n\n" +
                 $"**Время жизни:** {created:dd} дней | с {new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(dbUser.CreatedAt):f}\n\n" +
                 $"**Аккаунт создан:** {new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(dbUser.LiveTime):f} | {live:dd} дней назад")
+                .WithFooter($"ID: {discordUser.Id}")
+                .WithColor(dbUser.Rank.GetColor())
+                .Build();
+            await message.ModifyAsync(msg =>
+            {
+                msg.Embed = embed;
+                msg.Components = new ComponentBuilder()
+                .WithButton("Назад", "back", ButtonStyle.Danger)
+                    .Build();
+            });
+            await interaction.DeferAsync();
+            return await WaitFor.UserButtonInteraction(_client, message, interaction.User.Id);
+        }
+        public async Task<SocketMessageComponent> MapPartAsync(SocketInteraction interaction, IUserMessage message, User dbUser, IUser discordUser)
+        {
+            MapRegion region = _map.GetRegion(dbUser.MapRegion);
+            Embed embed = new EmbedBuilder()
+                .WithAuthor($"{discordUser.Username} | Место нахождения", discordUser.GetAvatarUrl())
+                .WithDescription($"**Регион:** {region.Name}\n**Локация:** {region.GetLocation(dbUser.MapLocation).Name}")
+                .WithImageUrl(region.PictureURL)
                 .WithFooter($"ID: {discordUser.Id}")
                 .WithColor(dbUser.Rank.GetColor())
                 .Build();
