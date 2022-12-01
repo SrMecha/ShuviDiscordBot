@@ -30,7 +30,7 @@ namespace ShardedClient.Modules
         {
             _database = provider.GetRequiredService<DatabaseManager>();
             _client = provider.GetRequiredService<DiscordShardedClient>();
-            _map = provider.GetRequiredService<WorldMap>();
+            _map = _database.Map;
         }
 
         [SlashCommand("profile", "Информаиця о игроке")]

@@ -43,7 +43,7 @@ namespace ShardedClient.Modules
             {
                 embed = new EmbedBuilder()
                     .WithAuthor("Карта Дисборда")
-                    .WithDescription($"Ваше местоположение: **{currentRegion.Name}**\n**Локация:** {currentRegion.GetLocation(dbUser.MapLocation)}")
+                    .WithDescription($"Ваше местоположение: **{currentRegion.Name}**\n**Локация:** {currentRegion.GetLocation(dbUser.MapLocation).Name}")
                     .WithImageUrl(_map.Settings.PictureURL)
                     .WithFooter(discordUser.Username, discordUser.GetAvatarUrl())
                     .Build();
