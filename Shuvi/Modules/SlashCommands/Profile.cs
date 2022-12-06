@@ -3,7 +3,6 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using ShuviBot.Services;
-using ShuviBot.Extensions.User;
 using ShuviBot.Enums.Ranks;
 using ShuviBot.Enums.UserRaces;
 using ShuviBot.Enums.UserProfessions;
@@ -12,6 +11,8 @@ using SummaryAttribute = Discord.Interactions.SummaryAttribute;
 using ShuviBot.Extensions.Interactions;
 using Shuvi.Extensions.EmojiList;
 using ShuviBot.Extensions.String;
+using ShuviBot.Extensions.User;
+using ShuviBot.Extensions.CustomEmbed;
 using MongoDB.Bson;
 using ShuviBot.Extensions.Items;
 using DnsClient;
@@ -66,7 +67,7 @@ namespace ShardedClient.Modules
             {
                 healthFullEmojiCount = (byte)(dbUser.GetCurrentHealth() / (UserSettings.HealthMax / UserSettings.HealthDisplayMax));
                 energyFullEmojiCount = (byte)(dbUser.GetCurrentEnergy() / (dbUser.GetMaxEnergy() / UserSettings.EnergyDisplayMax));
-                embed = new EmbedBuilder()
+                embed = new UserEmbedBuilder(discordUser)
                     .AddField($"**Ранг:** {dbUser.Rank.ToRusString()}",
                     $"**Рейтинг:** {dbUser.Rating}{(dbUser.Rank.CanRankUp() ? "/" + (global::ShuviBot.Enums.Ranks.Rank)(dbUser.Rank + 1).GetNeedRating() : ' ')}\n" +
                     $"**Раса:** {dbUser.Race.ToRusString()}\n**Профессия:** {dbUser.Profession.ToRusString()}\n" +
@@ -89,9 +90,7 @@ namespace ShardedClient.Modules
                     $"{dbUser.GetCurrentHealth()}/100\n" +
                     $"{(dbUser.GetRemainingHealthRegenTime() == 0 ? "" : $"[Восстановится <t:{dbUser.HealthRegenTime}:R>]")}",
                     false)
-                    .WithAuthor(discordUser.Username, discordUser.GetAvatarUrl())
-                    .WithFooter($"ID: {discordUser.Id}")
-                    .WithColor(dbUser.Rank.GetColor())
+                    .WithAuthor("Профиль")
                     .Build();
                 if (botMessage == null)
                 {
@@ -134,8 +133,9 @@ namespace ShardedClient.Modules
                 {
                     msg.Content = "";
                     msg.Embed = dbUser.Inventory.GetItemsEmbed(pageNow).ToEmbedBuilder()
-                    .WithAuthor($"{discordUser.Username} | Инвентарь", discordUser.GetAvatarUrl())
-                    .WithColor(dbUser.Rank.GetColor())
+                    .WithAuthor($"Инвентарь")
+                    .WithFooter($"{discordUser.Username} | {discordUser.Id}", discordUser.GetAvatarUrl())
+                    .WithColor(UserEmbedBuilder.StandartColor)
                     .Build();
                     msg.Components = new ComponentBuilder()
                         .WithButton("<", "<", ButtonStyle.Primary, disabled: pageNow <= 0)
@@ -171,8 +171,9 @@ namespace ShardedClient.Modules
             await message.ModifyAsync(msg =>
             {
                 msg.Embed = dbUser.Inventory.GetItemEmbed(itemId).ToEmbedBuilder()
-                .WithAuthor($"{discordUser.Username} | Просмотр предмета", discordUser.GetAvatarUrl())
-                .WithColor(dbUser.Rank.GetColor())
+                .WithAuthor($"Просмотр предмета")
+                .WithFooter($"{discordUser.Username} | {discordUser.Id}", discordUser.GetAvatarUrl())
+                    .WithColor(UserEmbedBuilder.StandartColor)
                 .Build();
                 msg.Components = new ComponentBuilder()
                     .WithButton("Назад", "back", ButtonStyle.Danger)
@@ -187,15 +188,13 @@ namespace ShardedClient.Modules
             EquipmentItem? armor = dbUser.GetEquipment(EquipmentType.Armor);
             EquipmentItem? leggings = dbUser.GetEquipment(EquipmentType.Leggings);
             EquipmentItem? boots = dbUser.GetEquipment(EquipmentType.Boots);
-            Embed embed = new EmbedBuilder()
-                .WithAuthor($"{discordUser.Username} | Экипировка", discordUser.GetAvatarUrl())
+            Embed embed = new UserEmbedBuilder(discordUser)
+                .WithAuthor($"Экипировка")
                 .AddField($"Шлем: {(helmet == null ? "Нету": helmet.Name)}", $"{(helmet == null ? "** **": helmet.GetBonusesInfo())}", true)
                 .AddField($"Шлем: {(armor == null ? "Нету" : armor.Name)}", $"{(armor == null ? "** **" : armor.GetBonusesInfo())}", true)
                 .AddField("** **", "** **", false)
                 .AddField($"Шлем: {(leggings == null ? "Нету" : leggings.Name)}", $"{(leggings == null ? "** **" : leggings.GetBonusesInfo())}", true)
                 .AddField($"Шлем: {(boots == null ? "Нету" : boots.Name)}", $"{(boots == null ? "** **" : boots.GetBonusesInfo())}", true)
-                .WithFooter($"ID: {discordUser.Id}")
-                .WithColor(dbUser.Rank.GetColor())
                 .Build();
             await message.ModifyAsync(msg =>
             {
@@ -211,16 +210,14 @@ namespace ShardedClient.Modules
         {
             TimeSpan created = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(dbUser.CreatedAt);
             TimeSpan live = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(dbUser.LiveTime);
-            Embed embed = new EmbedBuilder()
-                .WithAuthor($"{discordUser.Username} | Статистика", discordUser.GetAvatarUrl())
+            Embed embed = new UserEmbedBuilder(discordUser)
+                .WithAuthor("Статистика")
                 .WithDescription($"**Максимальный рейтинг:** {dbUser.MaxRating}\n" +
                 $"**Всего врагов убито:** {dbUser.EnemyKilled}\n" +
                 $"**Всего подземелий пройдено:** {dbUser.DungeonComplite}\n" +
                 $"**Всего смертей:** {dbUser.DeathCount}\n\n" +
                 $"**Время жизни:** {created:dd} дней | с {new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(dbUser.CreatedAt):f}\n\n" +
                 $"**Аккаунт создан:** {new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(dbUser.LiveTime):f} | {live:dd} дней назад")
-                .WithFooter($"ID: {discordUser.Id}")
-                .WithColor(dbUser.Rank.GetColor())
                 .Build();
             await message.ModifyAsync(msg =>
             {
@@ -235,12 +232,10 @@ namespace ShardedClient.Modules
         public async Task<SocketMessageComponent> MapPartAsync(SocketInteraction interaction, IUserMessage message, User dbUser, IUser discordUser)
         {
             MapRegion region = _map.GetRegion(dbUser.MapRegion);
-            Embed embed = new EmbedBuilder()
-                .WithAuthor($"{discordUser.Username} | Место нахождения", discordUser.GetAvatarUrl())
+            Embed embed = new UserEmbedBuilder(discordUser)
+                .WithAuthor("Место нахождения")
                 .WithDescription($"**Регион:** {region.Name}\n**Локация:** {region.GetLocation(dbUser.MapLocation).Name}")
                 .WithImageUrl(region.PictureURL)
-                .WithFooter($"ID: {discordUser.Id}")
-                .WithColor(dbUser.Rank.GetColor())
                 .Build();
             await message.ModifyAsync(msg =>
             {
