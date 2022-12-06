@@ -3,6 +3,7 @@ using MongoDB.Bson;
 using ShuviBot.Interfaces.Item;
 using ShuviBot.Extensions.Items;
 using ShuviBot.Extensions.MongoDocuments;
+using ShuviBot.Extensions.CustomEmbed;
 using System.Collections.Immutable;
 using ShuviBot.Enums.ItemType;
 using ShuviBot.Enums.Ranks;
@@ -67,7 +68,7 @@ namespace ShuviBot.Extensions.Inventory
                 itemsString += $"\n**#{i + 1}** {_itemsConfig.GetItemData(_localInventory.Keys.ElementAt(i)).Name} ";
             }
             if (itemsString == "") itemsString = "У вас нету предметов.";
-            return new EmbedBuilder()
+            return new BotEmbedBuilder()
                     .WithAuthor("Все предметы:")
                     .WithDescription(itemsString)
                     .WithFooter($"Страница {index + 1}/{GetTotalEmbeds()}")
@@ -84,7 +85,7 @@ namespace ShuviBot.Extensions.Inventory
                 needs = $"**Требования:**\n{item.GetNeedsInfo()}";
             }
 
-            return new EmbedBuilder()
+            return new BotEmbedBuilder()
                     .WithAuthor("Просмотр предмета")
                     .WithDescription($"**Название:** {item.Name}\n**Тип:** {item.Type.ToRusString()}\n" +
                     $"**Ранг:** {item.Rank.ToRusString()}\n**Максимум в инвентаре:** {(item.Max < 0 ? "бесконечно" : item.Max)}\n**У вас есть:** {item.Amount}\n\n" +
@@ -160,7 +161,7 @@ namespace ShuviBot.Extensions.Inventory
             {
                 itemsString += $"\n**#{i+1}** {_itemsDataArray[i].Name} ";
             }
-            return new EmbedBuilder()
+            return new BotEmbedBuilder()
                     .WithAuthor("Все предметы:")
                     .WithDescription(itemsString)
                     .WithFooter($"Страница {index + 1}/{(_itemsDataArray.Count + 9) / 10}")
@@ -178,7 +179,7 @@ namespace ShuviBot.Extensions.Inventory
                 needs = $"**Требования:**\n{item.GetNeedsInfo()}";
             }
 
-            return new EmbedBuilder()
+            return new BotEmbedBuilder()
                     .WithAuthor("Просмотр предмета")
                     .WithDescription($"**Название:** {item.Name}\n**Тип:** {item.Type.ToRusString()}\n" +
                     $"**Ранг:** {item.Rank.ToRusString()}\n**Максимум в инвентаре:** {(item.Max < 0 ? "бесконечно" : item.Max)}\n\n" +
