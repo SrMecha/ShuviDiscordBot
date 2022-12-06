@@ -101,7 +101,7 @@ namespace ShardedClient.Modules
                     await botMessage.ModifyAsync(msg => { msg.Embed = embed; msg.Components = components; });
                 if (interaction != null)
                     await interaction.DeferAsync();
-                interaction = await WaitFor.UserButtonInteraction(_client, botMessage, dbUser.Id);
+                interaction = await WaitFor.UserButtonInteraction(_client, botMessage, Context.User.Id);
                 switch (interaction.Data.CustomId)
                 {
                     case "equipment":
