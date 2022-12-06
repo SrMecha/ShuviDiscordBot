@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ShuviBot.Services;
 using ShuviBot.Extensions.User;
 using ShuviBot.Extensions.Interactions;
-using MongoDB.Bson;
+using ShuviBot.Extensions.CustomEmbed;
 using ShuviBot.Extensions.Map;
 using ShuviBot.Enums.Ranks;
 
@@ -41,11 +41,10 @@ namespace ShardedClient.Modules
             MapRegion currentRegion = _map.GetRegion(dbUser.MapRegion);
             do
             {
-                embed = new EmbedBuilder()
+                embed = new UserEmbedBuilder(discordUser)
                     .WithAuthor("Карта Дисборда")
                     .WithDescription($"**Ваше местоположение:** {currentRegion.Name}\n**Локация:** {currentRegion.GetLocation(dbUser.MapLocation).Name}")
                     .WithImageUrl(_map.Settings.PictureURL)
-                    .WithFooter(discordUser.Username, discordUser.GetAvatarUrl())
                     .Build();
                 components = new ComponentBuilder()
                     .WithSelectMenu("choose", _map.GetRegionsSelectMenu(),
@@ -69,12 +68,11 @@ namespace ShardedClient.Modules
         {
             Embed embed;
             MessageComponent components;
-            embed = new EmbedBuilder()
+            embed = new UserEmbedBuilder(discordUser)
                    .WithAuthor(region.Name)
                    .WithDescription($"Открывается с ранга {region.NeededRank.ToRusString()}\n**Описание:**\n{region.Description}\n\n" +
                    $"**Локации:**\n```{string.Join("\n", region.Locations.Select(location => location.Name))}```")
                    .WithImageUrl(region.PictureURL)
-                   .WithFooter(discordUser.Username, discordUser.GetAvatarUrl())
                    .Build();
             components = new ComponentBuilder()
                 .WithButton("Назад", "exit", ButtonStyle.Danger)
