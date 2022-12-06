@@ -1,5 +1,4 @@
 using Discord;
-using System.Runtime.Serialization;
 
 namespace ShuviBot.Extensions.CustomEmbed
 {
