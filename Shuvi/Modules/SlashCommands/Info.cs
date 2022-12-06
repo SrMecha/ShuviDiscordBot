@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ShuviBot.Services;
 using ShuviBot.Extensions.Interactions;
 using MongoDB.Bson;
+using ShuviBot.Extensions.CustomEmbed;
 
 namespace ShardedClient.Modules
 {
@@ -22,7 +23,7 @@ namespace ShardedClient.Modules
         [SlashCommand("info", "Информаиця о боте.")]
         public async Task InfoCommandAsync()
         {
-            Embed embed = new EmbedBuilder()
+            Embed embed = new BotEmbedBuilder()
                 .WithDescription($"Шард №{Context.Client.GetShardFor(Context.Guild).ShardId}\nСерверов: {Context.Client.Guilds.Count}\n")
                 .Build();
             ComponentBuilder components = new ComponentBuilder()
