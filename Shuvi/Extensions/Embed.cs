@@ -12,4 +12,12 @@ namespace ShuviBot.Extensions.CustomEmbed
             WithColor(StandartColor);
         }
     }
+
+    sealed class BotEmbedBuilder : EmbedBuilder
+    {
+        public BotEmbedBuilder()
+        {
+            WithColor(UserEmbedBuilder.StandartColor);
+        }
+    }
 }
