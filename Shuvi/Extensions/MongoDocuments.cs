@@ -6,6 +6,7 @@ using ShuviBot.Enums.UserProfessions;
 using ShuviBot.Enums.UserRaces;
 using ShuviBot.Enums.Characteristics;
 using ShuviBot.Enums.ItemNeeds;
+using ShuviBot.Extensions.Rates;
 
 namespace ShuviBot.Extensions.MongoDocuments
 {
@@ -60,14 +61,7 @@ namespace ShuviBot.Extensions.MongoDocuments
         public ObjectId Id { get; set; } = ObjectId.Empty;
         public string Name { get; set; } = "Джибрил блять";
         public string Description { get; set; } = "Ща она тебе пизды даст. Шуви сразу Ислам примет.";
-        public List<EnemyDrop> Drop { get; set; } = new();
-    }
-
-    public class EnemyDrop
-    {
-        public ObjectId Id { get; set; } = new();
-        public int Chance { get; set; } = 0;
-        public int Max { get; set; } = 1;
+        public List<AllRate> Drop { get; set; } = new();
     }
 
     public sealed class ShopDocument

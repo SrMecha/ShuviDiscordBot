@@ -139,7 +139,9 @@ namespace ShuviBot.Services
         }
         private WorldMap LoadMap()
         {
-            return BsonSerializer.Deserialize<WorldMap>(_infoCollection.Find(new BsonDocument { { "_id", "Map" } }).Single());
+            WorldMap result = BsonSerializer.Deserialize<WorldMap>(_infoCollection.Find(new BsonDocument { { "_id", "Map" } }).Single());
+
+            return result;
         }
 
         public WorldMap Map => _map;
