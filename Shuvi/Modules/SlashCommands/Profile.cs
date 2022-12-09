@@ -45,6 +45,7 @@ namespace ShardedClient.Modules
             IUserMessage? botMessage = null;
             byte healthFullEmojiCount;
             byte energyFullEmojiCount;
+            byte manaFullEmojiCount;
             if (discordUser.Id == Context.User.Id)
             {
                 components = new ComponentBuilder()
@@ -65,6 +66,7 @@ namespace ShardedClient.Modules
             }
             do 
             {
+                manaFullEmojiCount = (byte)(dbUser.GetCurrentMana() / (dbUser.MaxMana / UserSettings.ManaDisplayMax));
                 healthFullEmojiCount = (byte)(dbUser.GetCurrentHealth() / (UserSettings.HealthMax / UserSettings.HealthDisplayMax));
                 energyFullEmojiCount = (byte)(dbUser.GetCurrentEnergy() / (dbUser.GetMaxEnergy() / UserSettings.EnergyDisplayMax));
                 embed = new UserEmbedBuilder(discordUser)
@@ -81,14 +83,18 @@ namespace ShardedClient.Modules
                     $"**Выносливость:** {dbUser.Endurance} {(dbUser.Bonuses.Endurance >= 0 ? "| +" + dbUser.Bonuses.Endurance : "| " + dbUser.Bonuses.Endurance)}",
                     true)
                     .AddField("** **",
-                    $"[{EmojiList.Get("energyFull").ToString()!.Multiple(energyFullEmojiCount)}" +
+                    $"**Энергия:** [{EmojiList.Get("energyFull").ToString()!.Multiple(energyFullEmojiCount)}" +
                     $"{EmojiList.Get("energyEmpty").ToString()!.Multiple((byte)(UserSettings.EnergyDisplayMax - energyFullEmojiCount))}] " +
                     $"{dbUser.GetCurrentEnergy()}/{dbUser.GetMaxEnergy()}\n" +
                     $"{(dbUser.GetRemainingEnergyRegenTime() == 0 ? "" : $"[Восстановится <t:{dbUser.EnergyRegenTime}:R>]\n")}\n" +
-                    $"[{EmojiList.Get("healthFull").ToString()!.Multiple(healthFullEmojiCount)}" +
+                    $"**Здоровье:** [{EmojiList.Get("healthFull").ToString()!.Multiple(healthFullEmojiCount)}" +
                     $"{EmojiList.Get("healthEmpty").ToString()!.Multiple((byte)(UserSettings.HealthDisplayMax - healthFullEmojiCount))}] " +
                     $"{dbUser.GetCurrentHealth()}/100\n" +
-                    $"{(dbUser.GetRemainingHealthRegenTime() == 0 ? "" : $"[Восстановится <t:{dbUser.HealthRegenTime}:R>]")}",
+                    $"{(dbUser.GetRemainingHealthRegenTime() == 0 ? "" : $"[Восстановится <t:{dbUser.HealthRegenTime}:R>]\n")}\n" +
+                    $"**Мана:** [{EmojiList.Get("magicFull").ToString()!.Multiple(healthFullEmojiCount)}" +
+                    $"{EmojiList.Get("magicEmpty").ToString()!.Multiple((byte)(UserSettings.ManaDisplayMax - manaFullEmojiCount))}] " +
+                    $"{dbUser.GetCurrentMana()}/{dbUser.MaxMana}\n" +
+                    $"{(dbUser.GetRemainingManaRegenTime() == 0 ? "" : $"[Восстановится <t:{dbUser.ManaRegenTime}:R>]")}",
                     false)
                     .WithAuthor("Профиль")
                     .Build();
