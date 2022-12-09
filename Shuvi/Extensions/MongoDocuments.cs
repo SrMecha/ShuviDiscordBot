@@ -29,6 +29,8 @@ namespace ShuviBot.Extensions.MongoDocuments
         public int Luck { get; set; } = 1;
         public int Intellect { get; set; } = 1;
         public int Endurance { get; set; } = 1;
+        public int MaxMana { get; set; } = 10;
+        public long ManaRegenTime { get; set; } = 1;
         public long HealthRegenTime { get; set; } = 1;
         public long EnergyRegenTime { get; set; } = 1;
         public long CreatedAt { get; set; } = 1;

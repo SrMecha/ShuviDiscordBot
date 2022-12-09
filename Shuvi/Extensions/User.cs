@@ -14,14 +14,18 @@ namespace ShuviBot.Extensions.User
     {
         private const int _healthPointRegenTime = 60;
         private const int _energyPointRegenTime = 180;
+        private const int _manaPointRegenTime = 10;
         private const int _endurancePerEnergy = 10;
         private const int _standartEnergy = 10;
+        private const int _manaDisplayMax = 5;
         private const int _energyDisplayMax = 5;
         private const int _healthDisplayMax = 5;
         private const int _healthMax = 100;
 
         public static int HealthPointRegenTime => _healthPointRegenTime;
         public static int EnergyPointRegenTime => _energyPointRegenTime;
+        public static int ManaPointRegenTime => _manaPointRegenTime;
+        public static int ManaDisplayMax => _manaDisplayMax;
         public static int EndurancePerEnergy => _endurancePerEnergy;
         public static int StandartEnergy => _standartEnergy;
         public static int HealthDisplayMax => _healthDisplayMax;
@@ -60,6 +64,8 @@ namespace ShuviBot.Extensions.User
         private readonly int _luck;
         private readonly int _intellect;
         private readonly int _endurance;
+        private readonly int _maxMana;
+        private readonly long _manaRegenTime;
         private readonly long _healthRegenTime;
         private readonly long _energyRegenTime;
         private readonly long _createdAt;
@@ -91,6 +97,8 @@ namespace ShuviBot.Extensions.User
             _luck = userData.Luck;
             _intellect = userData.Intellect;
             _endurance = userData.Endurance;
+            _maxMana = userData.MaxMana;
+            _manaRegenTime = userData.ManaRegenTime;
             _healthRegenTime = userData.HealthRegenTime;
             _energyRegenTime = userData.EnergyRegenTime;
             _createdAt = userData.CreatedAt;
@@ -122,6 +130,8 @@ namespace ShuviBot.Extensions.User
         public int Luck => _luck;
         public int Intellect => _intellect;
         public int Endurance => _endurance;
+        public int MaxMana => _maxMana;
+        public long ManaRegenTime => _manaRegenTime;
         public long HealthRegenTime => _healthRegenTime;
         public long EnergyRegenTime => _energyRegenTime;
         public long CreatedAt => _createdAt;
@@ -133,6 +143,15 @@ namespace ShuviBot.Extensions.User
         public int MapRegion => _mapRegion;
         public int MapLocation => _mapLocation;
 
+        public int GetRemainingManaRegenTime()
+        {
+            int result = (int)(ManaRegenTime - ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds());
+            return result > 0 ? result : 0;
+        }
+        public int GetCurrentMana()
+        {
+            return MaxMana - (GetRemainingManaRegenTime() / UserSettings.ManaPointRegenTime);
+        }
         public int GetRemainingHealthRegenTime()
         {
             int result = (int)(HealthRegenTime - ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds());

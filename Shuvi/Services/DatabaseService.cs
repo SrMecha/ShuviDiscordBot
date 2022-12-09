@@ -74,6 +74,8 @@ namespace ShuviBot.Services
                 Luck = 1,
                 Intellect = 1,
                 Endurance = 1,
+                MaxMana = 10,
+                ManaRegenTime = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds(),
                 HealthRegenTime = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds(),
                 EnergyRegenTime = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds(),
                 CreatedAt = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds(),
