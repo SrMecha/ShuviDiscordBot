@@ -1,4 +1,4 @@
-using MongoDB.Bson;
+ï»¿using MongoDB.Bson;
 using ShuviBot.Extensions.Inventory;
 
 namespace ShuviBot.Extensions.Rates
@@ -17,7 +17,7 @@ namespace ShuviBot.Extensions.Rates
             DropInventory result = new();
             foreach (var item in _drop)
                 for (var i = item.Min; i <= random.Next(item.Min, ++item.Max); i++)
-                    if (random.Next(1001) < item.Chance) // 1001 == 100%. Ñäåëàë òàê, ÷òî áû íå èñïîëüçîâàòü ÷èñëà ñ çàïÿòîé. 1 == 0.1%
+                    if (random.Next(1001) < item.Chance) // 1001 == 100%. Ð¡Ð´ÐµÐ»Ð°Ð» Ñ‚Ð°Ðº, Ñ‡Ñ‚Ð¾ Ð±Ñ‹ Ð½Ðµ Ð¸ÑÐ¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÑŒ Ñ‡Ð¸ÑÐ»Ð° Ñ Ð·Ð°Ð¿ÑÑ‚Ð¾Ð¹. 1 == 0.1%
                         result.AddItem(item.Id);
             return result;
         }

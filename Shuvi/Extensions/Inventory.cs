@@ -1,4 +1,4 @@
-using Discord;
+п»їusing Discord;
 using MongoDB.Bson;
 using ShuviBot.Interfaces.Item;
 using ShuviBot.Extensions.Items;
@@ -67,11 +67,11 @@ namespace ShuviBot.Extensions.Inventory
             {
                 itemsString += $"\n**#{i + 1}** {_itemsConfig.GetItemData(_localInventory.Keys.ElementAt(i)).Name} ";
             }
-            if (itemsString == "") itemsString = "У вас нету предметов.";
+            if (itemsString == "") itemsString = "РЈ РІР°СЃ РЅРµС‚Сѓ РїСЂРµРґРјРµС‚РѕРІ.";
             return new BotEmbedBuilder()
-                    .WithAuthor("Все предметы:")
+                    .WithAuthor("Р’СЃРµ РїСЂРµРґРјРµС‚С‹:")
                     .WithDescription(itemsString)
-                    .WithFooter($"Страница {index + 1}/{GetTotalEmbeds()}")
+                    .WithFooter($"РЎС‚СЂР°РЅРёС†Р° {index + 1}/{GetTotalEmbeds()}")
                     .Build();
         }
         public Embed GetItemEmbed(ObjectId id)
@@ -81,15 +81,15 @@ namespace ShuviBot.Extensions.Inventory
             string needs = "";
             if (item.Type.WithBonuses())
             {
-                bonuses = $"**Бонусы:**\n{item.GetBonusesInfo()}";
-                needs = $"**Требования:**\n{item.GetNeedsInfo()}";
+                bonuses = $"**Р‘РѕРЅСѓСЃС‹:**\n{item.GetBonusesInfo()}";
+                needs = $"**РўСЂРµР±РѕРІР°РЅРёСЏ:**\n{item.GetNeedsInfo()}";
             }
 
             return new BotEmbedBuilder()
-                    .WithAuthor("Просмотр предмета")
-                    .WithDescription($"**Название:** {item.Name}\n**Тип:** {item.Type.ToRusString()}\n" +
-                    $"**Ранг:** {item.Rank.ToRusString()}\n**Максимум в инвентаре:** {(item.Max < 0 ? "бесконечно" : item.Max)}\n**У вас есть:** {item.Amount}\n\n" +
-                    $"**Описание:**\n{item.Description}\n{(item.CanTrade ? "Можно обменять" : "Нельзя обменять")}\n\n{bonuses}\n{needs}")
+                    .WithAuthor("РџСЂРѕСЃРјРѕС‚СЂ РїСЂРµРґРјРµС‚Р°")
+                    .WithDescription($"**РќР°Р·РІР°РЅРёРµ:** {item.Name}\n**РўРёРї:** {item.Type.ToRusString()}\n" +
+                    $"**Р Р°РЅРі:** {item.Rank.ToRusString()}\n**РњР°РєСЃРёРјСѓРј РІ РёРЅРІРµРЅС‚Р°СЂРµ:** {(item.Max < 0 ? "Р±РµСЃРєРѕРЅРµС‡РЅРѕ" : item.Max)}\n**РЈ РІР°СЃ РµСЃС‚СЊ:** {item.Amount}\n\n" +
+                    $"**РћРїРёСЃР°РЅРёРµ:**\n{item.Description}\n{(item.CanTrade ? "РњРѕР¶РЅРѕ РѕР±РјРµРЅСЏС‚СЊ" : "РќРµР»СЊР·СЏ РѕР±РјРµРЅСЏС‚СЊ")}\n\n{bonuses}\n{needs}")
                     .WithFooter($"ID: {item.Id}")
                     .WithColor(item.Rank.GetColor())
                     .Build();
@@ -162,9 +162,9 @@ namespace ShuviBot.Extensions.Inventory
                 itemsString += $"\n**#{i+1}** {_itemsDataArray[i].Name} ";
             }
             return new BotEmbedBuilder()
-                    .WithAuthor("Все предметы:")
+                    .WithAuthor("Р’СЃРµ РїСЂРµРґРјРµС‚С‹:")
                     .WithDescription(itemsString)
-                    .WithFooter($"Страница {index + 1}/{(_itemsDataArray.Count + 9) / 10}")
+                    .WithFooter($"РЎС‚СЂР°РЅРёС†Р° {index + 1}/{(_itemsDataArray.Count + 9) / 10}")
                     .Build();
         }
 
@@ -175,15 +175,15 @@ namespace ShuviBot.Extensions.Inventory
             string needs = "";
             if (item.Type.WithBonuses())
             {
-                bonuses = $"**Бонусы:**\n{item.GetBonusesInfo()}";
-                needs = $"**Требования:**\n{item.GetNeedsInfo()}";
+                bonuses = $"**Р‘РѕРЅСѓСЃС‹:**\n{item.GetBonusesInfo()}";
+                needs = $"**РўСЂРµР±РѕРІР°РЅРёСЏ:**\n{item.GetNeedsInfo()}";
             }
 
             return new BotEmbedBuilder()
-                    .WithAuthor("Просмотр предмета")
-                    .WithDescription($"**Название:** {item.Name}\n**Тип:** {item.Type.ToRusString()}\n" +
-                    $"**Ранг:** {item.Rank.ToRusString()}\n**Максимум в инвентаре:** {(item.Max < 0 ? "бесконечно" : item.Max)}\n\n" +
-                    $"**Описание:**\n{item.Description}\n{(item.CanTrade ? "Можно обменять" : "Нельзя обменять")}\n\n{bonuses}\n{needs}")
+                    .WithAuthor("РџСЂРѕСЃРјРѕС‚СЂ РїСЂРµРґРјРµС‚Р°")
+                    .WithDescription($"**РќР°Р·РІР°РЅРёРµ:** {item.Name}\n**РўРёРї:** {item.Type.ToRusString()}\n" +
+                    $"**Р Р°РЅРі:** {item.Rank.ToRusString()}\n**РњР°РєСЃРёРјСѓРј РІ РёРЅРІРµРЅС‚Р°СЂРµ:** {(item.Max < 0 ? "Р±РµСЃРєРѕРЅРµС‡РЅРѕ" : item.Max)}\n\n" +
+                    $"**РћРїРёСЃР°РЅРёРµ:**\n{item.Description}\n{(item.CanTrade ? "РњРѕР¶РЅРѕ РѕР±РјРµРЅСЏС‚СЊ" : "РќРµР»СЊР·СЏ РѕР±РјРµРЅСЏС‚СЊ")}\n\n{bonuses}\n{needs}")
                     .WithFooter($"ID: {item.Id}")
                     .WithColor(item.Rank.GetColor())
                     .Build();

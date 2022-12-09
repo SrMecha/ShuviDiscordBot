@@ -1,4 +1,4 @@
-using MongoDB.Bson;
+п»їusing MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using ShuviBot.Enums.ItemType;
 using ShuviBot.Enums.Ranks;
@@ -47,8 +47,8 @@ namespace ShuviBot.Extensions.MongoDocuments
     {
         [BsonElement("_id")]
         public ObjectId Id { get; set; } = ObjectId.Empty;
-        public string Name { get; set; } = "Хуйня без имени";
-        public string Description { get; set; } = "Долбаеб блять добавь описание предмету!!!";
+        public string Name { get; set; } = "РҐСѓР№РЅСЏ Р±РµР· РёРјРµРЅРё";
+        public string Description { get; set; } = "Р”РѕР»Р±Р°РµР± Р±Р»СЏС‚СЊ РґРѕР±Р°РІСЊ РѕРїРёСЃР°РЅРёРµ РїСЂРµРґРјРµС‚Сѓ!!!";
         public ItemType Type { get; set; } = ItemType.Simple;
         public Rank Rank { get; set; } = Rank.E;
         public bool CanTrade { get; set; } = false;
@@ -61,8 +61,8 @@ namespace ShuviBot.Extensions.MongoDocuments
     {
         [BsonElement("_id")]
         public ObjectId Id { get; set; } = ObjectId.Empty;
-        public string Name { get; set; } = "Джибрил блять";
-        public string Description { get; set; } = "Ща она тебе пизды даст. Шуви сразу Ислам примет.";
+        public string Name { get; set; } = "Р”Р¶РёР±СЂРёР» Р±Р»СЏС‚СЊ";
+        public string Description { get; set; } = "Р©Р° РѕРЅР° С‚РµР±Рµ РїРёР·РґС‹ РґР°СЃС‚. РЁСѓРІРё СЃСЂР°Р·Сѓ РСЃР»Р°Рј РїСЂРёРјРµС‚.";
         public List<AllRate> Drop { get; set; } = new();
     }
 
@@ -70,13 +70,13 @@ namespace ShuviBot.Extensions.MongoDocuments
     {
         [BsonElement("_id")]
         public ObjectId Id { get; set; } = ObjectId.Empty;
-        public string Name { get; set; } = "Икея";
+        public string Name { get; set; } = "РРєРµСЏ";
     }
 
     public sealed class DungeonDocument
     {
         [BsonElement("_id")]
         public ObjectId Id { get; set; } = ObjectId.Empty;
-        public string Name { get; set; } = "Икея";
+        public string Name { get; set; } = "РРєРµСЏ";
     }
 }

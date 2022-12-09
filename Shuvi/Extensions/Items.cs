@@ -1,4 +1,4 @@
-using MongoDB.Bson;
+п»їusing MongoDB.Bson;
 using ShuviBot.Enums.Characteristics;
 using ShuviBot.Enums.ItemNeeds;
 using ShuviBot.Enums.ItemType;
@@ -42,11 +42,11 @@ namespace ShuviBot.Extensions.Items
         public virtual Dictionary<ItemNeeds, int> Needs => new();
         public virtual string GetBonusesInfo()
         {
-            return "Нету бонусов.";
+            return "РќРµС‚Сѓ Р±РѕРЅСѓСЃРѕРІ.";
         }
         public virtual string GetNeedsInfo()
         {
-            return "Нету требований.";
+            return "РќРµС‚Сѓ С‚СЂРµР±РѕРІР°РЅРёР№.";
         }
     }
 
@@ -73,7 +73,7 @@ namespace ShuviBot.Extensions.Items
             }
             if (result == "")
             {
-                result = "Нету бонусов.";
+                result = "РќРµС‚Сѓ Р±РѕРЅСѓСЃРѕРІ.";
             }
             return result;
         }
@@ -86,7 +86,7 @@ namespace ShuviBot.Extensions.Items
             }
                 if (result == "")
                 {
-                result = "Нету требований.";
+                result = "РќРµС‚Сѓ С‚СЂРµР±РѕРІР°РЅРёР№.";
                 }
             return result;
         }
