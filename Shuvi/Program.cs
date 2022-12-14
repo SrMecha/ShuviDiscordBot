@@ -3,10 +3,10 @@ using Discord.Commands;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
-using Shuvi.Extensions.EmojiList;
-using ShuviBot.Services;
+using Shuvi.Classes.CustomEmoji;
+using Shuvi.Services;
 
-namespace ShuviBot
+namespace Shuvi
 {
     class Program
     {
@@ -36,7 +36,7 @@ namespace ShuviBot
 
             await services.GetRequiredService<InteractionHandlingService>()
                 .InitializeAsync();
-            EmojiList.Init();
+            InitStaticClasses();
 
             await client.LoginAsync(TokenType.Bot, botToken);
             await client.StartAsync();
@@ -54,5 +54,10 @@ namespace ShuviBot
                 .AddSingleton(new DatabaseManager(mongoKey))
                 .BuildServiceProvider();
         } 
+
+        private void InitStaticClasses()
+        {
+            EmojiList.Init();
+        }
     }
 }

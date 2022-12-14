@@ -1,8 +1,6 @@
-﻿using System.Text;
-
-namespace ShuviBot.Extensions.String
+﻿namespace Shuvi.Extensions
 {
-    public static class StringMethods
+    public static class StringExtension
     {
         public static string Multiple(this string original, byte repeatCount)
         {

@@ -1,7 +1,7 @@
 using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
-using ShuviBot.Services;
+using Shuvi.Services;
 
 namespace ShardedClient.Modules
 {

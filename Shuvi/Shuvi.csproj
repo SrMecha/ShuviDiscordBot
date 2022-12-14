@@ -14,6 +14,10 @@
     <PackageReference Include="MongoDB.Driver" Version="2.17.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Classes\Player\" />
+  </ItemGroup>
+
   <ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>
 
 </Project>

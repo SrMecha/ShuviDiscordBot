@@ -2,10 +2,11 @@ using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
-using ShuviBot.Services;
-using ShuviBot.Extensions.User;
-using ShuviBot.Extensions.Interactions;
+using Shuvi.Services;
+using Shuvi.Classes.User;
 using MongoDB.Bson;
+using Shuvi.Classes.Interactions;
+using Shuvi.Interfaces.User;
 
 namespace ShardedClient.Modules
 {
@@ -23,11 +24,11 @@ namespace ShardedClient.Modules
         [SlashCommand("inventory", "Посмотреть инвентарь")]
         public async Task InventoryCommandAsync()
         {
-            User dbUser = await _database.Users.GetUser(Context.User.Id);
+            IDatabaseUser dbUser = await _database.Users.GetUser(Context.User.Id);
             await ViewAllItemsAsync(dbUser);
         }
 
-        public async Task ViewAllItemsAsync(User dbUser)
+        public async Task ViewAllItemsAsync(IDatabaseUser dbUser)
         {
             int maxPage = dbUser.Inventory.GetTotalEmbeds();
             int pageNow = 0;
@@ -77,7 +78,7 @@ namespace ShardedClient.Modules
             } while (interaction != null);
         }
 
-        public async Task<SocketMessageComponent> ViewItemAsync(SocketInteraction interaction, IUserMessage message, User dbUser, ObjectId itemId)
+        public async Task<SocketMessageComponent> ViewItemAsync(SocketInteraction interaction, IUserMessage message, IDatabaseUser dbUser, ObjectId itemId)
         {
             await message.ModifyAsync(msg =>
             {

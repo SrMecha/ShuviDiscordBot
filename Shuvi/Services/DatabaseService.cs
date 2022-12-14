@@ -1,80 +1,56 @@
 using MongoDB.Bson;
 using MongoDB.Driver;
-using ShuviBot.Extensions.User;
-using ShuviBot.Extensions.Inventory;
-using ShuviBot.Extensions.MongoDocuments;
-using ShuviBot.Extensions.Map;
 using MongoDB.Bson.Serialization;
+using Shuvi.Classes.Map;
+using Shuvi.Classes.Shop;
+using Shuvi.Classes.Enemy;
+using Shuvi.Classes.Dungeon;
+using Shuvi.Classes.Items;
+using Shuvi.Classes.User;
+using Shuvi.Interfaces.User;
 
-namespace ShuviBot.Services
+namespace Shuvi.Services
 {
 
     public class DatabaseManager
     {
         private readonly MongoClient _mongo;
-        private readonly UserDatabase _userDatabase;
-        private readonly ItemDatabase _itemDatabase;
-        private readonly InfoDatabase _infoDatabase;
-        private readonly EnemiesDatabase _enemiesDatabase;
-        private readonly ShopDatabase _shopDatabase;
-        private readonly DungeonDatabase _dungeonDatabase;
-        private readonly AllItemsData _allItemsData;
-        private readonly WorldMap _map;
+
+        public UserDatabase Users { get; init; }
+        public ItemDatabase Items { get; init; }
+        public InfoDatabase Info { get; init; }
+        public WorldMap Map { get; init; }
+        public EnemiesDatabase EnemiesDatabase { get; init; }
+        public ShopDatabase ShopDatabase { get; init; }
+        public DungeonDatabase DungeonDatabase { get; init; }
 
         public DatabaseManager(string mongoKey)
         {
             _mongo = new MongoClient(mongoKey);
-            _itemDatabase = new ItemDatabase(_mongo.GetDatabase("Shuvi").GetCollection<ItemDocument>("Items"));
-            _allItemsData = _itemDatabase.GetAllItemsData();
-            _userDatabase = new UserDatabase(_mongo.GetDatabase("Shuvi").GetCollection<UserDocument>("Users"), _allItemsData);
-            _infoDatabase = new InfoDatabase(_mongo.GetDatabase("Shuvi").GetCollection<BsonDocument>("Info"));
-            _map = _infoDatabase.Map;
-            _enemiesDatabase = new EnemiesDatabase(_mongo.GetDatabase("Shuvi").GetCollection<EnemyDocument>("Enemies"));
-            _shopDatabase = new ShopDatabase(_mongo.GetDatabase("Shuvi").GetCollection<ShopDocument>("Shops"));
-            _dungeonDatabase = new DungeonDatabase(_mongo.GetDatabase("Shuvi").GetCollection<DungeonDocument>("Dungeons"));
+            Items = new ItemDatabase(_mongo.GetDatabase("Shuvi").GetCollection<ItemData>("Items"));
+            Users = new UserDatabase(_mongo.GetDatabase("Shuvi").GetCollection<UserData>("Users"));
+            Info = new InfoDatabase(_mongo.GetDatabase("Shuvi").GetCollection<BsonDocument>("Info"));
+            Map = Info.Map;
+            EnemiesDatabase = new EnemiesDatabase(_mongo.GetDatabase("Shuvi").GetCollection<EnemyData>("Enemies"));
+            ShopDatabase = new ShopDatabase(_mongo.GetDatabase("Shuvi").GetCollection<ShopData>("Shops"));
+            DungeonDatabase = new DungeonDatabase(_mongo.GetDatabase("Shuvi").GetCollection<DungeonData>("Dungeons"));
         }
-
-        public UserDatabase Users => _userDatabase;
-        public ItemDatabase Items => _itemDatabase;
-        public InfoDatabase Info => _infoDatabase;
-        public AllItemsData AllItemsData => _allItemsData;
-        public WorldMap Map => _map;
-        public EnemiesDatabase EnemiesDatabase => _enemiesDatabase;
-        public ShopDatabase ShopDatabase => _shopDatabase;
-        public DungeonDatabase DungeonDatabase => _dungeonDatabase;
     }
 
     public sealed class UserDatabase
     {
-        private readonly IMongoCollection<UserDocument> _userCollection;
-        private readonly AllItemsData _allItemsData;
+        private readonly IMongoCollection<UserData> _userCollection;
 
-        public UserDatabase(IMongoCollection<UserDocument> userCollection, AllItemsData allItemsData)
+        public UserDatabase(IMongoCollection<UserData> userCollection)
         {
             _userCollection = userCollection;
-            _allItemsData = allItemsData;
         }
-        public async Task<User> AddUser(ulong userId)
+        public async Task<IDatabaseUser> AddUser(ulong userId)
         {
-            UserDocument userData = new UserDocument
+            var userData = new UserData
             {
                 Id = userId,
-                Rating = 0,
-                Money = 0,
                 Race = UserFactory.GenerateRandomUserRace(),
-                Profession = 0,
-                Inventory = new Dictionary<ObjectId, int>(),
-                Weapon = null,
-                Head = null,
-                Body = null,
-                Legs = null,
-                Foots = null,
-                Strength = 1,
-                Agility = 1,
-                Luck = 1,
-                Intellect = 1,
-                Endurance = 1,
-                MaxMana = 10,
                 ManaRegenTime = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds(),
                 HealthRegenTime = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds(),
                 EnergyRegenTime = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds(),
@@ -82,14 +58,14 @@ namespace ShuviBot.Services
                 LiveTime = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds()
             };
             await _userCollection.InsertOneAsync(userData);
-            return new User(userData, _allItemsData);
+            return new DatabaseUser(userData);
         }
-        public async Task<User> GetUser(ulong userId)
+        public async Task<IDatabaseUser> GetUser(ulong userId)
         {
-            User user;
+            IDatabaseUser user;
             try {
-                UserDocument userData = await _userCollection.Find(new BsonDocument { { "_id", (long)userId } }).SingleAsync();
-                user = new User(userData, _allItemsData);
+                UserData userData = await _userCollection.Find(new BsonDocument { { "_id", (long)userId } }).SingleAsync();
+                user = new DatabaseUser(userData);
             } catch (InvalidOperationException) {
                 user = await AddUser(userId);
             }
@@ -99,45 +75,33 @@ namespace ShuviBot.Services
 
     public sealed class ItemDatabase
     {
-        private readonly IMongoCollection<ItemDocument> _itemCollection;
-        private readonly AllItemsData _allItemsData;
+        private readonly IMongoCollection<ItemData> _itemCollection;
 
-        public ItemDatabase(IMongoCollection<ItemDocument> itemCollection)
+        public ItemDatabase(IMongoCollection<ItemData> itemCollection)
         {
             _itemCollection = itemCollection;
-            _allItemsData = LoadAllItems();
+            LoadAllItems();
         }
 
-        private AllItemsData LoadAllItems()
+        private void LoadAllItems()
         {
-            AllItemsData tempData = new();
-            foreach (ItemDocument itemData in _itemCollection.FindSync(new BsonDocument { }).ToEnumerable<ItemDocument>())
+            foreach (ItemData itemData in _itemCollection.FindSync(new BsonDocument { }).ToEnumerable<ItemData>())
             {
-                tempData.AddItemData(itemData);
+                AllItemsData.AddItemData(itemData);
             }
-            return tempData;
-        }
-
-        public ItemDocument GetItemData(ObjectId id)
-        {
-            return _allItemsData.GetItemData(id);
-        }
-
-        public AllItemsData GetAllItemsData()
-        {
-            return _allItemsData;
         }
     }
 
     public sealed class InfoDatabase
     {
         private readonly IMongoCollection<BsonDocument> _infoCollection;
-        private readonly WorldMap _map;
+
+        public WorldMap Map { get; init; }
 
         public InfoDatabase(IMongoCollection<BsonDocument> infoCollection)
         {
             _infoCollection = infoCollection;
-            _map = LoadMap();
+            Map = LoadMap();
         }
         private WorldMap LoadMap()
         {
@@ -145,76 +109,71 @@ namespace ShuviBot.Services
 
             return result;
         }
-
-        public WorldMap Map => _map;
     }
 
     public sealed class EnemiesDatabase
     {
-        private readonly IMongoCollection<EnemyDocument> _enemiesCollection;
-        private readonly Dictionary<ObjectId, EnemyDocument> _enemies;
+        private readonly IMongoCollection<EnemyData> _enemiesCollection;
 
-        public EnemiesDatabase(IMongoCollection<EnemyDocument> enemyCollection)
+        public Dictionary<ObjectId, EnemyData> Enemies { get; init; }
+
+        public EnemiesDatabase(IMongoCollection<EnemyData> enemyCollection)
         {
             _enemiesCollection = enemyCollection;
-            _enemies = LoadEnemies();
+            Enemies = LoadEnemies();
         }
-        private Dictionary<ObjectId, EnemyDocument> LoadEnemies()
+        private Dictionary<ObjectId, EnemyData> LoadEnemies()
         {
-            Dictionary<ObjectId, EnemyDocument> result = new();
-            foreach (EnemyDocument enemyData in _enemiesCollection.FindSync(new BsonDocument { }).ToEnumerable<EnemyDocument>())
+            Dictionary<ObjectId, EnemyData> result = new();
+            foreach (EnemyData enemyData in _enemiesCollection.FindSync(new BsonDocument { }).ToEnumerable<EnemyData>())
             {
                 result.Add(enemyData.Id, enemyData);
             }
             return result;
         }
-
-        public Dictionary<ObjectId, EnemyDocument> Enemies => _enemies;
     }
 
     public sealed class ShopDatabase
     {
-        private readonly IMongoCollection<ShopDocument> _shopCollection;
-        private readonly Dictionary<ObjectId, ShopDocument> _shops;
+        private readonly IMongoCollection<ShopData> _shopCollection;
+        
+        public Dictionary<ObjectId, ShopData> Shops { get; init; }
 
-        public ShopDatabase(IMongoCollection<ShopDocument> shopCollection)
+        public ShopDatabase(IMongoCollection<ShopData> shopCollection)
         {
             _shopCollection = shopCollection;
-            _shops = LoadShops();
+            Shops = LoadShops();
         }
-        private Dictionary<ObjectId, ShopDocument> LoadShops()
+        private Dictionary<ObjectId, ShopData> LoadShops()
         {
-            Dictionary<ObjectId, ShopDocument> result = new();
-            foreach (ShopDocument shopData in _shopCollection.FindSync(new BsonDocument { }).ToEnumerable<ShopDocument>())
+            Dictionary<ObjectId, ShopData> result = new();
+            foreach (ShopData shopData in _shopCollection.FindSync(new BsonDocument { }).ToEnumerable<ShopData>())
             {
                 result.Add(shopData.Id, shopData);
             }
             return result;
         }
-
-        public Dictionary<ObjectId, ShopDocument> Shops => _shops;
     }
 
     public sealed class DungeonDatabase
     {
-        private readonly IMongoCollection<DungeonDocument> _dungeonCollection;
-        private readonly Dictionary<ObjectId, DungeonDocument> _dungeons;
+        private readonly IMongoCollection<DungeonData> _dungeonCollection;
 
-        public DungeonDatabase(IMongoCollection<DungeonDocument> shopCollection)
+        public Dictionary<ObjectId, DungeonData> Dungeons { get; init; }
+
+        public DungeonDatabase(IMongoCollection<DungeonData> shopCollection)
         {
             _dungeonCollection = shopCollection;
-            _dungeons = LoadDungeons();
+            Dungeons = LoadDungeons();
         }
-        private Dictionary<ObjectId, DungeonDocument> LoadDungeons()
+        private Dictionary<ObjectId, DungeonData> LoadDungeons()
         {
-            Dictionary<ObjectId, DungeonDocument> result = new();
-            foreach (DungeonDocument dungeonData in _dungeonCollection.FindSync(new BsonDocument { }).ToEnumerable<DungeonDocument>())
+            Dictionary<ObjectId, DungeonData> result = new();
+            foreach (DungeonData dungeonData in _dungeonCollection.FindSync(new BsonDocument { }).ToEnumerable<DungeonData>())
             {
                 result.Add(dungeonData.Id, dungeonData);
             }
             return result;
         }
-
-        public Dictionary<ObjectId, DungeonDocument> Dungeons => _dungeons;
     }
 }

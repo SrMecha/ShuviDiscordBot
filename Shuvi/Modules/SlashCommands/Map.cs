@@ -2,12 +2,12 @@ using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
-using ShuviBot.Services;
-using ShuviBot.Extensions.User;
-using ShuviBot.Extensions.Interactions;
-using ShuviBot.Extensions.CustomEmbed;
-using ShuviBot.Extensions.Map;
-using ShuviBot.Enums.Ranks;
+using Shuvi.Services;
+using Shuvi.Classes.CustomEmbeds;
+using Shuvi.Classes.Interactions;
+using Shuvi.Classes.Map;
+using Shuvi.Interfaces.User;
+using Shuvi.Extensions;
 
 namespace ShardedClient.Modules
 {
@@ -27,23 +27,24 @@ namespace ShardedClient.Modules
         [SlashCommand("map", "Посмотреть карту мира.")]
         public async Task MapCommandAsync()
         {
-            User dbUser = await _database.Users.GetUser(Context.User.Id);
+            IDatabaseUser dbUser = await _database.Users.GetUser(Context.User.Id);
             IUser discordUser = Context.User;
             await ViewAllMapAsync(dbUser, discordUser);
         }
 
-        public async Task ViewAllMapAsync(User dbUser, IUser discordUser)
+        public async Task ViewAllMapAsync(IDatabaseUser dbUser, IUser discordUser)
         {
             Embed embed;
             MessageComponent components;
             IUserMessage? message = null;
             SocketMessageComponent? interaction = null;
-            MapRegion currentRegion = _map.GetRegion(dbUser.MapRegion);
+            var currentRegion = _map.GetRegion(dbUser.Location.MapRegion);
+            var currentLocation = currentRegion.GetLocation(dbUser.Location.MapLocation);
             do
             {
                 embed = new UserEmbedBuilder(discordUser)
                     .WithAuthor("Карта Дисборда")
-                    .WithDescription($"**Ваше местоположение:** {currentRegion.Name}\n**Локация:** {currentRegion.GetLocation(dbUser.MapLocation).Name}")
+                    .WithDescription($"**Ваше местоположение:** {currentRegion.Name}\n**Локация:** {currentLocation.Name}")
                     .WithImageUrl(_map.Settings.PictureURL)
                     .Build();
                 components = new ComponentBuilder()

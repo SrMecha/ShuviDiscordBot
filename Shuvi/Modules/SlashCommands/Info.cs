@@ -2,10 +2,11 @@ using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
-using ShuviBot.Services;
-using ShuviBot.Extensions.Interactions;
+using Shuvi.Services;
 using MongoDB.Bson;
-using ShuviBot.Extensions.CustomEmbed;
+using Shuvi.Classes.CustomEmbeds;
+using Shuvi.Classes.Interactions;
+using Shuvi.Classes.Items;
 
 namespace ShardedClient.Modules
 {
@@ -43,18 +44,18 @@ namespace ShardedClient.Modules
 
         public async Task ViewAllItemsAsync(SocketInteraction originalInteraction, IUserMessage message)
         {
-            int maxPage = _database.AllItemsData.GetTotalEmbeds();
+            int maxPage = AllItemsData.GetTotalEmbeds();
             int pageNow = 0;
             SocketMessageComponent interaction = (SocketMessageComponent)originalInteraction;
             while (interaction != null)
             {
                 await message.ModifyAsync(msg =>
                 {
-                    msg.Embed = _database.AllItemsData.GetItemsEmbed(pageNow);
+                    msg.Embed = AllItemsData.GetItemsEmbed(pageNow);
                     msg.Components = new ComponentBuilder()
                         .WithButton("<", "<", ButtonStyle.Primary, disabled: pageNow <= 0)
                         .WithButton(">", ">", ButtonStyle.Primary, disabled: pageNow >= maxPage-1)
-                        .WithSelectMenu("choose", _database.AllItemsData.GetItemsSelectMenu(pageNow), "Выберите предмет для просмотра")
+                        .WithSelectMenu("choose", AllItemsData.GetItemsSelectMenu(pageNow), "Выберите предмет для просмотра")
                         .Build();
                  });
                 await interaction.DeferAsync();
@@ -80,7 +81,7 @@ namespace ShardedClient.Modules
         {
             await message.ModifyAsync(msg =>
             {
-                msg.Embed = _database.AllItemsData.GetItemEmbed(itemId);
+                msg.Embed = AllItemsData.GetItemEmbed(itemId);
                 msg.Components = new ComponentBuilder()
                     .WithButton("Назад", "back", ButtonStyle.Danger)
                     .Build();

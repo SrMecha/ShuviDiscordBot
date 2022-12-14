@@ -3,7 +3,7 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace ShuviBot.Services
+namespace Shuvi.Services
 {
     public class InteractionHandlingService
     {
