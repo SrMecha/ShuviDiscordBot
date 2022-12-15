@@ -9,7 +9,7 @@ using Shuvi.Classes.Map;
 using Shuvi.Interfaces.User;
 using Shuvi.Extensions;
 
-namespace ShardedClient.Modules
+namespace Shuvi.Modules.SlashCommands
 {
     public class MapCommandModule : InteractionModuleBase<ShardedInteractionContext>
     {

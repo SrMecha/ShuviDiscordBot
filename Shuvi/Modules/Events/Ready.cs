@@ -3,9 +3,9 @@ using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Shuvi.Services;
 
-namespace ShardedClient.Modules
+namespace Shuvi.Modules.Events
 {
-    public class ReadyEventModule: InteractionModuleBase<ShardedInteractionContext>
+    public class ReadyEventModule : InteractionModuleBase<ShardedInteractionContext>
     {
         private readonly DiscordShardedClient _client;
 

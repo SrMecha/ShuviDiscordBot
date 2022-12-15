@@ -1,6 +1,6 @@
 ﻿using Shuvi.Interfaces.Entity;
 
-namespace Shuvi.Interfaces.Effects
+namespace Shuvi.Interfaces.Effect
 {
     public interface IEffects
     {

@@ -11,6 +11,7 @@ namespace Shuvi.Classes.User
         public int Rating { get; set; } = 0;
         public int Money { get; set; } = 0;
         public int Dispoints { get; set; } = 0;
+        public string Spell { get; set; } = string.Empty;
         public UserRaces Race { get; set; } = UserRaces.ExMachina;
         public UserProfessions Profession { get; set; } = UserProfessions.NoProfession;
         public Dictionary<ObjectId, int> Inventory { get; set; } = new();
@@ -25,6 +26,7 @@ namespace Shuvi.Classes.User
         public int Intellect { get; set; } = 1;
         public int Endurance { get; set; } = 1;
         public int MaxMana { get; set; } = 10;
+        public int MaxHealth { get; set; } = 100;
         public long ManaRegenTime { get; set; } = 1;
         public long HealthRegenTime { get; set; } = 1;
         public long EnergyRegenTime { get; set; } = 1;

@@ -1,7 +1,7 @@
 ﻿using Shuvi.Classes.Characteristics;
 using Shuvi.Interfaces.Entity;
 
-namespace Shuvi.Classes.Effects
+namespace Shuvi.Classes.Effect
 {
     public class PoisionEffect : EffectBase
     {

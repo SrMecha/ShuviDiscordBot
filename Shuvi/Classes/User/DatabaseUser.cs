@@ -37,7 +37,7 @@ namespace Shuvi.Classes.User
             Characteristic = new UserCharacteristics(userData.Strength, userData.Agility, userData.Luck, userData.Intellect, userData.Endurance);
             Energy = new Energy(userData.EnergyRegenTime, Characteristic.Endurance);
             Mana = new Mana(userData.MaxMana, userData.ManaRegenTime);
-            Health = new Health(UserSettings.HealthMax, userData.HealthRegenTime);
+            Health = new Health(userData.MaxHealth, userData.HealthRegenTime);
             Statistics = new UserStatistics(
                 userData.CreatedAt, userData.LiveTime, userData.DeathCount, userData.DungeonComplite, userData.EnemyKilled, userData.MaxRating
                 );

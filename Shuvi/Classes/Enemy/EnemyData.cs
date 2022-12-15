@@ -1,15 +1,27 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Shuvi.Classes.Rates;
+using Shuvi.Enums;
 
 namespace Shuvi.Classes.Enemy
 {
     public sealed class EnemyData
     {
-        [BsonElement("_id")]
+        [BsonId]
         public ObjectId Id { get; set; } = ObjectId.Empty;
         public string Name { get; set; } = "Джибрил блять";
         public string Description { get; set; } = "Ща она тебе пизды даст. Шуви сразу Ислам примет.";
+        public Rank Rank { get; set; } = Rank.E;
+        public int UpgradePoints { get; set; } = 5;
+        public Dictionary<string, string> Pictures { get; set; } = new();
+        public string Spell { get; set; } = string.Empty;
+        public int Strength { get; set; } = 1;
+        public int Agility { get; set; } = 1;
+        public int Luck { get; set; } = 1;
+        public int Intellect { get; set; } = 1;
+        public int Endurance { get; set; } = 1;
+        public int Mana { get; set; } = 10;
+        public int Health { get; set; } = 100;
         public List<AllRate> Drop { get; set; } = new();
     }
 }

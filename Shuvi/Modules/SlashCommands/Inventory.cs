@@ -8,7 +8,7 @@ using MongoDB.Bson;
 using Shuvi.Classes.Interactions;
 using Shuvi.Interfaces.User;
 
-namespace ShardedClient.Modules
+namespace Shuvi.Modules.SlashCommands
 {
     public class InventoryCommandModule : InteractionModuleBase<ShardedInteractionContext>
     {
@@ -55,7 +55,7 @@ namespace ShardedClient.Modules
                 {
                     await message.ModifyAsync(msg => { msg.Embed = embed; msg.Components = components; });
                 }
-                if (interaction != null) 
+                if (interaction != null)
                     await interaction.DeferAsync();
                 interaction = await WaitFor.UserButtonInteraction(_client, message, dbUser.Id);
                 switch (interaction.Data.CustomId)

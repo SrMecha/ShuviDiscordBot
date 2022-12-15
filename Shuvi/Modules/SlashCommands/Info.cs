@@ -8,7 +8,7 @@ using Shuvi.Classes.CustomEmbeds;
 using Shuvi.Classes.Interactions;
 using Shuvi.Classes.Items;
 
-namespace ShardedClient.Modules
+namespace Shuvi.Modules.SlashCommands
 {
     public class InfoCommandModule : InteractionModuleBase<ShardedInteractionContext>
     {
@@ -36,7 +36,7 @@ namespace ShardedClient.Modules
             if (interaction == null) return;
             switch (interaction.Data.CustomId)
             {
-                case "AllItems": 
+                case "AllItems":
                     await ViewAllItemsAsync(interaction, botMessage);
                     break;
             }
@@ -54,10 +54,10 @@ namespace ShardedClient.Modules
                     msg.Embed = AllItemsData.GetItemsEmbed(pageNow);
                     msg.Components = new ComponentBuilder()
                         .WithButton("<", "<", ButtonStyle.Primary, disabled: pageNow <= 0)
-                        .WithButton(">", ">", ButtonStyle.Primary, disabled: pageNow >= maxPage-1)
+                        .WithButton(">", ">", ButtonStyle.Primary, disabled: pageNow >= maxPage - 1)
                         .WithSelectMenu("choose", AllItemsData.GetItemsSelectMenu(pageNow), "Выберите предмет для просмотра")
                         .Build();
-                 });
+                });
                 await interaction.DeferAsync();
                 interaction = await WaitFor.UserButtonInteraction(_client, message, interaction.User.Id);
                 switch (interaction.Data.CustomId)

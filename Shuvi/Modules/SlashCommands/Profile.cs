@@ -15,7 +15,7 @@ using Shuvi.Extensions;
 using Shuvi.Enums;
 using Shuvi.Classes.Characteristics;
 
-namespace ShardedClient.Modules
+namespace Shuvi.Modules.SlashCommands
 {
     public class ProfileCommandModule : InteractionModuleBase<ShardedInteractionContext>
     {
@@ -57,7 +57,7 @@ namespace ShardedClient.Modules
                     .WithButton("Статистика", "statistics", ButtonStyle.Primary, row: 0)
                     .Build();
             }
-            do 
+            do
             {
                 embed = new UserEmbedBuilder(discordUser)
                     .AddField($"**Ранг:** {dbUser.Rating.Rank.ToRusString()}",
@@ -179,7 +179,7 @@ namespace ShardedClient.Modules
             EquipmentItem? boots = dbUser.Equipment.Foots == null ? null : (EquipmentItem?)ItemFactory.CreateItem((ObjectId)dbUser.Equipment.Foots, 0);
             Embed embed = new UserEmbedBuilder(discordUser)
                 .WithAuthor($"Экипировка")
-                .AddField($"Шлем: {(helmet == null ? "Нету": helmet.Name)}", $"{(helmet == null ? "** **": helmet.GetBonusesInfo())}", true)
+                .AddField($"Шлем: {(helmet == null ? "Нету" : helmet.Name)}", $"{(helmet == null ? "** **" : helmet.GetBonusesInfo())}", true)
                 .AddField($"Шлем: {(armor == null ? "Нету" : armor.Name)}", $"{(armor == null ? "** **" : armor.GetBonusesInfo())}", true)
                 .AddField("** **", "** **", false)
                 .AddField($"Шлем: {(leggings == null ? "Нету" : leggings.Name)}", $"{(leggings == null ? "** **" : leggings.GetBonusesInfo())}", true)
