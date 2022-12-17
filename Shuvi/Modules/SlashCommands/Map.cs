@@ -1,4 +1,4 @@
-using Discord;
+ï»¿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,7 +24,7 @@ namespace Shuvi.Modules.SlashCommands
             _map = _database.Map;
         }
 
-        [SlashCommand("map", "Ïîñìîòðåòü êàðòó ìèðà.")]
+        [SlashCommand("map", "ÐŸÐ¾ÑÐ¼Ð¾Ñ‚Ñ€ÐµÑ‚ÑŒ ÐºÐ°Ñ€Ñ‚Ñƒ Ð¼Ð¸Ñ€Ð°.")]
         public async Task MapCommandAsync()
         {
             IDatabaseUser dbUser = await _database.Users.GetUser(Context.User.Id);
@@ -43,13 +43,13 @@ namespace Shuvi.Modules.SlashCommands
             do
             {
                 embed = new UserEmbedBuilder(discordUser)
-                    .WithAuthor("Êàðòà Äèñáîðäà")
-                    .WithDescription($"**Âàøå ìåñòîïîëîæåíèå:** {currentRegion.Name}\n**Ëîêàöèÿ:** {currentLocation.Name}")
+                    .WithAuthor("ÐšÐ°Ñ€Ñ‚Ð° Ð”Ð¸ÑÐ±Ð¾Ñ€Ð´Ð°")
+                    .WithDescription($"**Ð’Ð°ÑˆÐµ Ð¼ÐµÑÑ‚Ð¾Ð¿Ð¾Ð»Ð¾Ð¶ÐµÐ½Ð¸Ðµ:** {currentRegion.Name}\n**Ð›Ð¾ÐºÐ°Ñ†Ð¸Ñ:** {currentLocation.Name}")
                     .WithImageUrl(_map.Settings.PictureURL)
                     .Build();
                 components = new ComponentBuilder()
                     .WithSelectMenu("choose", _map.GetRegionsSelectMenu(),
-                            "Âûáåðèòå ðåãèîí äëÿ ïðîñìîòðà")
+                            "Ð’Ñ‹Ð±ÐµÑ€Ð¸Ñ‚Ðµ Ñ€ÐµÐ³Ð¸Ð¾Ð½ Ð´Ð»Ñ Ð¿Ñ€Ð¾ÑÐ¼Ð¾Ñ‚Ñ€Ð°")
                     .Build();
                 if (message == null)
                 {
@@ -71,12 +71,12 @@ namespace Shuvi.Modules.SlashCommands
             MessageComponent components;
             embed = new UserEmbedBuilder(discordUser)
                    .WithAuthor(region.Name)
-                   .WithDescription($"Îòêðûâàåòñÿ ñ ðàíãà {region.NeededRank.ToRusString()}\n**Îïèñàíèå:**\n{region.Description}\n\n" +
-                   $"**Ëîêàöèè:**\n```{string.Join("\n", region.Locations.Select(location => location.Name))}```")
+                   .WithDescription($"ÐžÑ‚ÐºÑ€Ñ‹Ð²Ð°ÐµÑ‚ÑÑ Ñ Ñ€Ð°Ð½Ð³Ð° {region.NeededRank.ToRusString()}\n**ÐžÐ¿Ð¸ÑÐ°Ð½Ð¸Ðµ:**\n{region.Description}\n\n" +
+                   $"**Ð›Ð¾ÐºÐ°Ñ†Ð¸Ð¸:**\n```{string.Join("\n", region.Locations.Select(location => location.Name))}```")
                    .WithImageUrl(region.PictureURL)
                    .Build();
             components = new ComponentBuilder()
-                .WithButton("Íàçàä", "exit", ButtonStyle.Danger)
+                .WithButton("ÐÐ°Ð·Ð°Ð´", "exit", ButtonStyle.Danger)
                 .Build();
             await message.ModifyAsync(msg => { msg.Embed = embed; msg.Components = components; });
             await interaction!.DeferAsync();

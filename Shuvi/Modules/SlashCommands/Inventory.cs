@@ -1,4 +1,4 @@
-using Discord;
+п»їusing Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,7 +21,7 @@ namespace Shuvi.Modules.SlashCommands
             _client = provider.GetRequiredService<DiscordShardedClient>();
         }
 
-        [SlashCommand("inventory", "Посмотреть инвентарь")]
+        [SlashCommand("inventory", "РџРѕСЃРјРѕС‚СЂРµС‚СЊ РёРЅРІРµРЅС‚Р°СЂСЊ")]
         public async Task InventoryCommandAsync()
         {
             IDatabaseUser dbUser = await _database.Users.GetUser(Context.User.Id);
@@ -41,10 +41,10 @@ namespace Shuvi.Modules.SlashCommands
                 embed = dbUser.Inventory.GetItemsEmbed(pageNow);
                 components = new ComponentBuilder()
                         .WithButton("<", "<", ButtonStyle.Primary, disabled: pageNow <= 0)
-                        .WithButton("Выйти", "exit", ButtonStyle.Danger)
+                        .WithButton("Р’С‹Р№С‚Рё", "exit", ButtonStyle.Danger)
                         .WithButton(">", ">", ButtonStyle.Primary, disabled: pageNow >= maxPage - 1)
                         .WithSelectMenu("choose", dbUser.Inventory.GetItemsSelectMenu(pageNow),
-                        "Выберите предмет для просмотра", disabled: dbUser.Inventory.Count == 0)
+                        "Р’С‹Р±РµСЂРёС‚Рµ РїСЂРµРґРјРµС‚ РґР»СЏ РїСЂРѕСЃРјРѕС‚СЂР°", disabled: dbUser.Inventory.Count == 0)
                         .Build();
                 if (message == null)
                 {
@@ -84,7 +84,7 @@ namespace Shuvi.Modules.SlashCommands
             {
                 msg.Embed = dbUser.Inventory.GetItemEmbed(itemId);
                 msg.Components = new ComponentBuilder()
-                    .WithButton("Назад", "back", ButtonStyle.Danger)
+                    .WithButton("РќР°Р·Р°Рґ", "back", ButtonStyle.Danger)
                     .Build();
             });
             await interaction.DeferAsync();

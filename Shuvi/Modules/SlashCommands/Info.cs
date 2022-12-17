@@ -1,4 +1,4 @@
-using Discord;
+п»їusing Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,14 +21,14 @@ namespace Shuvi.Modules.SlashCommands
             _client = provider.GetRequiredService<DiscordShardedClient>();
         }
 
-        [SlashCommand("info", "Информаиця о боте.")]
+        [SlashCommand("info", "РРЅС„РѕСЂРјР°РёС†СЏ Рѕ Р±РѕС‚Рµ.")]
         public async Task InfoCommandAsync()
         {
             Embed embed = new BotEmbedBuilder()
-                .WithDescription($"Шард №{Context.Client.GetShardFor(Context.Guild).ShardId}\nСерверов: {Context.Client.Guilds.Count}\n")
+                .WithDescription($"РЁР°СЂРґ в„–{Context.Client.GetShardFor(Context.Guild).ShardId}\nРЎРµСЂРІРµСЂРѕРІ: {Context.Client.Guilds.Count}\n")
                 .Build();
             ComponentBuilder components = new ComponentBuilder()
-                .WithButton("Предметы", "AllItems", ButtonStyle.Primary);
+                .WithButton("РџСЂРµРґРјРµС‚С‹", "AllItems", ButtonStyle.Primary);
 
             await RespondAsync(embed: embed, components: components.Build());
             IUserMessage botMessage = await GetOriginalResponseAsync();
@@ -55,7 +55,7 @@ namespace Shuvi.Modules.SlashCommands
                     msg.Components = new ComponentBuilder()
                         .WithButton("<", "<", ButtonStyle.Primary, disabled: pageNow <= 0)
                         .WithButton(">", ">", ButtonStyle.Primary, disabled: pageNow >= maxPage - 1)
-                        .WithSelectMenu("choose", AllItemsData.GetItemsSelectMenu(pageNow), "Выберите предмет для просмотра")
+                        .WithSelectMenu("choose", AllItemsData.GetItemsSelectMenu(pageNow), "Р’С‹Р±РµСЂРёС‚Рµ РїСЂРµРґРјРµС‚ РґР»СЏ РїСЂРѕСЃРјРѕС‚СЂР°")
                         .Build();
                 });
                 await interaction.DeferAsync();
@@ -83,7 +83,7 @@ namespace Shuvi.Modules.SlashCommands
             {
                 msg.Embed = AllItemsData.GetItemEmbed(itemId);
                 msg.Components = new ComponentBuilder()
-                    .WithButton("Назад", "back", ButtonStyle.Danger)
+                    .WithButton("РќР°Р·Р°Рґ", "back", ButtonStyle.Danger)
                     .Build();
             });
             await originalInteraction.DeferAsync();
