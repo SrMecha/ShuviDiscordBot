@@ -5,6 +5,7 @@ using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Shuvi.Classes.CustomEmoji;
 using Shuvi.Services;
+using System.Runtime.CompilerServices;
 
 namespace Shuvi
 {
@@ -18,8 +19,8 @@ namespace Shuvi
 
         public async Task MainAsync()
         {
-            string? botToken = Environment.GetEnvironmentVariable("BotToken", EnvironmentVariableTarget.User);
-            string? mongoKey = Environment.GetEnvironmentVariable("MongoKey", EnvironmentVariableTarget.User);
+            string? botToken = LoadEnviroment("BotToken");
+            string? mongoKey = LoadEnviroment("MongoKey");
 
             if (botToken == null || mongoKey == null)
             {
@@ -58,6 +59,19 @@ namespace Shuvi
         private void InitStaticClasses()
         {
             EmojiList.Init();
+        }
+        private string? LoadEnviroment(string name) 
+        {
+            var result = Environment.GetEnvironmentVariable("BotToken", EnvironmentVariableTarget.User);
+            if (result == null)
+                result = Environment.GetEnvironmentVariable("BotToken", EnvironmentVariableTarget.Process);
+            else
+                return result;
+            if (result == null)
+                result = Environment.GetEnvironmentVariable("BotToken", EnvironmentVariableTarget.Machine);
+            else
+                return result;
+            return result;
         }
     }
 }
