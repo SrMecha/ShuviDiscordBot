@@ -62,13 +62,13 @@ namespace Shuvi
         }
         private string? LoadEnviroment(string name) 
         {
-            var result = Environment.GetEnvironmentVariable("BotToken", EnvironmentVariableTarget.User);
+            var result = Environment.GetEnvironmentVariable(name, EnvironmentVariableTarget.User);
             if (result == null)
-                result = Environment.GetEnvironmentVariable("BotToken", EnvironmentVariableTarget.Process);
+                result = Environment.GetEnvironmentVariable(name, EnvironmentVariableTarget.Process);
             else
                 return result;
             if (result == null)
-                result = Environment.GetEnvironmentVariable("BotToken", EnvironmentVariableTarget.Machine);
+                result = Environment.GetEnvironmentVariable(name, EnvironmentVariableTarget.Machine);
             else
                 return result;
             return result;
