@@ -49,8 +49,7 @@ namespace Shuvi.Services
 
         private async Task ShardReadyAsync(DiscordSocketClient _)
         {
-            await _service.RegisterCommandsToGuildAsync(1013034653717905484);
-            /* await _service.RegisterCommandsGloballyAsync(); */
+            await _service.RegisterCommandsGloballyAsync();
         }
     }
 }
