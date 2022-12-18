@@ -1,6 +1,7 @@
 using Shuvi.Interfaces.Characteristics;
 using Shuvi.Interfaces.Effect;
 using Shuvi.Interfaces.Spell;
+using Shuvi.Interfaces.Status;
 
 namespace Shuvi.Interfaces.Entity
 {
@@ -15,11 +16,15 @@ namespace Shuvi.Interfaces.Entity
         public ICharacteristicBonuses EffectBonuses { get; }
         public IEffects Effects { get; }
 
-        public void DealDamage(IEntity target);
-        public int CalculateDamage();
+        public IActionResult CastSpell(IEntity target);
+        public IActionResult DealLightDamage(IEntity target);
+        public IActionResult DealHeavyDamage(IEntity target);
+        public int CalculateLightDamage();
+        public int CalculateHeavyDamage();
+        public IActionResult PreparingForDefense(IEntity target);
+        public IActionResult PreparingForDodge(IEntity target);
         public int BlockDamage(int damage);
-        public bool IsDodged(IEntity assaulter);
-        public bool IsCritical(IEntity target);
+        public bool IsDodged(IEntity assaulter, int hitBonusChance);
         public void RestoreHealth(int amount);
         public void ReduceHealth(int amount);
         public void RestoreMana(int amount);
