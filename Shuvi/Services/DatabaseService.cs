@@ -115,21 +115,17 @@ namespace Shuvi.Services
     {
         private readonly IMongoCollection<EnemyData> _enemiesCollection;
 
-        public Dictionary<ObjectId, EnemyData> Enemies { get; init; }
-
         public EnemiesDatabase(IMongoCollection<EnemyData> enemyCollection)
         {
             _enemiesCollection = enemyCollection;
-            Enemies = LoadEnemies();
+            LoadEnemies();
         }
-        private Dictionary<ObjectId, EnemyData> LoadEnemies()
+        private void LoadEnemies()
         {
-            Dictionary<ObjectId, EnemyData> result = new();
             foreach (EnemyData enemyData in _enemiesCollection.FindSync(new BsonDocument { }).ToEnumerable<EnemyData>())
             {
-                result.Add(enemyData.Id, enemyData);
+                AllEnemiesData.AddData(enemyData);
             }
-            return result;
         }
     }
 
