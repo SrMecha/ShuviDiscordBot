@@ -20,6 +20,7 @@ namespace Shuvi.Classes.Inventory
         }
         public UserInventory()
         {
+            _localInventory = new();
         }
         public void AddItem(IItem item)
         {
