@@ -10,6 +10,7 @@ namespace Shuvi.Interfaces.User
         public ulong Id { get; init; }
         public IUserRating Rating { get; init; }
         public IUserWallet Wallet { get; init; }
+        public string SpellName { get; init; }
         public UserRaces Race { get; init; }
         public UserProfessions Profession { get; init; }
         public IUserInventory Inventory { get; init; }

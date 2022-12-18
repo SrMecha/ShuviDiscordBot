@@ -18,6 +18,9 @@ namespace Shuvi.Classes.Inventory
         {
             _localInventory = inventoryData;
         }
+        public UserInventory()
+        {
+        }
         public void AddItem(IItem item)
         {
             _localInventory.Add(item.Id, item.Amount);
