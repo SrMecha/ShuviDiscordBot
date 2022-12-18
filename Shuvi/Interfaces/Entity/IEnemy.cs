@@ -1,5 +1,6 @@
 ﻿using Shuvi.Interfaces.Inventory;
 using Shuvi.Interfaces.Rates;
+using Shuvi.Interfaces.Status;
 
 namespace Shuvi.Interfaces.Entity
 {
@@ -7,5 +8,6 @@ namespace Shuvi.Interfaces.Entity
     {
         public string PictureUrl { get; init; }
         public IRate Drop { get; init; }
+        public IActionResult RandomAction(IEntity target);
     }
 }
