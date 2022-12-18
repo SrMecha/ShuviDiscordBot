@@ -13,8 +13,9 @@ namespace Shuvi.Classes.Enemy
         public string Description { get; set; } = "Ща она тебе пизды даст. Шуви сразу Ислам примет.";
         public Rank Rank { get; set; } = Rank.E;
         public int UpgradePoints { get; set; } = 5;
+        public EnemyActionChances ActionChances { get; set; } = new();
         public Dictionary<string, string> Pictures { get; set; } = new();
-        public string Spell { get; set; } = string.Empty;
+        public string SpellName { get; set; } = string.Empty;
         public int Strength { get; set; } = 1;
         public int Agility { get; set; } = 1;
         public int Luck { get; set; } = 1;

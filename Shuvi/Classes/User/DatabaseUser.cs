@@ -14,6 +14,7 @@ namespace Shuvi.Classes.User
         public ulong Id { get; init; }
         public IUserRating Rating { get; init; }
         public IUserWallet Wallet { get; init; }
+        public string SpellName { get; init; }
         public UserRaces Race { get; init; }
         public UserProfessions Profession { get; init; }
         public IUserInventory Inventory { get; init; }
@@ -30,6 +31,7 @@ namespace Shuvi.Classes.User
             Id = userData.Id;
             Rating = new UserRating(userData.Rating);
             Wallet = new UserWallet(userData.Money, userData.Dispoints);
+            SpellName = userData.Spell;
             Race = userData.Race;
             Profession = userData.Profession;
             Inventory = new UserInventory(userData.Inventory);
