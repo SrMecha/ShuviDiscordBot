@@ -1,5 +1,9 @@
-﻿using MongoDB.Bson;
+﻿using Discord;
+using MongoDB.Bson;
+using Shuvi.Classes.Items;
 using Shuvi.Enums;
+using Shuvi.Extensions;
+using System;
 
 namespace Shuvi.Classes.Map
 {
@@ -19,6 +23,29 @@ namespace Shuvi.Classes.Map
             if (Locations.Count - 1 > index)
                 return new MapLocation { };
             return Locations[index];
+        }
+        public List<SelectMenuOptionBuilder> GetLocationsSelectMenu()
+        {
+            var result = new List<SelectMenuOptionBuilder>();
+            for (int i = 0; i < Locations.Count; i++)
+            {
+                var location = GetLocation(i);
+                var description = location.Description;
+                if (description.Length > 70)
+                {
+                    description = $"{description[..70]}...";
+                }
+                result.Add(new SelectMenuOptionBuilder(
+                    $"{location.Name} 「{location.RecomendedRank.ToRusString()}」",
+                    i.ToString(),
+                    description
+                    ));
+            }
+            if (result.Count < 1)
+            {
+                result.Add(new SelectMenuOptionBuilder("None", "None", "В данном регионе нету локаций."));
+            }
+            return result;
         }
     }
 }
