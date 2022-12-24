@@ -12,12 +12,12 @@ namespace Shuvi.Modules.SlashCommands
 {
     public class InventoryCommandModule : InteractionModuleBase<ShardedInteractionContext>
     {
-        private readonly DatabaseManager _database;
+        private readonly DatabaseManagerService _database;
         private readonly DiscordShardedClient _client;
 
         public InventoryCommandModule(IServiceProvider provider)
         {
-            _database = provider.GetRequiredService<DatabaseManager>();
+            _database = provider.GetRequiredService<DatabaseManagerService>();
             _client = provider.GetRequiredService<DiscordShardedClient>();
         }
 
