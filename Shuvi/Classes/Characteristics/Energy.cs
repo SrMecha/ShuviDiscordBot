@@ -1,14 +1,16 @@
 ﻿using Shuvi.Classes.CustomEmoji;
+using Shuvi.Classes.SaveBuilders;
 using Shuvi.Classes.User;
 using Shuvi.Extensions;
 using Shuvi.Interfaces.Characteristics;
+using System.Xml.Linq;
 
 namespace Shuvi.Classes.Characteristics
 {
     public class Energy : IEnergy
     {
-        public int Max { get; init; }
-        public long RegenTime { get; init; }
+        public int Max { get; private set; }
+        public long RegenTime { get; private set; }
 
         public Energy(long regenTime, int endurance)
         {
@@ -28,6 +30,13 @@ namespace Shuvi.Classes.Characteristics
         {
             int result = (int)(RegenTime - ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds());
             return result > 0 ? result : 0;
+        }
+        public void ReduceEnergy(int amount)
+        {
+            if (((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds() > RegenTime)
+                RegenTime = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds() + (amount * UserSettings.EnergyPointRegenTime);
+            else
+                RegenTime += amount * UserSettings.EnergyPointRegenTime;
         }
         public string GetEmojiBar()
         {
