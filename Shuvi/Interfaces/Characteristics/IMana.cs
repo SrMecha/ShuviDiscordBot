@@ -7,6 +7,5 @@
         public int GetCurrentMana();
         public int GetRemainingRegenTime();
         public string GetEmojiBar();
-
     }
 }
