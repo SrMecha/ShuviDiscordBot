@@ -41,6 +41,21 @@ namespace Shuvi.Classes.SaveBuilders
                 _data.Set("ManaRegenTime", time + (amount * UserSettings.ManaPointRegenTime));
             return this;
         }
+        public UserSaveBuilder SetEnergy(long time)
+        {
+            _data.Set("EnergyRegenTime", time);
+            return this;
+        }
+        public UserSaveBuilder SetHealth(long time)
+        {
+            _data.Set("HealthRegenTime", time);
+            return this;
+        }
+        public UserSaveBuilder SetMana(long time)
+        {
+            _data.Set("ManaRegenTime", time);
+            return this;
+        }
         public UserSaveBuilder SetWeapon(ObjectId? id)
         {
             _data.Set("Weapon", id);
@@ -81,7 +96,7 @@ namespace Shuvi.Classes.SaveBuilders
             _data.Set("Spell", name);
             return this;
         }
-        public UserSaveBuilder SetMoney(int amount)
+        public UserSaveBuilder AddMoney(int amount)
         {
             _data.Set("Money", amount);
             return this;
@@ -96,7 +111,7 @@ namespace Shuvi.Classes.SaveBuilders
             _data.Set("Dispoints", amount);
             return this;
         }
-        public UserSaveBuilder IncDispoints(int amount)
+        public UserSaveBuilder AddDispoints(int amount)
         {
             _data.Inc("Dispoints", amount);
             return this;
@@ -116,7 +131,7 @@ namespace Shuvi.Classes.SaveBuilders
             _data.Set("Strength", amount);
             return this;
         }
-        public UserSaveBuilder IncStrength(int amount)
+        public UserSaveBuilder AddStrength(int amount)
         {
             _data.Inc("Strength", amount);
             return this;
@@ -126,7 +141,7 @@ namespace Shuvi.Classes.SaveBuilders
             _data.Set("Agility", amount);
             return this;
         }
-        public UserSaveBuilder IncAgility(int amount)
+        public UserSaveBuilder AddAgility(int amount)
         {
             _data.Inc("Agility", amount);
             return this;
@@ -136,7 +151,7 @@ namespace Shuvi.Classes.SaveBuilders
             _data.Set("Luck", amount);
             return this;
         }
-        public UserSaveBuilder IncLuck(int amount)
+        public UserSaveBuilder AddLuck(int amount)
         {
             _data.Inc("Luck", amount);
             return this;
@@ -146,7 +161,7 @@ namespace Shuvi.Classes.SaveBuilders
             _data.Set("Intellect", amount);
             return this;
         }
-        public UserSaveBuilder IncIntellect(int amount)
+        public UserSaveBuilder AddIntellect(int amount)
         {
             _data.Inc("Intellect", amount);
             return this;
@@ -156,7 +171,7 @@ namespace Shuvi.Classes.SaveBuilders
             _data.Set("Endurance", amount);
             return this;
         }
-        public UserSaveBuilder IncEndurance(int amount)
+        public UserSaveBuilder AddEndurance(int amount)
         {
             _data.Inc("Endurance", amount);
             return this;
@@ -166,7 +181,7 @@ namespace Shuvi.Classes.SaveBuilders
             _data.Set("MaxMana", amount);
             return this;
         }
-        public UserSaveBuilder IncMaxMana(int amount)
+        public UserSaveBuilder AddMaxMana(int amount)
         {
             _data.Inc("MaxMana", amount);
             return this;
@@ -176,7 +191,7 @@ namespace Shuvi.Classes.SaveBuilders
             _data.Set("MaxHealth", amount);
             return this;
         }
-        public UserSaveBuilder IncMaxHealth(int amount)
+        public UserSaveBuilder AddMaxHealth(int amount)
         {
             _data.Inc("MaxHealth", amount);
             return this;
@@ -196,17 +211,17 @@ namespace Shuvi.Classes.SaveBuilders
             _data.Set("LiveTime", time);
             return this;
         }
-        public UserSaveBuilder IncDeathCount(int amount)
+        public UserSaveBuilder AddDeathCount(int amount)
         {
             _data.Inc("DeathCount", amount);
             return this;
         }
-        public UserSaveBuilder IncDungeonComplite(int amount)
+        public UserSaveBuilder AddDungeonComplite(int amount)
         {
             _data.Inc("DungeonComplite", amount);
             return this;
         }
-        public UserSaveBuilder IncEnemyKilled(int amount)
+        public UserSaveBuilder AddEnemyKilled(int amount)
         {
             _data.Inc("EnemyKilled", amount);
             return this;
@@ -216,7 +231,7 @@ namespace Shuvi.Classes.SaveBuilders
             _data.Set("MaxRating", amount);
             return this;
         }
-        public UserSaveBuilder IncMaxRating(int amount)
+        public UserSaveBuilder AddMaxRating(int amount)
         {
             _data.Inc("MaxRating", amount);
             return this;
