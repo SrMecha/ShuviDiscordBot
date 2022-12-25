@@ -1,5 +1,7 @@
 ﻿using Discord;
+using Shuvi.Classes.Skills;
 using Shuvi.Enums;
+using Shuvi.Interfaces.Skills;
 using System.Runtime.CompilerServices;
 
 namespace Shuvi.Extensions
@@ -151,6 +153,16 @@ namespace Shuvi.Extensions
             {
                 UserRaces.ExMachina => "Экс-Машина",
                 _ => "Неизвестный"
+            };
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+        public static ISkill GetSkill(this UserProfessions target)
+        {
+            return target switch
+            {
+                UserProfessions.NoProfession => new VoidSkill(),
+                UserProfessions.Proofer => new ProoferSkill(),
+                _ => new VoidSkill()
             };
         }
     }
