@@ -2,18 +2,13 @@
 using Shuvi.Classes.User;
 using Shuvi.Extensions;
 using Shuvi.Interfaces.Characteristics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Shuvi.Classes.Characteristics
 {
     public class Mana : IMana
     {
-        public int Max { get; init; }
-        public long RegenTime { get; init; }
+        public int Max { get; private set; }
+        public long RegenTime { get; private set; }
 
         public Mana(int max, long regenTime)
         {
@@ -28,6 +23,13 @@ namespace Shuvi.Classes.Characteristics
         {
             int result = (int)(RegenTime - ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds());
             return result > 0 ? result : 0;
+        }
+        public void ReduceMana(int amount)
+        {
+            if (((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds() > RegenTime)
+                RegenTime = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds() + (amount * UserSettings.ManaPointRegenTime);
+            else
+                RegenTime += amount * UserSettings.ManaPointRegenTime;
         }
         public string GetEmojiBar()
         {
