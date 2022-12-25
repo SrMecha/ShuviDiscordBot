@@ -75,7 +75,7 @@ namespace Shuvi.Classes.Entity
         }
         public IActionResult CastSpell(IEntity target)
         {
-            throw new NotImplementedException();
+            return Spell.Cast(this, target);
         }
         public IActionResult PreparingForDefense(IEntity target)
         {
@@ -130,7 +130,7 @@ namespace Shuvi.Classes.Entity
         {
             Mana.RestoreMana(amount);
         }
-        public void Update()
+        public virtual void Update()
         {
             _isPreparingForDefense = false;
             _isPreparingForDodge = false;
