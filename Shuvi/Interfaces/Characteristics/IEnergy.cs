@@ -1,4 +1,6 @@
-﻿namespace Shuvi.Interfaces.Characteristics
+﻿using Discord.Commands;
+
+namespace Shuvi.Interfaces.Characteristics
 {
     public interface IEnergy
     {

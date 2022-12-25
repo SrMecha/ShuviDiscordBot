@@ -6,5 +6,6 @@
         public int Now { get; }
         public void ReduceMana(int amount);
         public void RestoreMana(int amount);
+        public string ToString();
     }
 }
