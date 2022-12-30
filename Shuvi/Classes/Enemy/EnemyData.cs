@@ -23,6 +23,6 @@ namespace Shuvi.Classes.Enemy
         public int Endurance { get; set; } = 1;
         public int Mana { get; set; } = 10;
         public int Health { get; set; } = 100;
-        public List<AllRate> Drop { get; set; } = new();
+        public EnemyDrop Drop { get; set; } = new();
     }
 }

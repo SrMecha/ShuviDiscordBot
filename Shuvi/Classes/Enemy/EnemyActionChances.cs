@@ -6,5 +6,6 @@
         public int HeavyAttack { get; set; } = 1;
         public int Dodge { get; set; } = 1;
         public int Defense { get; set; } = 1;
+        public int Spell { get; set; } = 0;
     }
 }

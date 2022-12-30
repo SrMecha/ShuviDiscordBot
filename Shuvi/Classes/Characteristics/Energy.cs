@@ -1,9 +1,7 @@
 ﻿using Shuvi.Classes.CustomEmoji;
-using Shuvi.Classes.SaveBuilders;
 using Shuvi.Classes.User;
 using Shuvi.Extensions;
 using Shuvi.Interfaces.Characteristics;
-using System.Xml.Linq;
 
 namespace Shuvi.Classes.Characteristics
 {
@@ -20,7 +18,8 @@ namespace Shuvi.Classes.Characteristics
 
         public int GetCurrentEnergy()
         {
-            return Max - (GetRemainingRegenTime() / UserSettings.EnergyPointRegenTime);
+            var result = (int)(Max - Math.Ceiling((float)GetRemainingRegenTime() / UserSettings.EnergyPointRegenTime));
+            return result > Max ? Max : result;
         }
         public int GetMaxEnergy(int endurance)
         {
@@ -43,6 +42,10 @@ namespace Shuvi.Classes.Characteristics
             var energyFullEmojiCount = (byte)(GetCurrentEnergy() / (Max / UserSettings.EnergyDisplayMax));
             return $"{EmojiList.Get("energyFull").ToString()!.Multiple(energyFullEmojiCount)}" +                    
                 $"{EmojiList.Get("energyEmpty").ToString()!.Multiple((byte)(UserSettings.EnergyDisplayMax - energyFullEmojiCount))}";
+        }
+        public bool HaveEnergy(int amount)
+        {
+            return amount <= GetCurrentEnergy();
         }
     }
 }

@@ -1,9 +1,7 @@
 ﻿using Discord;
 using MongoDB.Bson;
-using Shuvi.Classes.Items;
 using Shuvi.Enums;
 using Shuvi.Extensions;
-using System;
 
 namespace Shuvi.Classes.Map
 {
@@ -20,7 +18,7 @@ namespace Shuvi.Classes.Map
 
         public MapLocation GetLocation(int index)
         {
-            if (Locations.Count - 1 > index)
+            if (index >= Locations.Count)
                 return new MapLocation { };
             return Locations[index];
         }

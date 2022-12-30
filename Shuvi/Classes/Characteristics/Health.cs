@@ -18,7 +18,8 @@ namespace Shuvi.Classes.Characteristics
 
         public int GetCurrentHealth()
         {
-            return Max - (GetRemainingRegenTime() / UserSettings.HealthPointRegenTime);
+            var result = (int)(Max - Math.Ceiling((float)GetRemainingRegenTime() / UserSettings.HealthPointRegenTime));
+            return result > Max ? Max : result;
         }
         public int GetRemainingRegenTime()
         {

@@ -1,14 +1,13 @@
 ﻿using Shuvi.Interfaces.Entity;
 using Shuvi.Classes.Entity;
 using Shuvi.Interfaces.Inventory;
-using Shuvi.Classes.User;
 using Shuvi.Classes.Inventory;
 using Shuvi.Classes.Spell;
 using Shuvi.Classes.Characteristics;
 using Shuvi.Interfaces.Skills;
 using Shuvi.Extensions;
-using MongoDB.Driver;
 using Shuvi.Interfaces.Status;
+using Shuvi.Interfaces.User;
 
 namespace Shuvi.Classes.Player
 {
@@ -17,7 +16,7 @@ namespace Shuvi.Classes.Player
         public ISkill Skill { get; init; }
         public IUserInventory Inventory { get; init; }
 
-        public PlayerBase(string userName, DatabaseUser user)
+        public PlayerBase(string userName, IDatabaseUser user)
         {
             Name = userName;
             Characteristics = user.Characteristic;

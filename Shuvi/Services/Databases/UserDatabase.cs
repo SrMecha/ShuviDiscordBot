@@ -2,16 +2,20 @@
 using MongoDB.Driver;
 using Shuvi.Classes.User;
 using Shuvi.Interfaces.User;
+using Shuvi.Services.Caches;
 
 namespace Shuvi.Services.Databases
 {
     public sealed class UserDatabase
     {
         private readonly IMongoCollection<UserData> _userCollection;
+        private readonly UserCacheManager _cacheUsers;
 
         public UserDatabase(IMongoCollection<UserData> userCollection)
         {
             _userCollection = userCollection;
+            _cacheUsers = new();
+            StartCacheCleaner();
         }
         public async Task<IDatabaseUser> AddUser(ulong userId)
         {
@@ -26,25 +30,37 @@ namespace Shuvi.Services.Databases
                 LiveTime = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds()
             };
             await _userCollection.InsertOneAsync(userData);
+            _cacheUsers.TryAddUser(userData);
             return new DatabaseUser(userData);
         }
         public async Task<IDatabaseUser> GetUser(ulong userId)
         {
-            IDatabaseUser user;
+            if (_cacheUsers.TryGetUser(userId, out IDatabaseUser? user))
+                return user!;
             try
             {
                 UserData userData = await _userCollection.Find(new BsonDocument { { "_id", (long)userId } }).SingleAsync();
-                user = new DatabaseUser(userData);
+                _cacheUsers.TryAddUser(userData);
             }
             catch (InvalidOperationException)
             {
-                user = await AddUser(userId);
+                await AddUser(userId);
             }
-            return user;
+            return _cacheUsers.GetUser(userId);
         }
-        public async Task UpdateUser(ulong userId, BsonDocument updateConfig)
+        public async Task UpdateUser(ulong userId, UpdateDefinition<UserData> updateConfig)
         {
             await _userCollection.UpdateOneAsync(new BsonDocument { { "_id", (long)userId } }, updateConfig);
+        }
+        public void StartCacheCleaner()
+        {
+            _ = Task.Run(async () => {
+                while (true)
+                {
+                    await Task.Delay(300);
+                    _cacheUsers.DeleteNotUsedCache();
+                }
+            });
         }
     }
 }

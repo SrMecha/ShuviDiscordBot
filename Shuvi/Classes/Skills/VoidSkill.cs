@@ -7,7 +7,7 @@ namespace Shuvi.Classes.Skills
 {
     public class VoidSkill : ISkill
     {
-        public ISkillInfo Info { get; init; } = new SkillInfo("Нету", "Без описания.");
+        public ISkillInfo Info { get; init; } = new SkillInfo("Без способности", "Без описания.");
         public bool CanUse => false;
 
         public string GetStatus(IEntity owner)

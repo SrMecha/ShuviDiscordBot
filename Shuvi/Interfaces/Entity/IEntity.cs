@@ -19,11 +19,11 @@ namespace Shuvi.Interfaces.Entity
         public IActionResult CastSpell(IEntity target);
         public IActionResult DealLightDamage(IEntity target);
         public IActionResult DealHeavyDamage(IEntity target);
-        public int CalculateLightDamage();
-        public int CalculateHeavyDamage();
+        public float CalculateLightDamage();
+        public float CalculateHeavyDamage();
         public IActionResult PreparingForDefense(IEntity target);
         public IActionResult PreparingForDodge(IEntity target);
-        public int BlockDamage(int damage);
+        public int BlockDamage(float damage);
         public bool IsDodged(IEntity assaulter, int hitBonusChance);
         public void RestoreHealth(int amount);
         public void ReduceHealth(int amount);

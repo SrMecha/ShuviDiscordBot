@@ -19,7 +19,9 @@ namespace Shuvi.Services.Databases
         private WorldMap LoadMap()
         {
             WorldMap result = BsonSerializer.Deserialize<WorldMap>(_infoCollection.Find(new BsonDocument { { "_id", "Map" } }).Single());
-
+            foreach (var region in result.Regions)
+                foreach (var location in region.Locations)
+                    location.ConfigureRates();
             return result;
         }
     }

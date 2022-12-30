@@ -3,7 +3,6 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Shuvi.Services;
-using Shuvi.Classes.User;
 using MongoDB.Bson;
 using Shuvi.Classes.Interactions;
 using Shuvi.Interfaces.User;

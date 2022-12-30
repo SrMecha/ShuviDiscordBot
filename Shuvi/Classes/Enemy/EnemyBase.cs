@@ -5,6 +5,7 @@ using Shuvi.Interfaces.Entity;
 using Shuvi.Interfaces.Rates;
 using Shuvi.Enums;
 using Shuvi.Interfaces.Status;
+using Shuvi.Classes.Rates;
 
 namespace Shuvi.Classes.Enemy
 {
@@ -23,7 +24,7 @@ namespace Shuvi.Classes.Enemy
             Spell = SpellFactory.GetSpell(data.SpellName);
             Health = SetHealth(data.Health, data.UpgradePoints);
             Mana = SetMana(data.Mana, data.UpgradePoints);
-            Drop = (IRate)data.Drop;
+            Drop = new AllRate(data.Drop);
             _actionChances = SetActionChanses(data.ActionChances);
         }
         private UserCharacteristics SetCharacteristics(EnemyData data, int amount)
@@ -69,13 +70,26 @@ namespace Shuvi.Classes.Enemy
         }
         public IActionResult RandomAction(IEntity target)
         {
-            return (EnemyAction)_random.Next(0, _actionChances.Count) switch
-            {
-                EnemyAction.LightAttack => DealLightDamage(target),
-                EnemyAction.HeavyAttack => DealHeavyDamage(target),
-                EnemyAction.Dodge => PreparingForDodge(target),
-                EnemyAction.Defense => PreparingForDefense(target)
-            };
+            if (Spell.CanCast(this))
+                return (EnemyAction)_actionChances.ElementAt(_random.Next(0, _actionChances.Count)) switch
+                {
+                    EnemyAction.LightAttack => DealLightDamage(target),
+                    EnemyAction.HeavyAttack => DealHeavyDamage(target),
+                    EnemyAction.Dodge => PreparingForDodge(target),
+                    EnemyAction.Defense => PreparingForDefense(target),
+                    EnemyAction.Spell => CastSpell(target),
+                    _ => DealLightDamage(target)
+                };
+            else
+                return (EnemyAction)_actionChances.ElementAt(_random.Next(0, _actionChances.Count)) switch
+                {
+                    EnemyAction.LightAttack => DealLightDamage(target),
+                    EnemyAction.HeavyAttack => DealHeavyDamage(target),
+                    EnemyAction.Dodge => PreparingForDodge(target),
+                    EnemyAction.Defense => PreparingForDefense(target),
+                    EnemyAction.Spell => DealLightDamage(target),
+                    _ => DealLightDamage(target)
+                };
         }
     }
 }

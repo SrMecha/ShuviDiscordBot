@@ -9,5 +9,6 @@
         public int GetCurrentEnergy();
         public void ReduceEnergy(int amount);
         public string GetEmojiBar();
+        public bool HaveEnergy(int amount);
     }
 }

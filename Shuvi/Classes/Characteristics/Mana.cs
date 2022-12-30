@@ -17,7 +17,8 @@ namespace Shuvi.Classes.Characteristics
         }
         public int GetCurrentMana()
         {
-            return Max - (GetRemainingRegenTime() / UserSettings.ManaPointRegenTime);
+            var result = (int)(Max - Math.Ceiling((float)GetRemainingRegenTime() / UserSettings.ManaPointRegenTime));
+            return result > Max ? Max : result;
         }
         public int GetRemainingRegenTime()
         {
