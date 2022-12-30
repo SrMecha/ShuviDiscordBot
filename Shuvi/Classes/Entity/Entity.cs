@@ -28,54 +28,55 @@ namespace Shuvi.Classes.Entity
         public IActionResult DealLightDamage(IEntity target)
         {
             if (target.IsDodged(this, 30))
-                return new ActionResult($"{target.Name} увернулся от удара {Name}.");
-            var damage = CalculateLightDamage();
+                return new ActionResult($"{Name} промахнулся лёгким ударом.");
+            int damage;
             if (IsCritical(target))
             {
-                damage = target.BlockDamage(damage) * 2;
+                damage = target.BlockDamage(CalculateLightDamage()) * 2;
                 target.ReduceHealth(damage);
-                return new ActionResult($"{Name} нанёс {target.Name} {damage} урона критическим ударом.");
+                return new ActionResult($"{Name} нанёс {damage} урона критическим ударом.");
             }
-            damage = target.BlockDamage(damage);
+            damage = target.BlockDamage(CalculateLightDamage());
             target.ReduceHealth(damage);
-            return new ActionResult($"{Name} нанёс {target.Name} {damage} урона ударом.");
+            return new ActionResult($"{Name} нанёс {damage} урона лёгким ударом.");
         }
         public IActionResult DealHeavyDamage(IEntity target)
         {
             if (target.IsDodged(this, 0))
-                return new ActionResult($"{target.Name} увернулся от удара {Name}.");
-            var damage = CalculateHeavyDamage();
+                return new ActionResult($"{Name} промахнулся тяжёлым ударом.");
+            int damage;
             if (IsCritical(target))
             {
-                damage = target.BlockDamage(damage) * 2;
+                damage = target.BlockDamage(CalculateHeavyDamage()) * 2;
                 target.ReduceHealth(damage);
-                return new ActionResult($"{Name} нанёс {target.Name} {damage} урона критическим ударом.");
+                return new ActionResult($"{Name} нанёс {damage} урона критическим ударом.");
             }
-            damage = target.BlockDamage(damage);
+            damage = target.BlockDamage(CalculateHeavyDamage());
             target.ReduceHealth(damage);
-            return new ActionResult($"{Name} нанёс {target.Name} {damage} урона ударом.");
+            return new ActionResult($"{Name} нанёс {damage} урона тяжёлым ударом.");
         }
-        public int CalculateLightDamage()
+        public float CalculateLightDamage()
         {
-            return (Characteristics.Strength + EffectBonuses.Strength) * _random.Next(70, 81) / 100;
+            return (Characteristics.Strength + EffectBonuses.Strength) * _random.Next(70, 81) / 100.0f;
         }
-        public int CalculateHeavyDamage()
+        public float CalculateHeavyDamage()
         {
-            return (Characteristics.Strength + EffectBonuses.Strength) * _random.Next(120, 131) / 100;
+            return (Characteristics.Strength + EffectBonuses.Strength) * _random.Next(120, 131) / 100.0f;
         }
-        public int BlockDamage(int damage)
+        public int BlockDamage(float damage)
         {
-            var blockedDamageBonus = 0;
+            var blockedDamageBonus = 0.0f;
             if (_isPreparingForDefense)
-                blockedDamageBonus = (Characteristics.Endurance + EffectBonuses.Endurance) / 2;
-            var outDamage = damage - ((Characteristics.Endurance + EffectBonuses.Endurance + blockedDamageBonus) / 2);
+                blockedDamageBonus = (Characteristics.Endurance + EffectBonuses.Endurance) / 2.0f;
+            var outDamage =  (int)(damage - ((Characteristics.Endurance + EffectBonuses.Endurance + blockedDamageBonus) / 3.0f) + 0.5f);
+            // 0.5f для округления float в большую сторону.
             if (outDamage < 0)
                 outDamage = 0;
             return outDamage;
         }
         public IActionResult CastSpell(IEntity target)
         {
-            throw new NotImplementedException();
+            return Spell.Cast(this, target);
         }
         public IActionResult PreparingForDefense(IEntity target)
         {
@@ -108,11 +109,11 @@ namespace Shuvi.Classes.Entity
         {
             var dodgeBonus = 60;
             if (_isPreparingForDodge)
-                dodgeBonus = 140;
+                dodgeBonus = 120;
             dodgeBonus -= hitBonusChance;
             var dodgeChance = (dodgeBonus + 
                 (Characteristics.Agility + EffectBonuses.Agility - (assaulter.Characteristics.Agility + assaulter.EffectBonuses.Agility))) / 2;
-            return _random.Next(0, 101) >= dodgeChance;
+            return _random.Next(0, 101) <= dodgeChance;
         }
         public void ReduceHealth(int amount)
         {
@@ -130,7 +131,7 @@ namespace Shuvi.Classes.Entity
         {
             Mana.RestoreMana(amount);
         }
-        public void Update()
+        public virtual void Update()
         {
             _isPreparingForDefense = false;
             _isPreparingForDodge = false;

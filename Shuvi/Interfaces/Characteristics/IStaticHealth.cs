@@ -6,5 +6,6 @@
         public int Now { get; }
         public void ReduceHealth(int amount);
         public void RestoreHealth(int amount);
+        public string ToString();
     }
 }

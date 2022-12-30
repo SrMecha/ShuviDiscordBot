@@ -52,7 +52,7 @@ namespace Shuvi
                 .AddSingleton<CommandService>()
                 .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordShardedClient>()))
                 .AddSingleton<InteractionHandlingService>()
-                .AddSingleton(new DatabaseManager(mongoKey))
+                .AddSingleton(new DatabaseManagerService(mongoKey))
                 .BuildServiceProvider();
         } 
 

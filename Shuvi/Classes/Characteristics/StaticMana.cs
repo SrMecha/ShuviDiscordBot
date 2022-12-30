@@ -25,5 +25,9 @@ namespace Shuvi.Classes.Characteristics
             if (Now > Max)
                 Now = Max;
         }
+        public override string ToString()
+        {
+            return $"**Мана:** {Now}/{Max}";
+        }
     }
 }

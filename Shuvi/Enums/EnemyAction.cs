@@ -5,6 +5,7 @@
         LightAttack,
         HeavyAttack,
         Dodge,
-        Defense
+        Defense,
+        Spell
     }
 }

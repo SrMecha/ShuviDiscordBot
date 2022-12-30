@@ -10,12 +10,12 @@ namespace Shuvi.Classes.User
 {
     public class UserStatistics : IUserStatistics
     {
-        public long CreatedAt { get; init; }
-        public long LiveTime { get; init; }
-        public int DeathCount { get; init; }
-        public int DungeonComplite { get; init; }
-        public int EnemyKilled { get; init; }
-        public int MaxRating { get; init; }
+        public long CreatedAt { get; private set; }
+        public long LiveTime { get; private set; }
+        public int DeathCount { get; private set; }
+        public int DungeonComplite { get; private set; }
+        public int EnemyKilled { get; private set; }
+        public int MaxRating { get; private set; }
 
         public UserStatistics(long createdAt, long liveTime, int deathCount, int dungeonComplite, int enemyKiled, int maxRating)
         {
@@ -25,6 +25,21 @@ namespace Shuvi.Classes.User
             DungeonComplite = dungeonComplite;
             EnemyKilled = enemyKiled;
             MaxRating = maxRating;
+        }
+
+        public void AddEnemyKilled(int amount = 1)
+        {
+            EnemyKilled += amount;
+        }
+
+        public void AddDeathCount(int amount = 1)
+        {
+            DeathCount += amount;
+        }
+
+        public void AddDungeonComplite(int amount = 1)
+        {
+            DungeonComplite += amount;
         }
     }
 }

@@ -7,8 +7,8 @@ namespace Shuvi.Classes.Characteristics
 {
     public class Health : IHealth
     {
-        public int Max { get; init; }
-        public long RegenTime { get; init; }
+        public int Max { get; private set; }
+        public long RegenTime { get; private set; }
 
         public Health(int max, long regenTime)
         {
@@ -18,12 +18,20 @@ namespace Shuvi.Classes.Characteristics
 
         public int GetCurrentHealth()
         {
-            return Max - (GetRemainingRegenTime() / UserSettings.HealthPointRegenTime);
+            var result = (int)(Max - Math.Ceiling((float)GetRemainingRegenTime() / UserSettings.HealthPointRegenTime));
+            return result > Max ? Max : result;
         }
         public int GetRemainingRegenTime()
         {
             int result = (int)(RegenTime - ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds());
             return result > 0 ? result : 0;
+        }
+        public void ReduceHealth(int amount)
+        {
+            if (((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds() > RegenTime)
+                RegenTime = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds() + (amount * UserSettings.HealthPointRegenTime);
+            else
+                RegenTime += amount * UserSettings.HealthPointRegenTime;
         }
         public string GetEmojiBar()
         {

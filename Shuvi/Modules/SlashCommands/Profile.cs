@@ -19,13 +19,13 @@ namespace Shuvi.Modules.SlashCommands
 {
     public class ProfileCommandModule : InteractionModuleBase<ShardedInteractionContext>
     {
-        private readonly DatabaseManager _database;
+        private readonly DatabaseManagerService _database;
         private readonly DiscordShardedClient _client;
         private readonly WorldMap _map;
 
         public ProfileCommandModule(IServiceProvider provider)
         {
-            _database = provider.GetRequiredService<DatabaseManager>();
+            _database = provider.GetRequiredService<DatabaseManagerService>();
             _client = provider.GetRequiredService<DiscordShardedClient>();
             _map = _database.Map;
         }
@@ -180,10 +180,10 @@ namespace Shuvi.Modules.SlashCommands
             Embed embed = new UserEmbedBuilder(discordUser)
                 .WithAuthor($"Экипировка")
                 .AddField($"Шлем: {(helmet == null ? "Нету" : helmet.Name)}", $"{(helmet == null ? "** **" : helmet.GetBonusesInfo())}", true)
-                .AddField($"Шлем: {(armor == null ? "Нету" : armor.Name)}", $"{(armor == null ? "** **" : armor.GetBonusesInfo())}", true)
+                .AddField($"Броня: {(armor == null ? "Нету" : armor.Name)}", $"{(armor == null ? "** **" : armor.GetBonusesInfo())}", true)
                 .AddField("** **", "** **", false)
-                .AddField($"Шлем: {(leggings == null ? "Нету" : leggings.Name)}", $"{(leggings == null ? "** **" : leggings.GetBonusesInfo())}", true)
-                .AddField($"Шлем: {(boots == null ? "Нету" : boots.Name)}", $"{(boots == null ? "** **" : boots.GetBonusesInfo())}", true)
+                .AddField($"Поножи: {(leggings == null ? "Нету" : leggings.Name)}", $"{(leggings == null ? "** **" : leggings.GetBonusesInfo())}", true)
+                .AddField($"Ботинки: {(boots == null ? "Нету" : boots.Name)}", $"{(boots == null ? "** **" : boots.GetBonusesInfo())}", true)
                 .Build();
             await message.ModifyAsync(msg =>
             {

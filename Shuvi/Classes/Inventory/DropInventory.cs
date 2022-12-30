@@ -26,6 +26,11 @@ namespace Shuvi.Classes.Inventory
                 _localInventory.Add(id, amount);
         }
 
+        public IEnumerator<KeyValuePair<ObjectId, int>> GetEnumerator()
+        {
+            return _localInventory.GetEnumerator();
+        }
+
         public string GetDropInfo()
         {
             var result = new List<string>();
@@ -34,6 +39,8 @@ namespace Shuvi.Classes.Inventory
                 var item = ItemFactory.CreateItem(AllItemsData.GetItemData(itemId), amount);
                 result.Add($"{item.Name} +{amount}");
             }
+            if (result.Count == 0)
+                return "Ничего";
             return string.Join("\n", result);
 
         }

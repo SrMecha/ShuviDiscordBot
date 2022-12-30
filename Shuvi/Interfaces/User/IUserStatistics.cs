@@ -2,11 +2,15 @@
 {
     public interface IUserStatistics
     {
-        public long CreatedAt { get; init; }
-        public long LiveTime { get; init; }
-        public int DeathCount { get; init; }
-        public int DungeonComplite { get; init; }
-        public int EnemyKilled { get; init; }
-        public int MaxRating { get; init; }
+        public long CreatedAt { get; }
+        public long LiveTime { get; }
+        public int DeathCount { get; }
+        public int DungeonComplite { get; }
+        public int EnemyKilled { get; }
+        public int MaxRating { get; }
+
+        public void AddEnemyKilled(int amount = 1);
+        public void AddDeathCount(int amount = 1);
+        public void AddDungeonComplite(int amount = 1);
     }
 }

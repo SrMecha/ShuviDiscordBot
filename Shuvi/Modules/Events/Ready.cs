@@ -1,4 +1,4 @@
-using Discord.Interactions;
+ï»¿using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Shuvi.Services;
@@ -17,7 +17,7 @@ namespace Shuvi.Modules.Events
 
         private Task ShardReadyAsync(DiscordSocketClient shard)
         {
-            Console.WriteLine($"Øàðä ¹{shard.ShardId} Ïîäêëþ÷¸í.");
+            Console.WriteLine($"Ð¨Ð°Ñ€Ð´ â„–{shard.ShardId} ÐŸÐ¾Ð´ÐºÐ»ÑŽÑ‡Ñ‘Ð½.");
             return Task.CompletedTask;
         }
 

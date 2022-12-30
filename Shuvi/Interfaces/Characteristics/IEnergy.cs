@@ -2,11 +2,13 @@
 {
     public interface IEnergy
     {
-        public int Max { get; init; }
-        public long RegenTime { get; init; }
+        public int Max { get; }
+        public long RegenTime { get; }
         public int GetRemainingRegenTime();
         public int GetMaxEnergy(int endurance);
         public int GetCurrentEnergy();
+        public void ReduceEnergy(int amount);
         public string GetEmojiBar();
+        public bool HaveEnergy(int amount);
     }
 }

@@ -5,6 +5,7 @@ using Shuvi.Classes.Items;
 using Shuvi.Extensions;
 using Shuvi.Interfaces.Inventory;
 using Shuvi.Interfaces.Items;
+using System.Linq;
 
 namespace Shuvi.Classes.Inventory
 {
@@ -20,10 +21,21 @@ namespace Shuvi.Classes.Inventory
         }
         public UserInventory()
         {
+            _localInventory = new();
         }
         public void AddItem(IItem item)
         {
             _localInventory.Add(item.Id, item.Amount);
+        }
+        public void AddItems(IDropInventory drop)
+        {
+            foreach (var item in drop)
+            {
+                if (_localInventory.ContainsKey(item.Key))
+                    _localInventory[item.Key] += item.Value;
+                else
+                    _localInventory.Add(item.Key, item.Value);
+            }
         }
         public IItem GetItem(ObjectId id)
         {
@@ -61,7 +73,7 @@ namespace Shuvi.Classes.Inventory
             var itemsString = "";
             for (int i = index * 10; i <= _localInventory.Count - 1; i++)
             {
-                itemsString += $"\n**#{i + 1}** {AllItemsData.GetItemData(_localInventory.Keys.ElementAt(i)).Name} ";
+                itemsString += $"\n**#{i + 1}** {AllItemsData.GetItemData(_localInventory.Keys.ElementAt(i)).Name} x{_localInventory.Values.ElementAt(i)}";
             }
             if (itemsString == "") itemsString = "У вас нету предметов.";
             return new BotEmbedBuilder()
@@ -114,6 +126,13 @@ namespace Shuvi.Classes.Inventory
         public IEnumerable<ObjectId> GetItemsId()
         {
             return _localInventory.Keys;
+        }
+        public Dictionary<string, int> GetInvetoryCache()
+        {
+            Dictionary<string, int> result = new();
+            foreach (var item in _localInventory)
+                result.Add(item.Key.ToString(), item.Value);
+            return result;
         }
     }
 }

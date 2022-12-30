@@ -7,8 +7,8 @@ namespace Shuvi.Classes.Characteristics
 {
     public class Energy : IEnergy
     {
-        public int Max { get; init; }
-        public long RegenTime { get; init; }
+        public int Max { get; private set; }
+        public long RegenTime { get; private set; }
 
         public Energy(long regenTime, int endurance)
         {
@@ -18,7 +18,8 @@ namespace Shuvi.Classes.Characteristics
 
         public int GetCurrentEnergy()
         {
-            return Max - (GetRemainingRegenTime() / UserSettings.EnergyPointRegenTime);
+            var result = (int)(Max - Math.Ceiling((float)GetRemainingRegenTime() / UserSettings.EnergyPointRegenTime));
+            return result > Max ? Max : result;
         }
         public int GetMaxEnergy(int endurance)
         {
@@ -29,11 +30,22 @@ namespace Shuvi.Classes.Characteristics
             int result = (int)(RegenTime - ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds());
             return result > 0 ? result : 0;
         }
+        public void ReduceEnergy(int amount)
+        {
+            if (((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds() > RegenTime)
+                RegenTime = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds() + (amount * UserSettings.EnergyPointRegenTime);
+            else
+                RegenTime += amount * UserSettings.EnergyPointRegenTime;
+        }
         public string GetEmojiBar()
         {
             var energyFullEmojiCount = (byte)(GetCurrentEnergy() / (Max / UserSettings.EnergyDisplayMax));
             return $"{EmojiList.Get("energyFull").ToString()!.Multiple(energyFullEmojiCount)}" +                    
                 $"{EmojiList.Get("energyEmpty").ToString()!.Multiple((byte)(UserSettings.EnergyDisplayMax - energyFullEmojiCount))}";
+        }
+        public bool HaveEnergy(int amount)
+        {
+            return amount <= GetCurrentEnergy();
         }
     }
 }

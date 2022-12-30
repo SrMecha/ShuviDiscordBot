@@ -1,4 +1,5 @@
 ﻿using MongoDB.Bson;
+using Shuvi.Classes.Enemy;
 using Shuvi.Classes.Inventory;
 using Shuvi.Interfaces.Inventory;
 using Shuvi.Interfaces.Rates;
@@ -19,6 +20,15 @@ namespace Shuvi.Classes.Rates
                     _allDrop.Add(itemId);
             _min = min;
             _max = max;
+        }
+        public AllRate(EnemyDrop drop)
+        {
+            _allDrop = new();
+            foreach (var (itemId, count) in drop.Items)
+                for (int i = 0; i <= count; i++)
+                    _allDrop.Add(itemId);
+            _min = drop.Min;
+            _max = drop.Max;
         }
         public AllRate()
         {
