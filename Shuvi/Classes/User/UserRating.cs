@@ -1,4 +1,6 @@
 ﻿using Shuvi.Enums;
+using Shuvi.Extensions;
+using Shuvi.Interfaces.Status;
 using Shuvi.Interfaces.User;
 
 namespace Shuvi.Classes.User
@@ -17,14 +19,14 @@ namespace Shuvi.Classes.User
         {
             return rating switch
             {
-                < 100 => 0,
-                >= 100 and < 200 => (Rank)1,
-                >= 200 and < 500 => (Rank)2,
-                >= 500 and < 800 => (Rank)3,
-                >= 800 and < 1100 => (Rank)4,
-                >= 1100 and < 1500 => (Rank)5,
-                >= 1500 and < 2000 => (Rank)6,
-                >= 2000 => (Rank)7
+                >= 5000 => Rank.SSS,
+                >= 3500 => Rank.SS,
+                >= 2000 => Rank.S,
+                >= 1000 => Rank.A,
+                >= 600  => Rank.B,
+                >= 300  => Rank.C,
+                >= 100 => Rank.D,
+                _ => Rank.E
             };
         }
     }
