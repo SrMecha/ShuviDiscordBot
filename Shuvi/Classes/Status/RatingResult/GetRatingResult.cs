@@ -1,7 +1,7 @@
 ﻿using Shuvi.Enums;
-using Shuvi.Interfaces.Status;
+using Shuvi.Interfaces.Status.RatingResult;
 
-namespace Shuvi.Classes.Status
+namespace Shuvi.Classes.Status.RatingResult
 {
     public class GetRatingResult : ActionResult, IGetRatingResult
     {

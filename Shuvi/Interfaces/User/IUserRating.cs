@@ -1,5 +1,5 @@
 ﻿using Shuvi.Enums;
-using Shuvi.Interfaces.Status;
+using Shuvi.Interfaces.Status.RatingResult;
 
 namespace Shuvi.Interfaces.User
 {
@@ -9,5 +9,8 @@ namespace Shuvi.Interfaces.User
         public Rank Rank { get; }
         public Rank GetRank(int rating);
         public IGetRatingResult AddPoints(int amount, Rank rank);
+        public IGetRatingResult AddPoints(int amount);
+        public IRemoveRatingResult RemovePoints(int amount);
+        public ISetRatingResult SetPoints(int amount);
     }
 }

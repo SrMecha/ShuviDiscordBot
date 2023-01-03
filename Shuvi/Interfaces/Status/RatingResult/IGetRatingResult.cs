@@ -1,6 +1,6 @@
 ﻿using Shuvi.Enums;
 
-namespace Shuvi.Interfaces.Status
+namespace Shuvi.Interfaces.Status.RatingResult
 {
     public interface IGetRatingResult : IActionResult
     {
