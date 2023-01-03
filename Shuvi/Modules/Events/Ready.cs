@@ -1,7 +1,6 @@
 ﻿using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
-using Shuvi.Services;
 
 namespace Shuvi.Modules.Events
 {

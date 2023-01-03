@@ -5,7 +5,6 @@ using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Shuvi.Classes.CustomEmoji;
 using Shuvi.Services;
-using System.Runtime.CompilerServices;
 
 namespace Shuvi
 {
@@ -29,13 +28,16 @@ namespace Shuvi
             }
             var config = new DiscordSocketConfig
             {
-                TotalShards = 1
+                TotalShards = 1,
+                GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.MessageContent
             };
 
             ServiceProvider services = BuildServices(config, mongoKey);
             DiscordShardedClient client = services.GetRequiredService<DiscordShardedClient>();
 
             await services.GetRequiredService<InteractionHandlingService>()
+                .InitializeAsync();
+            await services.GetRequiredService<CommandHandlingService>()
                 .InitializeAsync();
             InitStaticClasses();
 
@@ -52,6 +54,7 @@ namespace Shuvi
                 .AddSingleton<CommandService>()
                 .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordShardedClient>()))
                 .AddSingleton<InteractionHandlingService>()
+                .AddSingleton<CommandHandlingService>()
                 .AddSingleton(new DatabaseManagerService(mongoKey))
                 .BuildServiceProvider();
         } 
