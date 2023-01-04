@@ -15,6 +15,8 @@ using Shuvi.Classes.Status;
 using Shuvi.Classes.Player;
 using MongoDB.Driver;
 using Shuvi.Classes.User;
+using Shuvi.StaticServices.UserCheck;
+using Shuvi.Enums;
 
 namespace Shuvi.Modules.SlashCommands
 {
@@ -42,7 +44,14 @@ namespace Shuvi.Modules.SlashCommands
                 await RespondAsync(embed: ErrorEmbedBuilder.Simple("У вас не хватает энергии."));
                 return;
             }
+            if (UserCommandsCheck.IsUseCommands(Context.User.Id, ActiveCommands.Hunt))
+            {
+                await RespondAsync(embed: UserCommandsCheck.GetErrorEmbed(Context.User.Id, ActiveCommands.Hunt));
+                return;
+            }
+            UserCommandsCheck.Add(Context.User.Id, ActiveCommands.Hunt);
             await FightPrepareAsync(dbUser);
+            UserCommandsCheck.Remove(Context.User.Id, ActiveCommands.Hunt);
         }
         public async Task FightPrepareAsync(IDatabaseUser dbUser)
         {
@@ -57,7 +66,7 @@ namespace Shuvi.Modules.SlashCommands
                 var embed = new FightEmbedBuilder(Context.User.GetAvatarUrl(), Context.User.Username, enemy.Name)
                     .WithAuthor("Охота")
                     .WithDescription($"Вы встретили {enemy.Name}!\n" +
-                    $"**Энергия:** [{dbUser.Energy.GetEmojiBar()}]\n{dbUser.Energy.GetCurrentEnergy()}/{dbUser.Energy.Max}")
+                    $"**Энергии осталось:** {dbUser.Energy.GetCurrentEnergy()}/{dbUser.Energy.Max}")
                     .AddField(enemy.Name,
                     ((UserCharacteristics)enemy.Characteristics).ToRusString(enemy.EffectBonuses) +
                     $"\n{enemy.Health.ToString()}\n{enemy.Mana.ToString()}",
@@ -192,15 +201,18 @@ namespace Shuvi.Modules.SlashCommands
         public async Task FightWinAsync(InteractionParameters param, IDatabaseUser dbUser, IPlayer player, IEnemy enemy, IFightStatus status)
         {
             var drop = enemy.Drop.GetRandom();
-            status.AddDescription("\n__Победа!__\n**Вы получили:**");
-            status.AddDescription(drop.GetDropInfo());
             dbUser.Inventory.AddItems(drop);
             dbUser.Health.ReduceHealth(dbUser.Health.GetCurrentHealth() - player.Health.Now);
             dbUser.Statistics.AddEnemyKilled(1);
+            status.AddDescription(dbUser.Rating.AddPoints(enemy.RatingGet, enemy.Rank).Description);
+            status.AddDescription("\n__Победа!__\n**Вы получили:**");
+            status.AddDescription(drop.GetDropInfo());
             await _database.Users.UpdateUser(
                 dbUser.Id, 
-                new UpdateDefinitionBuilder<UserData>().Set("Inventory", dbUser.Inventory.GetInvetoryCache())
+                new UpdateDefinitionBuilder<UserData>()
+                .Set("Inventory", dbUser.Inventory.GetInvetoryCache())
                 .Set("HealthRegenTime", dbUser.Health.RegenTime)
+                .Set("Rating", dbUser.Rating.Points)
                 .Inc("EnemyKilled", 1));
             var embed = FightEmbed(player, enemy, status);
             embed = embed.ToEmbedBuilder()

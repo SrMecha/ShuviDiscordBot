@@ -20,6 +20,7 @@ namespace Shuvi.Classes.Enemy
         public EnemyBase(EnemyData data, string picture)
         {
             Name = data.Name;
+            Rank = data.Rank;
             PictureUrl = data.Pictures.GetValueOrDefault(picture, "https://www.engageconsultants.com/wp-content/uploads/2020/01/No-data.jpg");
             RatingGet = data.RatingGet;
             Characteristics = SetCharacteristics(data, data.UpgradePoints);

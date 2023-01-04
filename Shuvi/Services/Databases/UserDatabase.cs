@@ -17,11 +17,11 @@ namespace Shuvi.Services.Databases
             _cacheUsers = new();
             StartCacheCleaner();
         }
-        public async Task<IDatabaseUser> AddUser(ulong userId)
+        public async Task<IDatabaseUser> AddUser(ulong id)
         {
             var userData = new UserData
             {
-                Id = userId,
+                Id = id,
                 Race = UserFactory.GenerateRandomUserRace(),
                 ManaRegenTime = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds(),
                 HealthRegenTime = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds(),
@@ -33,20 +33,20 @@ namespace Shuvi.Services.Databases
             _cacheUsers.TryAddUser(userData);
             return new DatabaseUser(userData);
         }
-        public async Task<IDatabaseUser> GetUser(ulong userId)
+        public async Task<IDatabaseUser> GetUser(ulong id)
         {
-            if (_cacheUsers.TryGetUser(userId, out IDatabaseUser? user))
+            if (_cacheUsers.TryGetUser(id, out IDatabaseUser? user))
                 return user!;
             try
             {
-                UserData userData = await _userCollection.Find(new BsonDocument { { "_id", (long)userId } }).SingleAsync();
+                UserData userData = await _userCollection.Find(new BsonDocument { { "_id", (long)id } }).SingleAsync();
                 _cacheUsers.TryAddUser(userData);
             }
             catch (InvalidOperationException)
             {
-                await AddUser(userId);
+                await AddUser(id);
             }
-            return _cacheUsers.GetUser(userId);
+            return _cacheUsers.GetUser(id);
         }
         public async Task UpdateUser(ulong userId, UpdateDefinition<UserData> updateConfig)
         {
