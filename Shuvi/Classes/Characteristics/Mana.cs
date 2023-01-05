@@ -18,6 +18,8 @@ namespace Shuvi.Classes.Characteristics
         public int GetCurrentMana()
         {
             var result = (int)(Max - Math.Ceiling((float)GetRemainingRegenTime() / UserSettings.ManaPointRegenTime));
+            if (result < 0)
+                return 0;
             return result > Max ? Max : result;
         }
         public int GetRemainingRegenTime()
@@ -32,11 +34,19 @@ namespace Shuvi.Classes.Characteristics
             else
                 RegenTime += amount * UserSettings.ManaPointRegenTime;
         }
+        public void IncreaseMana(int amount)
+        {
+            RegenTime += amount * UserSettings.ManaPointRegenTime;
+        }
         public string GetEmojiBar()
         {
             var manaFullEmojiCount = (byte)(GetCurrentMana() / (Max / UserSettings.ManaDisplayMax));
             return $"{EmojiList.Get("magicFull").ToString()!.Multiple(manaFullEmojiCount)}" +
                 $"{EmojiList.Get("magicEmpty").ToString()!.Multiple((byte)(UserSettings.ManaDisplayMax - manaFullEmojiCount))}";
+        }
+        public void SetMaxMana(int amount)
+        {
+            Max = amount;
         }
     }
 }

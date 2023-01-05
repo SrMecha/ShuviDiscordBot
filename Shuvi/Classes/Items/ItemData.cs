@@ -15,6 +15,7 @@ namespace Shuvi.Classes.Items
         public ItemType Type { get; set; } = ItemType.Simple;
         public Rank Rank { get; set; } = Rank.E;
         public bool CanTrade { get; set; } = false;
+        public bool CanLoose { get; set; } = true;
         public int Max { get; set; } = -1;
         public CharacteristicBonuses Bonuses { get; set; } = new();
         public Dictionary<ItemNeeds, int> Needs { get; set; } = new();

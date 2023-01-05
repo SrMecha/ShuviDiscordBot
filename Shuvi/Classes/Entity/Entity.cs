@@ -2,6 +2,7 @@
 using Shuvi.Classes.Effect;
 using Shuvi.Classes.Spell;
 using Shuvi.Classes.Status;
+using Shuvi.Enums;
 using Shuvi.Interfaces.Characteristics;
 using Shuvi.Interfaces.Effect;
 using Shuvi.Interfaces.Entity;
@@ -17,6 +18,7 @@ namespace Shuvi.Classes.Entity
         protected readonly Random _random = new();
 
         public string Name { get; protected init; } = string.Empty;
+        public Rank Rank { get; protected init; } = Rank.E;
         public ICharacteristics Characteristics { get; protected init; } = new UserCharacteristics();
         public ISpell Spell { get; protected init; } = SpellFactory.GetSpell("");
         public IStaticHealth Health { get; protected init; } = new StaticHealth(100, 100);

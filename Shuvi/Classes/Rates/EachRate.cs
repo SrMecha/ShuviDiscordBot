@@ -19,7 +19,7 @@ namespace Shuvi.Classes.Rates
             foreach (var item in _drop)
                 for (var i = item.Min; i <= random.Next(item.Min, ++item.Max); i++)
                     if (random.Next(1001) < item.Chance) // 1000 == 100%. Сделал так, что бы не использовать числа с запятой. 1 == 0.1%
-                        result.AddItem(item.Id);
+                        result.AddItem(item.Id, 1);
             return result;
         }
     }

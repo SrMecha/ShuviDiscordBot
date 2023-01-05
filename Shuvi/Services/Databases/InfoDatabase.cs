@@ -2,6 +2,7 @@
 using MongoDB.Driver;
 using MongoDB.Bson.Serialization;
 using Shuvi.Classes.Map;
+using Shuvi.StaticServices.AdminCheck;
 
 namespace Shuvi.Services.Databases
 {
@@ -15,6 +16,7 @@ namespace Shuvi.Services.Databases
         {
             _infoCollection = infoCollection;
             Map = LoadMap();
+            AdminCheckManager.SetAdmins(LoadAdmins());
         }
         private WorldMap LoadMap()
         {
@@ -23,6 +25,17 @@ namespace Shuvi.Services.Databases
                 foreach (var location in region.Locations)
                     location.ConfigureRates();
             return result;
+        }
+        private AdminsData LoadAdmins()
+        {
+            return BsonSerializer.Deserialize<AdminsData>(_infoCollection.Find(new BsonDocument { { "_id", "Admins" } }).Single());
+        }
+        public async Task SetAdmins()
+        {
+            await _infoCollection.UpdateOneAsync(
+                new BsonDocument { { "_id", "Admins" } }, 
+                new UpdateDefinitionBuilder<BsonDocument>().Set("AdminIds", AdminCheckManager.Data.AdminIds)
+                );
         }
     }
 }

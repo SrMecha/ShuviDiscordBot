@@ -1,3 +1,4 @@
+using Shuvi.Enums;
 using Shuvi.Interfaces.Characteristics;
 using Shuvi.Interfaces.Effect;
 using Shuvi.Interfaces.Spell;
@@ -8,6 +9,7 @@ namespace Shuvi.Interfaces.Entity
     public interface IEntity
     {
         public string Name { get; }
+        public Rank Rank { get; }
         public ICharacteristics Characteristics { get; }
         public ISpell Spell { get; }
         public IStaticHealth Health { get; }

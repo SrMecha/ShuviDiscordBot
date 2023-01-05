@@ -205,8 +205,8 @@ namespace Shuvi.Modules.SlashCommands
                 $"**Всего врагов убито:** {dbUser.Statistics.EnemyKilled}\n" +
                 $"**Всего подземелий пройдено:** {dbUser.Statistics.DungeonComplite}\n" +
                 $"**Всего смертей:** {dbUser.Statistics.DeathCount}\n\n" +
-                $"**Время жизни:** {created:dd} дней | с {new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(dbUser.Statistics.CreatedAt):f}\n\n" +
-                $"**Аккаунт создан:** {new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(dbUser.Statistics.LiveTime):f} | {live:dd} дней назад")
+                $"**Последняя смерть:** <t:{dbUser.Statistics.LiveTime}:R>\n\n" +
+                $"**Аккаунт создан:** <t:{dbUser.Statistics.CreatedAt}:R>")
                 .Build();
             await message.ModifyAsync(msg =>
             {

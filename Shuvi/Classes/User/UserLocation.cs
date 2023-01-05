@@ -1,21 +1,24 @@
 ﻿using Shuvi.Interfaces.User;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Shuvi.Classes.User
 {
     public class UserLocation : IUserLocation
     {
-        public int MapLocation { get; init; }
-        public int MapRegion { get; init; }
+        public int MapLocation { get; private set; }
+        public int MapRegion { get; private set; }
 
         public UserLocation(int mapLocation, int mapRegion)
         {
             MapLocation = mapLocation;
             MapRegion = mapRegion;
+        }
+        public void SetLocation(int index)
+        {
+            MapLocation = index;
+        }
+        public void SetRegion(int index)
+        {
+            MapRegion = index;
         }
     }
 }

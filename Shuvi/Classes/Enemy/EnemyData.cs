@@ -1,6 +1,5 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Shuvi.Classes.Rates;
 using Shuvi.Enums;
 
 namespace Shuvi.Classes.Enemy
@@ -12,6 +11,7 @@ namespace Shuvi.Classes.Enemy
         public string Name { get; set; } = "Джибрил блять";
         public string Description { get; set; } = "Ща она тебе пизды даст. Шуви сразу Ислам примет.";
         public Rank Rank { get; set; } = Rank.E;
+        public int RatingGet { get; set; } = 1;
         public int UpgradePoints { get; set; } = 5;
         public EnemyActionChances ActionChances { get; set; } = new();
         public Dictionary<string, string> Pictures { get; set; } = new();

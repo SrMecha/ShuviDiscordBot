@@ -13,13 +13,16 @@ namespace Shuvi.Classes.Enemy
     {
         private readonly List<int> _actionChances;
 
+        public int RatingGet { get; init; }
         public string PictureUrl { get; init; }
         public IRate Drop { get; init; }
 
         public EnemyBase(EnemyData data, string picture)
         {
             Name = data.Name;
+            Rank = data.Rank;
             PictureUrl = data.Pictures.GetValueOrDefault(picture, "https://www.engageconsultants.com/wp-content/uploads/2020/01/No-data.jpg");
+            RatingGet = data.RatingGet;
             Characteristics = SetCharacteristics(data, data.UpgradePoints);
             Spell = SpellFactory.GetSpell(data.SpellName);
             Health = SetHealth(data.Health, data.UpgradePoints);

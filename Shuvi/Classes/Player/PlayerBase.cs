@@ -19,6 +19,7 @@ namespace Shuvi.Classes.Player
         public PlayerBase(string userName, IDatabaseUser user)
         {
             Name = userName;
+            Rank = user.Rating.Rank;
             Characteristics = user.Characteristic;
             Spell = SpellFactory.GetSpell(user.SpellName);
             Skill = user.Profession.GetSkill();

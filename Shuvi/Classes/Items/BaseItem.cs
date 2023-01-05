@@ -15,6 +15,7 @@ namespace Shuvi.Classes.Items
         public ItemType Type { get; init; }
         public Rank Rank { get; init; }
         public bool CanTrade { get; init; }
+        public bool CanLoose { get; init; }
         public int Max { get; init; }
         public virtual ICharacteristicBonuses Bonuses { get; protected set; } = new CharacteristicBonuses();
         public virtual Dictionary<ItemNeeds, int> Needs { get; protected set; } = new();
@@ -27,6 +28,7 @@ namespace Shuvi.Classes.Items
             Type = data.Type;
             Rank = data.Rank;
             CanTrade = data.CanTrade;
+            CanLoose = data.CanLoose;
             Max = data.Max;
             Amount = amount;
         }

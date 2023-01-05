@@ -4,10 +4,12 @@ namespace Shuvi.Interfaces.Equipment
 {
     public interface IEquipment
     {
-        public ObjectId? Weapon { get; init; }
-        public ObjectId? Head { get; init; }
-        public ObjectId? Body { get; init; }
-        public ObjectId? Legs { get; init; }
-        public ObjectId? Foots { get; init; }
+        public ObjectId? Weapon { get; }
+        public ObjectId? Head { get; }
+        public ObjectId? Body { get; }
+        public ObjectId? Legs { get; }
+        public ObjectId? Foots { get; }
+
+        public void RemoveAllEquipment();
     }
 }

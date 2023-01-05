@@ -41,7 +41,7 @@ namespace Shuvi.Classes.Rates
             var random = new Random();
             var result = new DropInventory();
             for (var i = 0; i <= random.Next(_min, _max + 1); i++)
-                result.AddItem(_allDrop.ElementAt(random.Next(0, _allDrop.Count)));
+                result.AddItem(_allDrop.ElementAt(random.Next(0, _allDrop.Count)), 1);
             return result;
         }
     }

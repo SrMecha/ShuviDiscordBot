@@ -19,6 +19,8 @@ namespace Shuvi.Classes.Characteristics
         public int GetCurrentHealth()
         {
             var result = (int)(Max - Math.Ceiling((float)GetRemainingRegenTime() / UserSettings.HealthPointRegenTime));
+            if (result < 0)
+                return 0;
             return result > Max ? Max : result;
         }
         public int GetRemainingRegenTime()
@@ -33,11 +35,19 @@ namespace Shuvi.Classes.Characteristics
             else
                 RegenTime += amount * UserSettings.HealthPointRegenTime;
         }
+        public void IncreaseHealth(int amount)
+        {
+            RegenTime -= amount * UserSettings.HealthPointRegenTime;
+        }
         public string GetEmojiBar()
         {
             var healthFullEmojiCount = (byte)(GetCurrentHealth() / (Max / UserSettings.HealthDisplayMax));
             return $"{EmojiList.Get("healthFull").ToString()!.Multiple(healthFullEmojiCount)}" +
                 $"{EmojiList.Get("healthEmpty").ToString()!.Multiple((byte)(UserSettings.HealthDisplayMax - healthFullEmojiCount))}";
+        }
+        public void SetMaxHealth(int amount)
+        {
+            Max = amount;
         }
     }
 }

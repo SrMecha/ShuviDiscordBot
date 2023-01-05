@@ -14,12 +14,12 @@ namespace Shuvi.Classes.User
         public ulong Id { get; init; }
         public IUserRating Rating { get; init; }
         public IUserWallet Wallet { get; init; }
-        public string SpellName { get; init; }
-        public UserRaces Race { get; init; }
-        public UserProfessions Profession { get; init; }
+        public string SpellName { get; private set; }
+        public UserRaces Race { get; private set; }
+        public UserProfessions Profession { get; private set; }
         public IUserInventory Inventory { get; init; }
         public IEquipment Equipment { get; init; }
-        public ICharacteristics Characteristic { get; init; }
+        public IUserCharacteristics Characteristic { get; init; }
         public IEnergy Energy { get; init; }
         public IMana Mana { get; init; }
         public IHealth Health { get; init; }
@@ -44,6 +44,18 @@ namespace Shuvi.Classes.User
                 userData.CreatedAt, userData.LiveTime, userData.DeathCount, userData.DungeonComplite, userData.EnemyKilled, userData.MaxRating
                 );
             Location = new UserLocation(userData.MapLocation, userData.MapRegion);
+        }
+        public void SetSpell(string name)
+        {
+            SpellName = name;
+        }
+        public void SetRace(UserRaces race)
+        {
+            Race = race;
+        }
+        public void SetProfession(UserProfessions profession)
+        {
+            Profession = profession;
         }
     }
 }

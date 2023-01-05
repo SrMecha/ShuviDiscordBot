@@ -13,6 +13,7 @@ namespace Shuvi.Interfaces.Items
         public ItemType Type { get; init; }
         public Rank Rank { get; init; }
         public bool CanTrade { get; init; }
+        public bool CanLoose { get; init; }
         public int Max { get; init; }
         public ICharacteristicBonuses? Bonuses { get; }
         public Dictionary<ItemNeeds, int>? Needs { get; }

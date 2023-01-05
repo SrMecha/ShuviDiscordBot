@@ -10,16 +10,20 @@ namespace Shuvi.Interfaces.User
         public ulong Id { get; init; }
         public IUserRating Rating { get; init; }
         public IUserWallet Wallet { get; init; }
-        public string SpellName { get; init; }
-        public UserRaces Race { get; init; }
-        public UserProfessions Profession { get; init; }
+        public string SpellName { get; }
+        public UserRaces Race { get; }
+        public UserProfessions Profession { get; }
         public IUserInventory Inventory { get; init; }
         public IEquipment Equipment { get; init; }
-        public ICharacteristics Characteristic { get; init; }
+        public IUserCharacteristics Characteristic { get; init; }
         public IEnergy Energy { get; init; }
         public IMana Mana { get; init; }
         public IHealth Health { get; init; }
         public IUserStatistics Statistics { get; init; }
         public IUserLocation Location { get; init; }
+
+        public void SetSpell(string name);
+        public void SetRace(UserRaces race);
+        public void SetProfession(UserProfessions profession);
     }
 }
