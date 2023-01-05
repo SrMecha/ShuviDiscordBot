@@ -26,20 +26,26 @@ namespace Shuvi.Classes.User
             EnemyKilled = enemyKiled;
             MaxRating = maxRating;
         }
-
         public void AddEnemyKilled(int amount = 1)
         {
             EnemyKilled += amount;
         }
-
         public void AddDeathCount(int amount = 1)
         {
             DeathCount += amount;
         }
-
         public void AddDungeonComplite(int amount = 1)
         {
             DungeonComplite += amount;
+        }
+        public void UpdateMaxRating(int amount)
+        {
+            if (MaxRating < amount)
+                MaxRating = amount;
+        }
+        public void UpdateLiveTime()
+        {
+            LiveTime = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds();
         }
     }
 }

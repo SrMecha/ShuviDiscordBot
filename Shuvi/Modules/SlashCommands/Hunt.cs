@@ -38,25 +38,30 @@ namespace Shuvi.Modules.SlashCommands
         [SlashCommand("hunt", "Охота на монстров.")]
         public async Task HuntCommandAsync()
         {
+            await DeferAsync();
+            var param = new InteractionParameters(await GetOriginalResponseAsync(), null);
             var dbUser = await _database.Users.GetUser(Context.User.Id);
             if (!dbUser.Energy.HaveEnergy(_huntEnergyCost))
             {
-                await RespondAsync(embed: ErrorEmbedBuilder.Simple("У вас не хватает энергии."));
+                await ModifyOriginalResponseAsync(
+                    msg => { msg.Embed = ErrorEmbedBuilder.Simple("У вас не хватает энергии."); }
+                    );
                 return;
             }
             if (UserCommandsCheck.IsUseCommands(Context.User.Id, ActiveCommands.Hunt))
             {
-                await RespondAsync(embed: UserCommandsCheck.GetErrorEmbed(Context.User.Id, ActiveCommands.Hunt));
+                await ModifyOriginalResponseAsync(
+                    msg => { msg.Embed = UserCommandsCheck.GetErrorEmbed(Context.User.Id, ActiveCommands.Hunt); }
+                    );
                 return;
             }
             UserCommandsCheck.Add(Context.User.Id, ActiveCommands.Hunt);
-            await FightPrepareAsync(dbUser);
+            await FightPrepareAsync(param, dbUser);
             UserCommandsCheck.Remove(Context.User.Id, ActiveCommands.Hunt);
         }
-        public async Task FightPrepareAsync(IDatabaseUser dbUser)
+        public async Task FightPrepareAsync(InteractionParameters param, IDatabaseUser dbUser)
         {
             var enemies = _map.GetRegion(dbUser.Location.MapRegion).GetLocation(dbUser.Location.MapRegion).EnemiesWithChance;
-            InteractionParameters? param = null;
             IEnemy? enemy;
             while (true)
             {
@@ -69,7 +74,7 @@ namespace Shuvi.Modules.SlashCommands
                     $"**Энергии осталось:** {dbUser.Energy.GetCurrentEnergy()}/{dbUser.Energy.Max}")
                     .AddField(enemy.Name,
                     ((UserCharacteristics)enemy.Characteristics).ToRusString(enemy.EffectBonuses) +
-                    $"\n{enemy.Health.ToString()}\n{enemy.Mana.ToString()}",
+                    $"\n{enemy.Mana.ToString()}\n{enemy.Health.ToString()}",
                     true)
                     .AddField("Дополнительно:",
                     $"**Заклинание:** {enemy.Spell.Info.Name}",
@@ -81,15 +86,7 @@ namespace Shuvi.Modules.SlashCommands
                     .WithButton("Поискать другого противника", "retry", ButtonStyle.Secondary, 
                     disabled: !dbUser.Energy.HaveEnergy(_huntEnergyCost), row: 1)
                     .Build();
-                if (param == null)
-                {
-                    await RespondAsync(embed: embed, components: components);
-                    param = new InteractionParameters(await GetOriginalResponseAsync(), null);
-                }
-                else
-                {
-                    await param.Message.ModifyAsync(msg => { msg.Embed = embed; msg.Components = components; });
-                }
+                await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = components; });
                 if (param.Interaction != null)
                     await param.Interaction.DeferAsync();
                 param.Interaction = await WaitFor.UserButtonInteraction(_client, param.Message, Context.User.Id);
@@ -105,13 +102,13 @@ namespace Shuvi.Modules.SlashCommands
                             .WithAuthor("Охота")
                             .WithDescription("Вы сбежали.")
                             .Build();
-                        await param.Message.ModifyAsync(msg => { msg.Embed = embed; msg.Components = null; });
+                        await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = new ComponentBuilder().Build(); });
                         return;
                     case "retry":
-                        if (dbUser.Energy.HaveEnergy(_huntEnergyCost))
+                        if (!dbUser.Energy.HaveEnergy(_huntEnergyCost))
                         {
                             await param.Interaction.RespondAsync(embed: ErrorEmbedBuilder.Simple("У вас не хватает энергии."), ephemeral: true);
-                            await param.Message.ModifyAsync(msg => { msg.Components = null; });
+                            await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = new ComponentBuilder().Build(); });
                             return;
                         }
                         break;
@@ -135,13 +132,13 @@ namespace Shuvi.Modules.SlashCommands
                 EnemyHod(player, enemy, status);
                 if (player.IsDead)
                 {
-                    await FightLooseAsync(param, player, enemy, status);
+                    await FightLooseAsync(param, dbUser, player, enemy, status);
                     return;
                 }
                 player.Update();
                 if (player.IsDead)
                 {
-                    await FightLooseAsync(param, player, enemy, status);
+                    await FightLooseAsync(param, dbUser, player, enemy, status);
                     return;
                 }
                 enemy.Update();
@@ -164,7 +161,7 @@ namespace Shuvi.Modules.SlashCommands
                     .WithButton(player.Spell.Info.Name, "spell", ButtonStyle.Primary, disabled: !player.Spell.CanCast(player),row: 2)
                     .WithButton(player.Skill.Info.Name, "skill", ButtonStyle.Primary, disabled: !player.Skill.CanUse, row: 2)
                     .Build();
-            await param.Message.ModifyAsync(msg => { msg.Embed = embed; msg.Components = components; });
+            await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = components; });
             await param.Interaction!.DeferAsync();
             param.Interaction = await WaitFor.UserButtonInteraction(_client, param.Message, Context.User.Id);
             status.ClearDescriptions();
@@ -205,6 +202,7 @@ namespace Shuvi.Modules.SlashCommands
             dbUser.Health.ReduceHealth(dbUser.Health.GetCurrentHealth() - player.Health.Now);
             dbUser.Statistics.AddEnemyKilled(1);
             status.AddDescription(dbUser.Rating.AddPoints(enemy.RatingGet, enemy.Rank).Description);
+            dbUser.Statistics.UpdateMaxRating(dbUser.Rating.Points);
             status.AddDescription("\n__Победа!__\n**Вы получили:**");
             status.AddDescription(drop.GetDropInfo());
             await _database.Users.UpdateUser(
@@ -213,23 +211,25 @@ namespace Shuvi.Modules.SlashCommands
                 .Set("Inventory", dbUser.Inventory.GetInvetoryCache())
                 .Set("HealthRegenTime", dbUser.Health.RegenTime)
                 .Set("Rating", dbUser.Rating.Points)
+                .Set("MaxRating", dbUser.Statistics.MaxRating)
                 .Inc("EnemyKilled", 1));
             var embed = FightEmbed(player, enemy, status);
             embed = embed.ToEmbedBuilder()
                 .WithAuthor($"{embed.Author} | Победа")
                 .WithColor(Color.Green)
                 .Build();
-            await param.Message.ModifyAsync(msg => { msg.Embed = embed; msg.Components = null; });
+            await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = new ComponentBuilder().Build(); });
         }
-        public async Task FightLooseAsync(InteractionParameters param, IPlayer player, IEnemy enemy, IFightStatus status)
+        public async Task FightLooseAsync(InteractionParameters param, IDatabaseUser dbUser, IPlayer player, IEnemy enemy, IFightStatus status)
         {
             var embed = FightEmbed(player, enemy, status);
             embed = embed.ToEmbedBuilder()
                 .WithAuthor($"Охота | Поражение")
-                .WithFooter("Вы проиграли...")
                 .WithColor(Color.Red)
                 .Build();
-            await param.Message.ModifyAsync(msg => { msg.Embed = embed; msg.Components = null; });
+            await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = new ComponentBuilder().Build(); });
+            await _database.Users.KillUser(dbUser.Id);
+            await param.Message.Channel.SendMessageAsync(embed: UserDeadEmbedBuilder.Simple(enemy.Name));
         }
         public Embed FightEmbed(IPlayer player, IEnemy enemy, IFightStatus status)
         {

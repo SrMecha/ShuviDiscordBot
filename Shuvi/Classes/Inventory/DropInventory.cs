@@ -1,36 +1,26 @@
 ﻿using MongoDB.Bson;
 using Shuvi.Classes.Items;
 using Shuvi.Interfaces.Inventory;
+using Shuvi.Interfaces.Items;
 
 namespace Shuvi.Classes.Inventory
 {
-    public sealed class DropInventory : IDropInventory
+    public sealed class DropInventory : InventoryBase, IDropInventory
     {
-        private readonly Dictionary<ObjectId, int> _localInventory;
-
         public Dictionary<ObjectId, int> Items => _localInventory;
 
-        public DropInventory(Dictionary<ObjectId, int> inventoryData)
+        public DropInventory(Dictionary<ObjectId, int> inventoryData) : base(inventoryData)
         {
-            _localInventory = inventoryData;
-        }
-        public DropInventory()
-        {
-            _localInventory = new();
-        }
-        public void AddItem(ObjectId id, int amount = 1)
-        {
-            if (Items.ContainsKey(id))
-                _localInventory[id] += amount;
-            else
-                _localInventory.Add(id, amount);
-        }
 
+        }
+        public DropInventory() : base(new())
+        {
+
+        }
         public IEnumerator<KeyValuePair<ObjectId, int>> GetEnumerator()
         {
             return _localInventory.GetEnumerator();
         }
-
         public string GetDropInfo()
         {
             var result = new List<string>();

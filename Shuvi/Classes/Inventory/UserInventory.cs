@@ -9,23 +9,15 @@ using System.Linq;
 
 namespace Shuvi.Classes.Inventory
 {
-    public class UserInventory : IUserInventory
+    public class UserInventory : InventoryBase, IUserInventory
     {
-        private readonly Dictionary<ObjectId, int> _localInventory;
+        public UserInventory(Dictionary<ObjectId, int> inventoryData) : base(inventoryData) 
+        {
 
-        public int Count { get => _localInventory.Count; }
+        }
+        public UserInventory() : base(new())
+        {
 
-        public UserInventory(Dictionary<ObjectId, int> inventoryData)
-        {
-            _localInventory = inventoryData;
-        }
-        public UserInventory()
-        {
-            _localInventory = new();
-        }
-        public void AddItem(IItem item)
-        {
-            _localInventory.Add(item.Id, item.Amount);
         }
         public void AddItems(IDropInventory drop)
         {
@@ -40,10 +32,6 @@ namespace Shuvi.Classes.Inventory
         public IItem GetItem(ObjectId id)
         {
             return ItemFactory.CreateItem(AllItemsData.GetItemData(id), _localInventory.GetValueOrDefault(id, 0));
-        }
-        public void RemoveItem(ObjectId id)
-        {
-            _localInventory.Remove(id);
         }
         public List<SelectMenuOptionBuilder> GetItemsSelectMenu(int index)
         {
@@ -106,33 +94,18 @@ namespace Shuvi.Classes.Inventory
         {
             return ((_localInventory.Count + 9) / 10) < 1 ? 1 : (_localInventory.Count + 9) / 10;
         }
-
-        public void AddItem(ObjectId id, int amount)
-        {
-            _localInventory.Add(id, amount);
-        }
-
-        public TItem GetItem<TItem>(ObjectId id) where TItem : IItem
-        {
-            return (TItem)ItemFactory.CreateItem(AllItemsData.GetItemData(id), _localInventory.GetValueOrDefault(id, 0));
-        }
-
-        public IEnumerable<TItem> GetItems<TItem>() where TItem : IItem
-        {
-            foreach (var (itemId, amount) in _localInventory)
-                yield return (TItem)ItemFactory.CreateItem(AllItemsData.GetItemData(itemId), amount);
-        }
-
-        public IEnumerable<ObjectId> GetItemsId()
-        {
-            return _localInventory.Keys;
-        }
         public Dictionary<string, int> GetInvetoryCache()
         {
             Dictionary<string, int> result = new();
             foreach (var item in _localInventory)
                 result.Add(item.Key.ToString(), item.Value);
             return result;
+        }
+        public void Clear()
+        {
+            for (int i = _localInventory.Count - 1; i > 0; i--)
+                if (!GetItemAt(i).CanLoose)
+                    RemoveItem(_localInventory.Keys.ElementAt(i));
         }
     }
 }

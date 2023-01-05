@@ -2,7 +2,9 @@
 {
     public interface IUserLocation
     {
-        public int MapLocation { get; init; }
-        public int MapRegion { get; init; }
+        public int MapLocation { get; }
+        public int MapRegion { get; }
+        public void SetLocation(int index);
+        public void SetRegion(int index);
     }
 }

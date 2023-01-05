@@ -8,7 +8,9 @@
         public int GetMaxEnergy(int endurance);
         public int GetCurrentEnergy();
         public void ReduceEnergy(int amount);
+        public void IncreaseEnergy(int amount);
         public string GetEmojiBar();
         public bool HaveEnergy(int amount);
+        public void UpdateMaxEnergy(int endurance);
     }
 }

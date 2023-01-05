@@ -19,6 +19,8 @@ namespace Shuvi.Classes.Characteristics
         public int GetCurrentEnergy()
         {
             var result = (int)(Max - Math.Ceiling((float)GetRemainingRegenTime() / UserSettings.EnergyPointRegenTime));
+            if (result < 0)
+                return 0;
             return result > Max ? Max : result;
         }
         public int GetMaxEnergy(int endurance)
@@ -37,6 +39,10 @@ namespace Shuvi.Classes.Characteristics
             else
                 RegenTime += amount * UserSettings.EnergyPointRegenTime;
         }
+        public void IncreaseEnergy(int amount)
+        {
+            RegenTime -= amount * UserSettings.EnergyPointRegenTime;
+        }
         public string GetEmojiBar()
         {
             var energyFullEmojiCount = (byte)(GetCurrentEnergy() / (Max / UserSettings.EnergyDisplayMax));
@@ -46,6 +52,10 @@ namespace Shuvi.Classes.Characteristics
         public bool HaveEnergy(int amount)
         {
             return amount <= GetCurrentEnergy();
+        }
+        public void UpdateMaxEnergy(int endurance)
+        {
+            Max = GetMaxEnergy(endurance);
         }
     }
 }

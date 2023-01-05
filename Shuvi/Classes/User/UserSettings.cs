@@ -2,7 +2,7 @@
 {
     public static class UserSettings
     {
-        private const int _healthPointRegenTime = 60;
+        private const int _healthPointRegenTime = 5;
         private const int _energyPointRegenTime = 180;
         private const int _manaPointRegenTime = 10;
         private const int _endurancePerEnergy = 10;

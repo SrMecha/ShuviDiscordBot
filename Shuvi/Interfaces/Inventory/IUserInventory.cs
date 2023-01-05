@@ -1,5 +1,6 @@
 ﻿using Discord;
 using MongoDB.Bson;
+using Shuvi.Interfaces.Items;
 
 namespace Shuvi.Interfaces.Inventory
 {
@@ -11,5 +12,6 @@ namespace Shuvi.Interfaces.Inventory
         public void AddItems(IDropInventory drop);
         public Dictionary<string, int> GetInvetoryCache();
         public int GetTotalEmbeds();
+        public void Clear();
     }
 }
