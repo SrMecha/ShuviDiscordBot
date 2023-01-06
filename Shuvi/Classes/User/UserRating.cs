@@ -1,7 +1,7 @@
-﻿using Shuvi.Classes.Status.RatingResult;
+﻿using Shuvi.Classes.Status;
 using Shuvi.Enums;
 using Shuvi.Extensions;
-using Shuvi.Interfaces.Status.RatingResult;
+using Shuvi.Interfaces.Status;
 using Shuvi.Interfaces.User;
 
 namespace Shuvi.Classes.User
@@ -30,45 +30,45 @@ namespace Shuvi.Classes.User
                 _ => Rank.E
             };
         }
-        public IGetRatingResult AddPoints(int amount, Rank rank)
+        public IRatingResult AddPoints(int amount, Rank rank)
         {
             if (Rank < rank)
-                return new GetRatingResult(Rank, Rank, "Ранг побежденного существа слишком мало для полечения очков рейтинга.");
+                return new RatingResult(Rank, Rank, "Ранг побежденного существа слишком мало для полечения очков рейтинга.");
             Points += amount;
             var rankBefore = Rank;
             Rank = GetRank(Points);
             if (rankBefore < Rank)
-                return new GetRatingResult(rankBefore, Rank, $"Вы получили {amount} очков рейтинга, и повысили свой ранг до {Rank.ToRusString()}!");
-            return new GetRatingResult(rankBefore, Rank, $"Вы получили {amount} очков рейтинга.");
+                return new RatingResult(rankBefore, Rank, $"Вы получили {amount} очков рейтинга, и повысили свой ранг до {Rank.ToRusString()}!");
+            return new RatingResult(rankBefore, Rank, $"Вы получили {amount} очков рейтинга.");
             
         }
-        public IGetRatingResult AddPoints(int amount)
+        public IRatingResult AddPoints(int amount)
         {
             Points += amount;
             var rankBefore = Rank;
             Rank = GetRank(Points);
             if (rankBefore < Rank)
-                return new GetRatingResult(rankBefore, Rank, $"Вы получили {amount} очков рейтинга, и повысили свой ранг до {Rank.ToRusString()}!");
-            return new GetRatingResult(rankBefore, Rank, $"Вы получили {amount} очков рейтинга.");
+                return new RatingResult(rankBefore, Rank, $"Вы получили {amount} очков рейтинга, и повысили свой ранг до {Rank.ToRusString()}!");
+            return new RatingResult(rankBefore, Rank, $"Вы получили {amount} очков рейтинга.");
 
         }
-        public IRemoveRatingResult RemovePoints(int amount)
+        public IRatingResult RemovePoints(int amount)
         {
             Points -= amount;
             var rankBefore = Rank;
             Rank = GetRank(Points);
             if (rankBefore > Rank)
-                return new RemoveRatingResult(rankBefore, Rank, $"Вы потеряли {amount} очков рейтинга, и понизили свой ранг до {Rank.ToRusString()}.");
-            return new RemoveRatingResult(rankBefore, Rank, $"Вы потеряли {amount} очков рейтинга.");
+                return new RatingResult(rankBefore, Rank, $"Вы потеряли {amount} очков рейтинга, и понизили свой ранг до {Rank.ToRusString()}.");
+            return new RatingResult(rankBefore, Rank, $"Вы потеряли {amount} очков рейтинга.");
         }
-        public ISetRatingResult SetPoints(int amount)
+        public IRatingResult SetPoints(int amount)
         {
             Points = amount;
             var rankBefore = Rank;
             Rank = GetRank(Points);
             if (rankBefore != Rank)
-                return new SetRatingResult(rankBefore, Rank, $"Вам присвоено {amount} очков рейтинга. Вы получили ранг {Rank.ToRusString()}.");
-            return new SetRatingResult(rankBefore, Rank, $"Вам присвоено {amount} очков рейтинга.");
+                return new RatingResult(rankBefore, Rank, $"Вам присвоено {amount} очков рейтинга. Вы получили ранг {Rank.ToRusString()}.");
+            return new RatingResult(rankBefore, Rank, $"Вам присвоено {amount} очков рейтинга.");
         }
     }
 }

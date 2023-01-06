@@ -1,7 +1,9 @@
-﻿using Shuvi.Classes.Characteristics;
+﻿using Shuvi.Classes.ActionChances;
+using Shuvi.Classes.Characteristics;
 using Shuvi.Classes.Equipment;
 using Shuvi.Classes.Inventory;
 using Shuvi.Enums;
+using Shuvi.Interfaces.ActionChances;
 using Shuvi.Interfaces.Characteristics;
 using Shuvi.Interfaces.Equipment;
 using Shuvi.Interfaces.Inventory;
@@ -18,6 +20,7 @@ namespace Shuvi.Classes.User
         public UserRaces Race { get; private set; }
         public UserProfessions Profession { get; private set; }
         public IUserInventory Inventory { get; init; }
+        public IUserActionChances ActionChances { get; private set; }
         public IEquipment Equipment { get; init; }
         public IUserCharacteristics Characteristic { get; init; }
         public IEnergy Energy { get; init; }
@@ -35,6 +38,7 @@ namespace Shuvi.Classes.User
             Race = userData.Race;
             Profession = userData.Profession;
             Inventory = new UserInventory(userData.Inventory);
+            ActionChances = userData.ActionChances;
             Equipment = new UserEquipment(userData.Weapon, userData.Head, userData.Body, userData.Legs, userData.Foots);
             Characteristic = new UserCharacteristics(userData.Strength, userData.Agility, userData.Luck, userData.Intellect, userData.Endurance);
             Energy = new Energy(userData.EnergyRegenTime, Characteristic.Endurance);

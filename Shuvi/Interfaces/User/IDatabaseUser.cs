@@ -1,4 +1,6 @@
-﻿using Shuvi.Enums;
+﻿using Shuvi.Classes.ActionChances;
+using Shuvi.Enums;
+using Shuvi.Interfaces.ActionChances;
 using Shuvi.Interfaces.Characteristics;
 using Shuvi.Interfaces.Equipment;
 using Shuvi.Interfaces.Inventory;
@@ -14,6 +16,7 @@ namespace Shuvi.Interfaces.User
         public UserRaces Race { get; }
         public UserProfessions Profession { get; }
         public IUserInventory Inventory { get; init; }
+        public IUserActionChances ActionChances { get; }
         public IEquipment Equipment { get; init; }
         public IUserCharacteristics Characteristic { get; init; }
         public IEnergy Energy { get; init; }

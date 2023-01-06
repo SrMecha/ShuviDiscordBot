@@ -25,6 +25,7 @@ namespace Shuvi.Modules.SlashCommands
         private readonly DatabaseManagerService _database;
         private readonly DiscordShardedClient _client;
         private readonly WorldMap _map;
+        private bool _isAfk = false;
 
         private const int _huntEnergyCost = 1; 
 
@@ -90,8 +91,11 @@ namespace Shuvi.Modules.SlashCommands
                 if (param.Interaction != null)
                     await param.Interaction.DeferAsync();
                 param.Interaction = await WaitFor.UserButtonInteraction(_client, param.Message, Context.User.Id);
-                if (param.Interaction == null) 
+                if (param.Interaction == null)
+                {
+                    await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = new ComponentBuilder().Build(); });
                     return;
+                }
                 switch (param.Interaction.Data.CustomId)
                 {
                     case "fight":
@@ -123,7 +127,10 @@ namespace Shuvi.Modules.SlashCommands
             status.AddDescription("Сражение началось!");
             while (true)
             {
-                await PlayerHodAsync(param, player, enemy, status);
+                if (_isAfk)
+                    PlayerAutoHod(param, player, enemy, status);
+                else
+                    await PlayerHodAsync(param, player, enemy, status);
                 if (enemy.IsDead)
                 {
                     await FightWinAsync(param, dbUser, player, enemy, status);
@@ -166,7 +173,11 @@ namespace Shuvi.Modules.SlashCommands
             param.Interaction = await WaitFor.UserButtonInteraction(_client, param.Message, Context.User.Id);
             status.ClearDescriptions();
             if (param.Interaction == null)
+            {
+                _isAfk = true;
+                PlayerAutoHod(param, player, enemy, status);
                 return;
+            }
             switch (param.Interaction.Data.CustomId)
             {
                 case "lightAttack":
@@ -190,6 +201,11 @@ namespace Shuvi.Modules.SlashCommands
                 default:
                     break;
             }
+        }
+        public void PlayerAutoHod(InteractionParameters param, IPlayer player, IEnemy enemy, IFightStatus status)
+        {
+            status.ClearDescriptions();
+            status.AddDescription(player.RandomAction(enemy).Description);
         }
         public void EnemyHod(IPlayer player, IEnemy enemy, IFightStatus status)
         {

@@ -1,6 +1,8 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using Shuvi.Classes.ActionChances;
 using Shuvi.Enums;
+using Shuvi.Interfaces.ActionChances;
 
 namespace Shuvi.Classes.Enemy
 {

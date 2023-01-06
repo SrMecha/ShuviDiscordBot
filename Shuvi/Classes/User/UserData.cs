@@ -1,6 +1,7 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson;
 using Shuvi.Enums;
+using Shuvi.Classes.ActionChances;
 
 namespace Shuvi.Classes.User
 {
@@ -15,6 +16,7 @@ namespace Shuvi.Classes.User
         public UserRaces Race { get; set; } = UserRaces.ExMachina;
         public UserProfessions Profession { get; set; } = UserProfessions.NoProfession;
         public Dictionary<ObjectId, int> Inventory { get; set; } = new();
+        public UserActionChances ActionChances { get; set; } = new();
         public ObjectId? Weapon { get; set; } = null;
         public ObjectId? Head { get; set; } = null;
         public ObjectId? Body { get; set; } = null;

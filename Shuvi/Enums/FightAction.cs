@@ -1,11 +1,12 @@
 ﻿namespace Shuvi.Enums
 {
-    public enum EnemyAction
+    public enum FightAction
     {
         LightAttack,
         HeavyAttack,
         Dodge,
         Defense,
-        Spell
+        Spell,
+        Skill
     }
 }

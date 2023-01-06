@@ -1,8 +1,8 @@
 ﻿using Shuvi.Enums;
 
-namespace Shuvi.Interfaces.Status.RatingResult
+namespace Shuvi.Interfaces.Status
 {
-    public interface ISetRatingResult : IActionResult
+    public interface IRatingResult : IActionResult
     {
         public bool IsRankChanged { get; init; }
         public Rank RankBefore { get; init; }
