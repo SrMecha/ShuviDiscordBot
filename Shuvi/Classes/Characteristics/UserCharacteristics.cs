@@ -27,6 +27,14 @@ namespace Shuvi.Classes.Characteristics
                 $"**Интеллект:** {Intellect} {(bonuses.Intellect != 0 ? "| " + (bonuses.Intellect > 0 ? $"+{bonuses.Intellect}" : bonuses.Intellect) : "")}\n" +
                 $"**Выносливость:** {Endurance} {(bonuses.Endurance != 0 ? "| " + (bonuses.Endurance > 0 ? $"+{bonuses.Endurance}" : bonuses.Endurance) : "")}";
         }
+        public void Add(ICharacteristics characteristics)
+        {
+            Strength += characteristics.Strength;
+            Agility += characteristics.Agility;
+            Luck += characteristics.Luck;
+            Intellect += characteristics.Intellect;
+            Endurance += characteristics.Endurance;
+        }
         public void Reset()
         {
             Strength = 1;

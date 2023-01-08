@@ -9,5 +9,6 @@ namespace Shuvi.Interfaces.Entity
         public ISkill Skill { get; init; }
         public IUserInventory Inventory { get; init; }
         public IActionResult UseSkill(IEntity target);
+        public IActionResult RandomAction(IEntity target);
     }
 }

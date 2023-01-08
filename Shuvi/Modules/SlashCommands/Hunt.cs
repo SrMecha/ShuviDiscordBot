@@ -25,8 +25,10 @@ namespace Shuvi.Modules.SlashCommands
         private readonly DatabaseManagerService _database;
         private readonly DiscordShardedClient _client;
         private readonly WorldMap _map;
+        private bool _isAfk = false;
 
-        private const int _huntEnergyCost = 1; 
+        private const int _huntEnergyCost = 1;
+        private const int _maxHod = 100;
 
         public HuntCommandModule(IServiceProvider provider)
         {
@@ -90,8 +92,11 @@ namespace Shuvi.Modules.SlashCommands
                 if (param.Interaction != null)
                     await param.Interaction.DeferAsync();
                 param.Interaction = await WaitFor.UserButtonInteraction(_client, param.Message, Context.User.Id);
-                if (param.Interaction == null) 
+                if (param.Interaction == null)
+                {
+                    await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = new ComponentBuilder().Build(); });
                     return;
+                }
                 switch (param.Interaction.Data.CustomId)
                 {
                     case "fight":
@@ -123,7 +128,15 @@ namespace Shuvi.Modules.SlashCommands
             status.AddDescription("Сражение началось!");
             while (true)
             {
-                await PlayerHodAsync(param, player, enemy, status);
+                if (status.Hod > _maxHod)
+                {
+                    await FightDrawAsync(param, dbUser, player, enemy, status);
+                    return;
+                }
+                if (_isAfk)
+                    PlayerAutoHod(param, player, enemy, status);
+                else
+                    await PlayerHodAsync(param, player, enemy, status);
                 if (enemy.IsDead)
                 {
                     await FightWinAsync(param, dbUser, player, enemy, status);
@@ -166,7 +179,11 @@ namespace Shuvi.Modules.SlashCommands
             param.Interaction = await WaitFor.UserButtonInteraction(_client, param.Message, Context.User.Id);
             status.ClearDescriptions();
             if (param.Interaction == null)
+            {
+                _isAfk = true;
+                PlayerAutoHod(param, player, enemy, status);
                 return;
+            }
             switch (param.Interaction.Data.CustomId)
             {
                 case "lightAttack":
@@ -191,6 +208,11 @@ namespace Shuvi.Modules.SlashCommands
                     break;
             }
         }
+        public void PlayerAutoHod(InteractionParameters param, IPlayer player, IEnemy enemy, IFightStatus status)
+        {
+            status.ClearDescriptions();
+            status.AddDescription(player.RandomAction(enemy).Description);
+        }
         public void EnemyHod(IPlayer player, IEnemy enemy, IFightStatus status)
         {
             status.AddDescription(enemy.RandomAction(player).Description);
@@ -200,6 +222,7 @@ namespace Shuvi.Modules.SlashCommands
             var drop = enemy.Drop.GetRandom();
             dbUser.Inventory.AddItems(drop);
             dbUser.Health.ReduceHealth(dbUser.Health.GetCurrentHealth() - player.Health.Now);
+            dbUser.Mana.ReduceMana(dbUser.Mana.GetCurrentMana() - player.Mana.Now);
             dbUser.Statistics.AddEnemyKilled(1);
             status.AddDescription(dbUser.Rating.AddPoints(enemy.RatingGet, enemy.Rank).Description);
             dbUser.Statistics.UpdateMaxRating(dbUser.Rating.Points);
@@ -210,6 +233,7 @@ namespace Shuvi.Modules.SlashCommands
                 new UpdateDefinitionBuilder<UserData>()
                 .Set("Inventory", dbUser.Inventory.GetInvetoryCache())
                 .Set("HealthRegenTime", dbUser.Health.RegenTime)
+                .Set("ManaRegenTime", dbUser.Mana.RegenTime)
                 .Set("Rating", dbUser.Rating.Points)
                 .Set("MaxRating", dbUser.Statistics.MaxRating)
                 .Inc("EnemyKilled", 1));
@@ -224,12 +248,30 @@ namespace Shuvi.Modules.SlashCommands
         {
             var embed = FightEmbed(player, enemy, status);
             embed = embed.ToEmbedBuilder()
-                .WithAuthor($"Охота | Поражение")
+                .WithAuthor($"{embed.Author} | Поражение")
                 .WithColor(Color.Red)
                 .Build();
             await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = new ComponentBuilder().Build(); });
             await _database.Users.KillUser(dbUser.Id);
             await param.Message.Channel.SendMessageAsync(embed: UserDeadEmbedBuilder.Simple(enemy.Name));
+        }
+        public async Task FightDrawAsync(InteractionParameters param, IDatabaseUser dbUser, IPlayer player, IEnemy enemy, IFightStatus status)
+        {
+            dbUser.Health.ReduceHealth(dbUser.Health.GetCurrentHealth() - player.Health.Now);
+            dbUser.Mana.ReduceMana(dbUser.Mana.GetCurrentMana() - player.Mana.Now);
+            status.AddDescription("\nВремя на сражение истекло. Ничья.");
+            await _database.Users.UpdateUser(
+                dbUser.Id,
+                new UpdateDefinitionBuilder<UserData>()
+                .Set("Inventory", dbUser.Inventory.GetInvetoryCache())
+                .Set("HealthRegenTime", dbUser.Health.RegenTime)
+                .Set("ManaRegenTime", dbUser.Mana.RegenTime));
+            var embed = FightEmbed(player, enemy, status);
+            embed = embed.ToEmbedBuilder()
+                .WithAuthor($"{embed.Author} | Ничья")
+                .WithColor(Color.LightGrey)
+                .Build();
+            await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = new ComponentBuilder().Build(); });
         }
         public Embed FightEmbed(IPlayer player, IEnemy enemy, IFightStatus status)
         {

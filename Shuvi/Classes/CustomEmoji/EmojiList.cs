@@ -19,7 +19,7 @@ namespace Shuvi.Classes.CustomEmoji
                 { "energyFull", "<:energy_full:1030943971532349491>" },
                 { "healthEmpty", "<:health_empty:1030948347529412628>" },
                 { "healthFull", "<:health_full:1030948349022588958>" },
-                { "choosePoint", "<a:right_point:12313213123:>" },
+                { "choosePoint", "<a:right_point:1031199297301131285>" },
                 { "magicFull", "<:magic_full:1050772671002071160>" },
                 { "magicEmpty", "<:magic_empty:1050772733828530218>" }
             };

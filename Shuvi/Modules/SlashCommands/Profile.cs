@@ -3,7 +3,6 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Shuvi.Services;
-using SummaryAttribute = Discord.Interactions.SummaryAttribute;
 using MongoDB.Bson;
 using Shuvi.Classes.Items;
 using Shuvi.Classes.Interactions;
@@ -14,6 +13,8 @@ using Shuvi.Interfaces.User;
 using Shuvi.Extensions;
 using Shuvi.Enums;
 using Shuvi.Classes.Characteristics;
+using MongoDB.Driver;
+using Shuvi.Classes.User;
 
 namespace Shuvi.Modules.SlashCommands
 {
@@ -33,12 +34,12 @@ namespace Shuvi.Modules.SlashCommands
         [SlashCommand("profile", "Информаиця о игроке")]
         public async Task ProfileCommandAsync([Summary("user", "Выберите пользователя.")] IUser? paramUser = null)
         {
+            await DeferAsync();
+            var param = new InteractionParameters(await GetOriginalResponseAsync(), null);
             var discordUser = paramUser ?? Context.User;
             var dbUser = await _database.Users.GetUser(discordUser.Id);
-            SocketMessageComponent? interaction = null;
             Embed embed;
             MessageComponent components;
-            IUserMessage? botMessage = null;
             if (discordUser.Id == Context.User.Id)
             {
                 components = new ComponentBuilder()
@@ -81,70 +82,161 @@ namespace Shuvi.Modules.SlashCommands
                     false)
                     .WithAuthor("Профиль")
                     .Build();
-                if (botMessage == null)
+                await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = components; });
+                if (param.Interaction != null)
+                    await param.Interaction.DeferAsync();
+                param.Interaction = await WaitFor.UserButtonInteraction(_client, param.Message, Context.User.Id);
+                if (param.Interaction == null)
                 {
-                    await RespondAsync(embed: embed, components: components);
-                    botMessage = await GetOriginalResponseAsync();
+                    await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = new ComponentBuilder().Build(); });
+                    return;
                 }
-                else
-                    await botMessage.ModifyAsync(msg => { msg.Embed = embed; msg.Components = components; });
-                if (interaction != null)
-                    await interaction.DeferAsync();
-                interaction = await WaitFor.UserButtonInteraction(_client, botMessage, Context.User.Id);
-                switch (interaction.Data.CustomId)
+                switch (param.Interaction.Data.CustomId)
                 {
                     case "equipment":
-                        interaction = await EquipmnetPartAsync(interaction, botMessage, dbUser, discordUser);
+                        await EquipmnetPartAsync(param, dbUser, discordUser);
                         break;
                     case "location":
-                        interaction = await MapPartAsync(interaction, botMessage, dbUser, discordUser);
+                         await MapPartAsync(param, dbUser, discordUser);
                         break;
                     case "statistics":
-                        interaction = await StatisticsPartAsync(interaction, botMessage, dbUser, discordUser);
+                        await StatisticsPartAsync(param, dbUser, discordUser);
                         break;
                     case "inventory":
-                        interaction = await InventoryPartAsync(dbUser, interaction, botMessage, discordUser);
+                        await InventoryPartAsync(param, dbUser);
                         break;
                     case "upgrade":
+                        await UpgradePartAsync(param, dbUser);
                         break;
                     default:
                         break;
                 }
-            } while (interaction != null);
+            } while (param.Interaction != null);
+            await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = new ComponentBuilder().Build(); });
+            return;
         }
-        public async Task<SocketMessageComponent?> InventoryPartAsync(IDatabaseUser dbUser, SocketMessageComponent? interaction, IUserMessage message, IUser discordUser)
+        public async Task UpgradePartAsync(InteractionParameters param, IDatabaseUser dbUser)
+        {
+            var upgradePoints = dbUser.UpgradePoints.GetPoints();
+            var charactersticToAdd = new List<int>() { 0, 0, 0, 0, 0, 0, 0 };
+            var cursor = 0;
+            while (true)
+            {
+                var embed = new UserEmbedBuilder(Context.User)
+                   .WithAuthor("Улучшение")
+                   .WithDescription($"Осталось очков прокачки: {upgradePoints}\n\n" +
+                   $"{UpgradeCommandModule.SetCursor(cursor, 0)}**Сила:** {dbUser.Characteristic.Strength} " +
+                   $"{(charactersticToAdd[0] != 0 ? $"| +{charactersticToAdd[0]}" : string.Empty)}\n" +
+                   $"{UpgradeCommandModule.SetCursor(cursor, 1)}**Ловкость:** {dbUser.Characteristic.Agility} " +
+                   $"{(charactersticToAdd[1] != 0 ? $"| +{charactersticToAdd[1]}" : string.Empty)}\n" +
+                   $"{UpgradeCommandModule.SetCursor(cursor, 2)}**Удача:** {dbUser.Characteristic.Luck} " +
+                   $"{(charactersticToAdd[2] != 0 ? $"| +{charactersticToAdd[2]}" : string.Empty)}\n" +
+                   $"{UpgradeCommandModule.SetCursor(cursor, 3)}**Интеллект:** {dbUser.Characteristic.Intellect} " +
+                   $"{(charactersticToAdd[3] != 0 ? $"| +{charactersticToAdd[3]}" : string.Empty)}\n" +
+                   $"{UpgradeCommandModule.SetCursor(cursor, 4)}**Выносливость:** {dbUser.Characteristic.Endurance} " +
+                   $"{(charactersticToAdd[4] != 0 ? $"| +{charactersticToAdd[4]}" : string.Empty)}\n" +
+                   $"{UpgradeCommandModule.SetCursor(cursor, 5)}**Мана:** {dbUser.Mana.Max} " +
+                   $"{(charactersticToAdd[5] != 0 ? $"| +{charactersticToAdd[5]}" : string.Empty)}\n" +
+                   $"{UpgradeCommandModule.SetCursor(cursor, 6)}**Жизни:** {dbUser.Health.Max} " +
+                   $"{(charactersticToAdd[6] != 0 ? $"| +{charactersticToAdd[6]}" : string.Empty)}\n")
+                   .Build();
+                var components = new ComponentBuilder()
+                    .WithSelectMenu("choose", UpgradeCommandModule.GetUpgradeSelectMenu(), "Выберите параметр.")
+                    .WithButton("+1", "+1", ButtonStyle.Success, disabled: upgradePoints < 1, row: 1)
+                    .WithButton("+2", "+2", ButtonStyle.Success, disabled: upgradePoints < 2, row: 1)
+                    .WithButton("+5", "+5", ButtonStyle.Success, disabled: upgradePoints < 5, row: 1)
+                    .WithButton("Отмена", "back", ButtonStyle.Danger, row: 2)
+                    .WithButton("Сбросить", "clear", ButtonStyle.Secondary, row: 2)
+                    .WithButton("Принять", "apply", ButtonStyle.Success, row: 2)
+                    .Build();
+                await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = components; });
+                if (param.Interaction != null)
+                    await param.Interaction.DeferAsync();
+                param.Interaction = await WaitFor.UserButtonInteraction(_client, param.Message, Context.User.Id);
+                if (param.Interaction == null)
+                {
+                    await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = new ComponentBuilder().Build(); });
+                    return;
+                }
+                switch (param.Interaction.Data.CustomId)
+                {
+                    case "choose":
+                        cursor = int.Parse(param.Interaction.Data.Values.First());
+                        break;
+                    case "-5" or "-2" or "-1" or "+1" or "+2" or "+5":
+                        var amount = int.Parse(param.Interaction.Data.CustomId);
+                        charactersticToAdd = UpgradeCommandModule.UpdateCharacteristic(charactersticToAdd, cursor, amount);
+                        upgradePoints -= amount;
+                        break;
+                    case "back":
+                        return;
+                    case "clear":
+                        upgradePoints = dbUser.UpgradePoints.GetPoints();
+                        charactersticToAdd = new List<int>() { 0, 0, 0, 0, 0, 0, 0 };
+                        break;
+                    case "apply":
+                        dbUser.Characteristic.Add(new UserCharacteristics(
+                            charactersticToAdd[0],
+                            charactersticToAdd[1],
+                            charactersticToAdd[2],
+                            charactersticToAdd[3],
+                            charactersticToAdd[4]
+                            ));
+                        dbUser.Mana.SetMaxMana(dbUser.Mana.Max + charactersticToAdd[5]);
+                        dbUser.Health.SetMaxHealth(dbUser.Health.Max + charactersticToAdd[6]);
+                        await _database.Users.UpdateUser(
+                            Context.User.Id,
+                            new UpdateDefinitionBuilder<UserData>()
+                            .Inc("Strength", charactersticToAdd[0])
+                            .Inc("Agility", charactersticToAdd[1])
+                            .Inc("Luck", charactersticToAdd[2])
+                            .Inc("Intellect", charactersticToAdd[3])
+                            .Inc("Endurance", charactersticToAdd[4])
+                            .Inc("MaxMana", charactersticToAdd[5])
+                            .Inc("MaxHealth", charactersticToAdd[6])
+                            );
+                        return;
+                    default:
+                        return;
+                }
+            }
+        }
+        public async Task InventoryPartAsync(InteractionParameters param, IDatabaseUser dbUser)
         {
             int maxPage = dbUser.Inventory.GetTotalEmbeds();
             int pageNow = 0;
             do
             {
-                await message.ModifyAsync(msg =>
-                {
-                    msg.Content = "";
-                    msg.Embed = dbUser.Inventory.GetItemsEmbed(pageNow).ToEmbedBuilder()
+                var embed = dbUser.Inventory.GetItemsEmbed(pageNow).ToEmbedBuilder()
                     .WithAuthor($"Инвентарь")
-                    .WithFooter($"{discordUser.Username} | {discordUser.Id}", discordUser.GetAvatarUrl())
+                    .WithFooter($"{Context.User.Username} | {Context.User.Id}", Context.User.GetAvatarUrl())
                     .WithColor(UserEmbedBuilder.StandartColor)
                     .Build();
-                    msg.Components = new ComponentBuilder()
-                        .WithButton("<", "<", ButtonStyle.Primary, disabled: pageNow <= 0)
-                        .WithButton("Выйти", "exit", ButtonStyle.Danger)
-                        .WithButton(">", ">", ButtonStyle.Primary, disabled: pageNow >= maxPage - 1)
-                        .WithSelectMenu("choose", dbUser.Inventory.GetItemsSelectMenu(pageNow),
-                        "Выберите предмет для просмотра", disabled: dbUser.Inventory.Count == 0)
-                        .Build();
-                });
-                if (interaction != null) await interaction.DeferAsync();
-                interaction = await WaitFor.UserButtonInteraction(_client, message, dbUser.Id);
-                switch (interaction.Data.CustomId)
+                var components = new ComponentBuilder()
+                    .WithButton("<", "<", ButtonStyle.Primary, disabled: pageNow <= 0)
+                    .WithButton("Выйти", "exit", ButtonStyle.Danger)
+                    .WithButton(">", ">", ButtonStyle.Primary, disabled: pageNow >= maxPage - 1)
+                    .WithSelectMenu("choose", dbUser.Inventory.GetItemsSelectMenu(pageNow),
+                    "Выберите предмет для просмотра", disabled: dbUser.Inventory.Count == 0)
+                    .Build();
+                await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = components; });
+                if (param.Interaction != null)
+                    await param.Interaction.DeferAsync();
+                param.Interaction = await WaitFor.UserButtonInteraction(_client, param.Message, Context.User.Id);
+                if (param.Interaction == null)
+                {
+                    await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = new ComponentBuilder().Build(); });
+                    return;
+                }
+                switch (param.Interaction.Data.CustomId)
                 {
                     case "<":
                         pageNow--;
                         break;
                     case "exit":
-                        return interaction;
+                        return;
                     case "choose":
-                        interaction = await ItemPartAsync(interaction, message, dbUser, discordUser, new ObjectId(interaction.Data.Values.First()));
+                        await ItemPartAsync(param, dbUser, new ObjectId(param.Interaction.Data.Values.First()));
                         break;
                     case ">":
                         pageNow++;
@@ -152,32 +244,31 @@ namespace Shuvi.Modules.SlashCommands
                     default:
                         break;
                 }
-            } while (interaction != null);
-            return interaction;
+            } while (param.Interaction != null);
+            return;
         }
-        public async Task<SocketMessageComponent?> ItemPartAsync(SocketInteraction interaction, IUserMessage message, IDatabaseUser dbUser, IUser discordUser, ObjectId itemId)
+        public async Task ItemPartAsync(InteractionParameters param, IDatabaseUser dbUser, ObjectId itemId)
         {
-            await message.ModifyAsync(msg =>
-            {
-                msg.Embed = dbUser.Inventory.GetItemEmbed(itemId).ToEmbedBuilder()
+            var embed = dbUser.Inventory.GetItemEmbed(itemId).ToEmbedBuilder()
                 .WithAuthor($"Просмотр предмета")
-                .WithFooter($"{discordUser.Username} | {discordUser.Id}", discordUser.GetAvatarUrl())
-                    .WithColor(UserEmbedBuilder.StandartColor)
+                .WithFooter($"{Context.User.Username} | {Context.User.Id}", Context.User.GetAvatarUrl())
+                .WithColor(UserEmbedBuilder.StandartColor)
                 .Build();
-                msg.Components = new ComponentBuilder()
-                    .WithButton("Назад", "back", ButtonStyle.Danger)
-                    .Build();
-            });
-            await interaction.DeferAsync();
-            return await WaitFor.UserButtonInteraction(_client, message, interaction.User.Id);
+            var components = new ComponentBuilder()
+                .WithButton("Назад", "back", ButtonStyle.Danger)
+                .Build();
+            await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = components; });
+            if (param.Interaction != null)
+                await param.Interaction.DeferAsync();
+            param.Interaction = await WaitFor.UserButtonInteraction(_client, param.Message, Context.User.Id);
         }
-        public async Task<SocketMessageComponent> EquipmnetPartAsync(SocketInteraction interaction, IUserMessage message, IDatabaseUser dbUser, IUser discordUser)
+        public async Task EquipmnetPartAsync(InteractionParameters param, IDatabaseUser dbUser, IUser discordUser)
         {
             EquipmentItem? helmet = dbUser.Equipment.Head == null ? null : (EquipmentItem?)ItemFactory.CreateItem((ObjectId)dbUser.Equipment.Head, 0);
             EquipmentItem? armor = dbUser.Equipment.Body == null ? null : (EquipmentItem?)ItemFactory.CreateItem((ObjectId)dbUser.Equipment.Body, 0);
             EquipmentItem? leggings = dbUser.Equipment.Legs == null ? null : (EquipmentItem?)ItemFactory.CreateItem((ObjectId)dbUser.Equipment.Legs, 0);
             EquipmentItem? boots = dbUser.Equipment.Foots == null ? null : (EquipmentItem?)ItemFactory.CreateItem((ObjectId)dbUser.Equipment.Foots, 0);
-            Embed embed = new UserEmbedBuilder(discordUser)
+            var embed = new UserEmbedBuilder(discordUser)
                 .WithAuthor($"Экипировка")
                 .AddField($"Шлем: {(helmet == null ? "Нету" : helmet.Name)}", $"{(helmet == null ? "** **" : helmet.GetBonusesInfo())}", true)
                 .AddField($"Броня: {(armor == null ? "Нету" : armor.Name)}", $"{(armor == null ? "** **" : armor.GetBonusesInfo())}", true)
@@ -185,21 +276,19 @@ namespace Shuvi.Modules.SlashCommands
                 .AddField($"Поножи: {(leggings == null ? "Нету" : leggings.Name)}", $"{(leggings == null ? "** **" : leggings.GetBonusesInfo())}", true)
                 .AddField($"Ботинки: {(boots == null ? "Нету" : boots.Name)}", $"{(boots == null ? "** **" : boots.GetBonusesInfo())}", true)
                 .Build();
-            await message.ModifyAsync(msg =>
-            {
-                msg.Embed = embed;
-                msg.Components = new ComponentBuilder()
-                    .WithButton("Назад", "back", ButtonStyle.Danger)
-                    .Build();
-            });
-            await interaction.DeferAsync();
-            return await WaitFor.UserButtonInteraction(_client, message, interaction.User.Id);
+            var components = new ComponentBuilder()
+                .WithButton("Назад", "back", ButtonStyle.Danger)
+                .Build();
+            await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = components; });
+            if (param.Interaction != null)
+                await param.Interaction.DeferAsync();
+            param.Interaction = await WaitFor.UserButtonInteraction(_client, param.Message, Context.User.Id);
         }
-        public async Task<SocketMessageComponent> StatisticsPartAsync(SocketInteraction interaction, IUserMessage message, IDatabaseUser dbUser, IUser discordUser)
+        public async Task StatisticsPartAsync(InteractionParameters param, IDatabaseUser dbUser, IUser discordUser)
         {
-            TimeSpan created = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(dbUser.Statistics.CreatedAt);
-            TimeSpan live = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(dbUser.Statistics.LiveTime);
-            Embed embed = new UserEmbedBuilder(discordUser)
+            var created = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(dbUser.Statistics.CreatedAt);
+            var live = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(dbUser.Statistics.LiveTime);
+            var embed = new UserEmbedBuilder(discordUser)
                 .WithAuthor("Статистика")
                 .WithDescription($"**Максимальный рейтинг:** {dbUser.Statistics.MaxRating}\n" +
                 $"**Всего врагов убито:** {dbUser.Statistics.EnemyKilled}\n" +
@@ -208,33 +297,29 @@ namespace Shuvi.Modules.SlashCommands
                 $"**Последняя смерть:** <t:{dbUser.Statistics.LiveTime}:R>\n\n" +
                 $"**Аккаунт создан:** <t:{dbUser.Statistics.CreatedAt}:R>")
                 .Build();
-            await message.ModifyAsync(msg =>
-            {
-                msg.Embed = embed;
-                msg.Components = new ComponentBuilder()
+            var components = new ComponentBuilder()
                 .WithButton("Назад", "back", ButtonStyle.Danger)
-                    .Build();
-            });
-            await interaction.DeferAsync();
-            return await WaitFor.UserButtonInteraction(_client, message, interaction.User.Id);
+                .Build();
+            await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = components; });
+            if (param.Interaction != null)
+                await param.Interaction.DeferAsync();
+            param.Interaction = await WaitFor.UserButtonInteraction(_client, param.Message, Context.User.Id);
         }
-        public async Task<SocketMessageComponent> MapPartAsync(SocketInteraction interaction, IUserMessage message, IDatabaseUser dbUser, IUser discordUser)
+        public async Task MapPartAsync(InteractionParameters param, IDatabaseUser dbUser, IUser discordUser)
         {
-            MapRegion region = _map.GetRegion(dbUser.Location.MapRegion);
-            Embed embed = new UserEmbedBuilder(discordUser)
+            var region = _map.GetRegion(dbUser.Location.MapRegion);
+            var embed = new UserEmbedBuilder(discordUser)
                 .WithAuthor("Место нахождения")
                 .WithDescription($"**Регион:** {region.Name}\n**Локация:** {region.GetLocation(dbUser.Location.MapLocation).Name}")
                 .WithImageUrl(region.PictureURL)
                 .Build();
-            await message.ModifyAsync(msg =>
-            {
-                msg.Embed = embed;
-                msg.Components = new ComponentBuilder()
+            var components = new ComponentBuilder()
                 .WithButton("Назад", "back", ButtonStyle.Danger)
-                    .Build();
-            });
-            await interaction.DeferAsync();
-            return await WaitFor.UserButtonInteraction(_client, message, interaction.User.Id);
+                .Build();
+            await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = components; });
+            if (param.Interaction != null)
+                await param.Interaction.DeferAsync();
+            param.Interaction = await WaitFor.UserButtonInteraction(_client, param.Message, Context.User.Id);
         }
     }
 }
