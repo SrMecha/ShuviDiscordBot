@@ -139,11 +139,11 @@ namespace Shuvi.Modules.SlashCommands
             }
         }
 
-        private string SetCursor(int now, int need)
+        public static string SetCursor(int now, int need)
         {
             return now == need ? EmojiList.Get("choosePoint").ToString()! : string.Empty;
         }
-        private List<SelectMenuOptionBuilder> GetUpgradeSelectMenu()
+        public static List<SelectMenuOptionBuilder> GetUpgradeSelectMenu()
         {
             return new List<SelectMenuOptionBuilder>()
             {
@@ -156,7 +156,7 @@ namespace Shuvi.Modules.SlashCommands
                 new SelectMenuOptionBuilder("Жизни", "6")
             };
         }
-        private List<int> UpdateCharacteristic(List<int> characteristic, int cursor, int amount)
+        public static List<int> UpdateCharacteristic(List<int> characteristic, int cursor, int amount)
         {
             var toUp = 1;
             if (cursor == 6)
