@@ -27,8 +27,8 @@ namespace Shuvi.Classes.User
         public int Luck { get; set; } = 1;
         public int Intellect { get; set; } = 1;
         public int Endurance { get; set; } = 1;
-        public int MaxMana { get; set; } = 10;
-        public int MaxHealth { get; set; } = 100;
+        public int MaxMana { get; set; } = UserSettings.StandartMana;
+        public int MaxHealth { get; set; } = UserSettings.StandartHealth;
         public long ManaRegenTime { get; set; } = 1;
         public long HealthRegenTime { get; set; } = 1;
         public long EnergyRegenTime { get; set; } = 1;

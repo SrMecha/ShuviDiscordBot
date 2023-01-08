@@ -4,6 +4,7 @@
     public enum ActiveCommands
     {
         None = 0b0000000000000,
-        Hunt = 0b0000000000001
+        Hunt = 0b0000000000001,
+        Upgrade = 0b0000000000010,
     }
 }

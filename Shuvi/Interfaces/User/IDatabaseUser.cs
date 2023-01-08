@@ -11,6 +11,7 @@ namespace Shuvi.Interfaces.User
     {
         public ulong Id { get; init; }
         public IUserRating Rating { get; init; }
+        public IUserUpgradePoints UpgradePoints { get; init; }
         public IUserWallet Wallet { get; init; }
         public string SpellName { get; }
         public UserRaces Race { get; }

@@ -15,6 +15,7 @@ namespace Shuvi.Classes.User
     {
         public ulong Id { get; init; }
         public IUserRating Rating { get; init; }
+        public IUserUpgradePoints UpgradePoints { get; init; }
         public IUserWallet Wallet { get; init; }
         public string SpellName { get; private set; }
         public UserRaces Race { get; private set; }
@@ -48,6 +49,7 @@ namespace Shuvi.Classes.User
                 userData.CreatedAt, userData.LiveTime, userData.DeathCount, userData.DungeonComplite, userData.EnemyKilled, userData.MaxRating
                 );
             Location = new UserLocation(userData.MapLocation, userData.MapRegion);
+            UpgradePoints = new UserUpgradePoints(Rating, Characteristic, Mana, Health);
         }
         public void SetSpell(string name)
         {
