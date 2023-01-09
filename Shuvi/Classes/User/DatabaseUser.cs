@@ -1,4 +1,6 @@
-﻿using Shuvi.Classes.ActionChances;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
+using Shuvi.Classes.ActionChances;
 using Shuvi.Classes.Characteristics;
 using Shuvi.Classes.Equipment;
 using Shuvi.Classes.Inventory;
@@ -8,11 +10,14 @@ using Shuvi.Interfaces.Characteristics;
 using Shuvi.Interfaces.Equipment;
 using Shuvi.Interfaces.Inventory;
 using Shuvi.Interfaces.User;
+using Shuvi.Services.Databases;
 
 namespace Shuvi.Classes.User
 {
     public class DatabaseUser : IDatabaseUser
     {
+        protected readonly UserDatabase _database; 
+
         public ulong Id { get; init; }
         public IUserRating Rating { get; init; }
         public IUserUpgradePoints UpgradePoints { get; init; }
@@ -30,8 +35,9 @@ namespace Shuvi.Classes.User
         public IUserStatistics Statistics { get; init; }
         public IUserLocation Location { get; init; }
 
-        public DatabaseUser(UserData userData)
+        public DatabaseUser(UserData userData, UserDatabase database)
         {
+            _database = database;
             Id = userData.Id;
             Rating = new UserRating(userData.Rating);
             Wallet = new UserWallet(userData.Money, userData.Dispoints);
@@ -40,7 +46,7 @@ namespace Shuvi.Classes.User
             Profession = userData.Profession;
             Inventory = new UserInventory(userData.Inventory);
             ActionChances = userData.ActionChances;
-            Equipment = new UserEquipment(userData.Weapon, userData.Head, userData.Body, userData.Legs, userData.Foots);
+            Equipment = new UserEquipment(userData.Weapon, userData.Helmet, userData.Armor, userData.Leggings, userData.Boots);
             Characteristic = new UserCharacteristics(userData.Strength, userData.Agility, userData.Luck, userData.Intellect, userData.Endurance);
             Energy = new Energy(userData.EnergyRegenTime, Characteristic.Endurance);
             Mana = new Mana(userData.MaxMana, userData.ManaRegenTime);
@@ -50,6 +56,10 @@ namespace Shuvi.Classes.User
                 );
             Location = new UserLocation(userData.MapLocation, userData.MapRegion);
             UpgradePoints = new UserUpgradePoints(Rating, Characteristic, Mana, Health);
+        }
+        public async Task UpdateUser(UpdateDefinition<UserData> updateConfig)
+        {
+            await _database.UpdateUser(Id, updateConfig);
         }
         public void SetSpell(string name)
         {

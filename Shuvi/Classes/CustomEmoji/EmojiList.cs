@@ -12,8 +12,8 @@ namespace Shuvi.Classes.CustomEmoji
             IDictionary<string, string> emotesBase = new Dictionary<string, string>
             {
                 { "_", "<:404:1036314484790280232>" },
-                { "goodMark", "<:canceled:1031196187870629898>" },
-                { "badMark", "<:checked:1031196185794449470>" },
+                { "goodMark", "<:checked:1031196185794449470>" },
+                { "badMark", "<:canceled:1031196187870629898>" },
                 { "money", "<:dispoint:1015999481034068048>" },
                 { "energyEmpty", "<:energy_empty:1030943969863024730>" },
                 { "energyFull", "<:energy_full:1030943971532349491>" },

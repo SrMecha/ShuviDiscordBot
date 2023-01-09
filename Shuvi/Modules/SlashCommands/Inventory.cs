@@ -23,18 +23,18 @@ namespace Shuvi.Modules.SlashCommands
         [SlashCommand("inventory", "Посмотреть инвентарь")]
         public async Task InventoryCommandAsync()
         {
+            await DeferAsync();
+            var param = new InteractionParameters(await GetOriginalResponseAsync(), null);
             IDatabaseUser dbUser = await _database.Users.GetUser(Context.User.Id);
-            await ViewAllItemsAsync(dbUser);
+            await ViewAllItemsAsync(param, dbUser);
         }
 
-        public async Task ViewAllItemsAsync(IDatabaseUser dbUser)
+        public async Task ViewAllItemsAsync(InteractionParameters param, IDatabaseUser dbUser)
         {
             int maxPage = dbUser.Inventory.GetTotalEmbeds();
             int pageNow = 0;
             Embed embed;
             MessageComponent components;
-            IUserMessage? message = null;
-            SocketMessageComponent? interaction = null;
             do
             {
                 embed = dbUser.Inventory.GetItemsEmbed(pageNow);
@@ -45,28 +45,26 @@ namespace Shuvi.Modules.SlashCommands
                         .WithSelectMenu("choose", dbUser.Inventory.GetItemsSelectMenu(pageNow),
                         "Выберите предмет для просмотра", disabled: dbUser.Inventory.Count == 0)
                         .Build();
-                if (message == null)
+                await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = components; });
+                if (param.Interaction != null)
+                    await param.Interaction.DeferAsync();
+                param.Interaction = await WaitFor.UserButtonInteraction(_client, param.Message, Context.User.Id);
+                if (param.Interaction == null)
                 {
-                    await RespondAsync(embed: embed, components: components);
-                    message = await GetOriginalResponseAsync();
+                    await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = new ComponentBuilder().Build(); });
+                    return;
                 }
-                else
-                {
-                    await message.ModifyAsync(msg => { msg.Embed = embed; msg.Components = components; });
-                }
-                if (interaction != null)
-                    await interaction.DeferAsync();
-                interaction = await WaitFor.UserButtonInteraction(_client, message, dbUser.Id);
-                switch (interaction.Data.CustomId)
+                switch (param.Interaction.Data.CustomId)
                 {
                     case "<":
                         pageNow--;
                         break;
                     case "exit":
-                        await message.DeleteAsync();
+                        await DeleteOriginalResponseAsync();
                         return;
                     case "choose":
-                        interaction = await ViewItemAsync(interaction, message, dbUser, new ObjectId(interaction.Data.Values.First()));
+                        await dbUser.Inventory.GetItem(new ObjectId(param.Interaction.Data.Values.First()))
+                           .ViewItemAsync(_client, param, dbUser, Context.User);
                         break;
                     case ">":
                         pageNow++;
@@ -74,20 +72,9 @@ namespace Shuvi.Modules.SlashCommands
                     default:
                         break;
                 }
-            } while (interaction != null);
-        }
-
-        public async Task<SocketMessageComponent> ViewItemAsync(SocketInteraction interaction, IUserMessage message, IDatabaseUser dbUser, ObjectId itemId)
-        {
-            await message.ModifyAsync(msg =>
-            {
-                msg.Embed = dbUser.Inventory.GetItemEmbed(itemId);
-                msg.Components = new ComponentBuilder()
-                    .WithButton("Назад", "back", ButtonStyle.Danger)
-                    .Build();
-            });
-            await interaction.DeferAsync();
-            return await WaitFor.UserButtonInteraction(_client, message, interaction.User.Id);
+            } while (param.Interaction != null);
+            await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = new ComponentBuilder().Build(); });
+            return;
         }
     }
 }

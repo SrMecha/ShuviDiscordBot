@@ -1,68 +1,43 @@
 ﻿using Discord.WebSocket;
 using Discord;
-using Shuvi.Classes.Characteristics;
+using MongoDB.Driver;
 using Shuvi.Classes.CustomEmbeds;
 using Shuvi.Classes.Interactions;
-using Shuvi.Enums;
-using Shuvi.Extensions;
-using Shuvi.Interfaces.Characteristics;
-using Shuvi.Interfaces.User;
-using Shuvi.Classes.CustomEmoji;
-using MongoDB.Driver;
+using Shuvi.Classes.Status;
 using Shuvi.Classes.User;
-using System.Reflection.Metadata;
+using Shuvi.Extensions;
+using Shuvi.Interfaces.Items;
+using Shuvi.Interfaces.Status;
+using Shuvi.Interfaces.User;
+using Shuvi.Classes.Rates;
+using MongoDB.Bson;
+using Shuvi.Classes.CustomEmoji;
 
 namespace Shuvi.Classes.Items
 {
-    public sealed class EquipmentItem : BaseItem
+    public class ChestItem : BaseItem, IUsefullItem
     {
-        public override ICharacteristicBonuses Bonuses { get; protected set; }
-        public override Dictionary<ItemNeeds, int> Needs { get; protected set; }
+        protected readonly int _dispointsMin;
+        protected readonly int _dispointsMax;
+        protected readonly AllRate _drop;
+        private readonly string _dropInfo;
 
-        public EquipmentItem(ItemData data, int amount) : base(data, amount)
+        public ChestItem(ItemData data, int amount) : base(data, amount)
         {
-            Bonuses = data.Bonuses;
-            Needs = data.Needs;
+            _dispointsMin = data.Drop.DispointsMin;
+            _dispointsMax = data.Drop.DispointsMax;
+            _drop = new(data.Drop.Items);
+            _dropInfo = GetPossibleDropInfo();
         }
-        public string GetBonusesInfo()
+        protected string GetPossibleDropInfo()
         {
-            var result = "";
-            foreach (var (bonus, amount) in Bonuses)
+            var result = new List<string>();
+            foreach (var (id, chance) in _drop)
             {
-                result += $"{bonus.ToRusString()} {amount}+\n";
+                var item = ItemFactory.CreateItem(id, 1);
+                result.Add($"{item.Name} {chance / (float)_drop.All:P1}");
             }
-            if (result == "")
-            {
-                result = "Нету бонусов.";
-            }
-            return result;
-        }
-        public string GetNeedsInfo()
-        {
-            var result = "";
-            foreach (var need in Needs)
-            {
-                result += $"{need.Key.ToRusString()} {need.Key.GetFormatString(need.Value)}+\n";
-            }
-            if (result == "")
-            {
-                result = "Нету требований.";
-            }
-            return result;
-        }
-        public string GetNeedsInfo(IDatabaseUser dbUser)
-        {
-            var result = "";
-            foreach (var (need, amount) in Needs)
-            {
-                result += MeetNeeds(dbUser, need, amount) ? EmojiList.Get("goodMark").ToString() : EmojiList.Get("badMark").ToString();
-                result += $" {need.ToRusString()} {need.GetFormatString(amount)}+\n";
-            }
-            if (result == "")
-            {
-                result = "Нету требований.";
-            }
-            return result;
+            return string.Join("\n", result);
         }
         public override Embed GetEmbed()
         {
@@ -71,8 +46,7 @@ namespace Shuvi.Classes.Items
                     .WithDescription($"**Название:** {Name}\n**Тип:** {Type.ToRusString()}\n" +
                     $"**Ранг:** {Rank.ToRusString()}\n**Максимум в инвентаре:** {(Max < 0 ? "бесконечно" : Max)}\n\n" +
                     $"**Описание:**\n{Description}\n{(CanTrade ? "Можно обменять" : "Нельзя обменять")}\n\n" +
-                    $"**Бонусы:** \n{GetBonusesInfo()}\n" +
-                    $"**Требования:**\n {GetNeedsInfo()}")
+                    $"**Возможный дроп:**\n {_dropInfo}")
                     .WithFooter($"ID: {Id}")
                     .WithColor(Rank.GetColor())
                     .Build();
@@ -84,19 +58,33 @@ namespace Shuvi.Classes.Items
                     .WithDescription($"**Название:** {Name}\n**Тип:** {Type.ToRusString()}\n" +
                     $"**Ранг:** {Rank.ToRusString()}\n**Максимум в инвентаре:** {(Max < 0 ? "бесконечно" : Max)}\n**У вас есть:** {Amount}\n\n" +
                     $"**Описание:**\n{Description}\n{(CanTrade ? "Можно обменять" : "Нельзя обменять")}\n\n" +
-                    $"**Бонусы:** \n{GetBonusesInfo()}\n" +
-                    $"**Требования:**\n {GetNeedsInfo(dbUser)}")
+                    $"**Возможный дроп:**\n {_dropInfo}")
                     .WithFooter($"ID: {Id}")
                     .WithColor(Rank.GetColor())
                     .Build();
         }
+
+        public async Task<IActionResult> Use(IDatabaseUser dbUser)
+        {
+            Amount -= 1;
+            var dispoints = new Random().Next(_dispointsMin, _dispointsMax + 1);
+            var drop = _drop.GetRandom();
+            dbUser.Wallet.AddDispoints(dispoints);
+            dbUser.Inventory.AddItems(drop);
+            dbUser.Inventory.RemoveItem(Id, 1);
+            await dbUser.UpdateUser(new UpdateDefinitionBuilder<UserData>()
+                        .Inc("Dispoints", dispoints)
+                        .Set("Inventory", dbUser.Inventory.GetInvetoryCache()));
+            return new ActionResult($"{(dispoints < 1 ? string.Empty : $"+{dispoints} {EmojiList.Get("money")}")}\n{drop.GetDropInfo()}");
+        }
+
         public override async Task ViewItemAsync(DiscordShardedClient client, InteractionParameters param, IDatabaseUser dbUser, IUser discordUser)
         {
             while (true)
             {
                 var components = new ComponentBuilder()
                 .WithButton("Назад", "back", ButtonStyle.Danger)
-                .WithButton("Надеть", "equip", ButtonStyle.Success, disabled: dbUser.Equipment.GetEquipment(Type) == Id)
+                .WithButton("Использовать", "use", ButtonStyle.Success, disabled: !dbUser.Inventory.HaveItem(Id, 1))
                 .Build();
                 await param.Message.ModifyAsync(msg => { msg.Embed = GetEmbed(dbUser, discordUser); msg.Components = components; });
                 if (param.Interaction != null)
@@ -109,16 +97,14 @@ namespace Shuvi.Classes.Items
                 }
                 switch (param.Interaction.Data.CustomId)
                 {
-                    case "equip":
-                        if (!dbUser.Inventory.HaveItem(Id, Amount))
+                    case "use":
+                        if (!dbUser.Inventory.HaveItem(Id, 1))
                         {
                             await param.Interaction.RespondAsync(embed: ErrorEmbedBuilder.Simple("У вас нету данного предмета."), ephemeral: true);
-                            param.Interaction = null;
                             return;
                         }
-                        dbUser.Equipment.SetEquipment(Type, Id);
-                        await dbUser.UpdateUser(new UpdateDefinitionBuilder<UserData>().Set(Type.ToEngString(), Id));
-                        var embed = new EmbedBuilder().WithDescription("Предмет экипирован.").WithColor(Color.Green).Build();
+                        var result = await Use(dbUser);
+                        var embed = new EmbedBuilder().WithDescription(result.Description).WithColor(Color.Green).Build();
                         await param.Interaction.RespondAsync(embed: embed, ephemeral: true);
                         param.Interaction = null;
                         break;

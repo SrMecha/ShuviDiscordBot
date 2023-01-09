@@ -26,6 +26,23 @@ namespace Shuvi.Extensions
             };
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+        public static string ToEngString(this ItemType target)
+        {
+            return target switch
+            {
+                ItemType.Test => nameof(ItemType.Test),
+                ItemType.Weapon => nameof(ItemType.Weapon),
+                ItemType.Helmet => nameof(ItemType.Helmet),
+                ItemType.Armor => nameof(ItemType.Armor),
+                ItemType.Leggings => nameof(ItemType.Leggings),
+                ItemType.Boots => nameof(ItemType.Boots),
+                ItemType.Simple => nameof(ItemType.Simple),
+                ItemType.Potion => nameof(ItemType.Potion),
+                ItemType.Chest => nameof(ItemType.Chest),
+                _ => string.Empty
+            };
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         public static bool WithBonuses(this ItemType target)
         {
             return target switch

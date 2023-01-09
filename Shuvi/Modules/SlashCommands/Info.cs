@@ -85,7 +85,8 @@ namespace Shuvi.Modules.SlashCommands
                         pageNow--;
                         break;
                     case "choose":
-                        await ViewItemAsync(param, new ObjectId(param.Interaction.Data.Values.First()));
+                        await ItemFactory.CreateItem(new ObjectId(param.Interaction.Data.Values.First()), 1)
+                            .ViewItemAsync(_client, param, Context.User);
                         break;
                     case ">":
                         pageNow++;
@@ -93,23 +94,6 @@ namespace Shuvi.Modules.SlashCommands
                     default:
                         break;
                 }
-            }
-        }
-
-        public async Task ViewItemAsync(InteractionParameters param, ObjectId itemId)
-        {
-            var embed = AllItemsData.GetItemEmbed(itemId);
-            var components = new ComponentBuilder()
-                    .WithButton("Назад", "back", ButtonStyle.Danger)
-                    .Build();
-            await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = components; });
-            if (param.Interaction != null)
-                await param.Interaction.DeferAsync();
-            param.Interaction = await WaitFor.UserButtonInteraction(_client, param.Message, Context.User.Id);
-            if (param.Interaction == null)
-            {
-                await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = new ComponentBuilder().Build(); });
-                return;
             }
         }
     }

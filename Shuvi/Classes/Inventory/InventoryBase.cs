@@ -18,21 +18,33 @@ namespace Shuvi.Classes.Inventory
         }
         public void AddItem(IItem item)
         {
-            if (_localInventory.ContainsKey(item.Id))
-                _localInventory[item.Id] += item.Amount;
+            var toAdd = 0;
+            if (item.Max == -1)
+                toAdd = item.Amount;
             else
-                _localInventory.Add(item.Id, item.Amount);
+            {
+                var alreadyHave = _localInventory.GetValueOrDefault(item.Id, 0);
+                if (alreadyHave + item.Amount > item.Max)
+                    toAdd = item.Max - alreadyHave;
+                else
+                    toAdd = item.Amount;
+            }
+            if (_localInventory.ContainsKey(item.Id))
+                _localInventory[item.Id] += toAdd;
+            else
+                _localInventory.Add(item.Id, toAdd);
         }
         public void AddItem(ObjectId id, int amount)
         {
-            if (_localInventory.ContainsKey(id))
-                _localInventory[id] += amount;
-            else
-                _localInventory.Add(id, amount);
+            AddItem(ItemFactory.CreateItem(id, amount));
         }
         public TItem GetItem<TItem>(ObjectId id) where TItem : IItem
         {
             return (TItem)ItemFactory.CreateItem(AllItemsData.GetItemData(id), _localInventory.GetValueOrDefault(id, 0));
+        }
+        public IItem GetItem(ObjectId id)
+        {
+            return ItemFactory.CreateItem(AllItemsData.GetItemData(id), _localInventory.GetValueOrDefault(id, 0));
         }
         public IItem GetItemAt(int index)
         {
@@ -50,6 +62,14 @@ namespace Shuvi.Classes.Inventory
         public void RemoveItem(ObjectId id)
         {
             _localInventory.Remove(id);
+        }
+        public void RemoveItem(ObjectId id, int amount)
+        {
+            if (!_localInventory.ContainsKey(id))
+                return;
+            _localInventory[id] -= amount;
+            if (_localInventory[id] < 1)
+                _localInventory.Remove(id);
         }
     }
 }

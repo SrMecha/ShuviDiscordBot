@@ -31,8 +31,8 @@ namespace Shuvi.Services.Databases
                 LiveTime = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds()
             };
             await _userCollection.InsertOneAsync(userData);
-            _cacheUsers.TryAddUser(userData);
-            return new DatabaseUser(userData);
+            _cacheUsers.TryAddUser(userData, this);
+            return new DatabaseUser(userData, this);
         }
         public async Task<IDatabaseUser> GetUser(ulong id)
         {
@@ -41,7 +41,7 @@ namespace Shuvi.Services.Databases
             try
             {
                 UserData userData = await _userCollection.Find(new BsonDocument { { "_id", (long)id } }).SingleAsync();
-                _cacheUsers.TryAddUser(userData);
+                _cacheUsers.TryAddUser(userData, this);
             }
             catch (InvalidOperationException)
             {
@@ -80,10 +80,10 @@ namespace Shuvi.Services.Databases
                 .Set("Profession", user.Profession)
                 .Set("Inventory", user.Inventory.GetInvetoryCache())
                 .Set("Weapon", user.Equipment.Weapon)
-                .Set("Head", user.Equipment.Head)
-                .Set("Body", user.Equipment.Body)
-                .Set("Legs", user.Equipment.Legs)
-                .Set("Foots", user.Equipment.Foots)
+                .Set("Helmet", user.Equipment.Helmet)
+                .Set("Armor", user.Equipment.Armor)
+                .Set("Leggings", user.Equipment.Leggings)
+                .Set("Boots", user.Equipment.Boots)
                 .Set("Strength", user.Characteristic.Strength)
                 .Set("Agility", user.Characteristic.Agility)
                 .Set("Luck", user.Characteristic.Luck)

@@ -1,5 +1,6 @@
 ﻿using Shuvi.Classes.User;
 using Shuvi.Interfaces.User;
+using Shuvi.Services.Databases;
 
 namespace Shuvi.Services.Caches
 {
@@ -14,10 +15,10 @@ namespace Shuvi.Services.Caches
             _timeCache.TryAdd(user.Id, ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds());
             return _userCache.TryAdd(user.Id, user);
         }
-        public bool TryAddUser(UserData userData)
+        public bool TryAddUser(UserData userData, UserDatabase database)
         {
             _timeCache.TryAdd(userData.Id, ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds());
-            return _userCache.TryAdd(userData.Id, new DatabaseUser(userData));
+            return _userCache.TryAdd(userData.Id, new DatabaseUser(userData, database));
         }
         public bool TryRemoveUser(ulong id)
         {

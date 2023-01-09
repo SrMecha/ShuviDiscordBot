@@ -5,6 +5,7 @@ using Shuvi.Classes.ActionChances;
 
 namespace Shuvi.Classes.User
 {
+    [BsonIgnoreExtraElements]
     public sealed class UserData
     {
         [BsonId]
@@ -18,10 +19,10 @@ namespace Shuvi.Classes.User
         public Dictionary<ObjectId, int> Inventory { get; set; } = new();
         public UserActionChances ActionChances { get; set; } = new();
         public ObjectId? Weapon { get; set; } = null;
-        public ObjectId? Head { get; set; } = null;
-        public ObjectId? Body { get; set; } = null;
-        public ObjectId? Legs { get; set; } = null;
-        public ObjectId? Foots { get; set; } = null;
+        public ObjectId? Helmet { get; set; } = null;
+        public ObjectId? Armor { get; set; } = null;
+        public ObjectId? Leggings { get; set; } = null;
+        public ObjectId? Boots { get; set; } = null;
         public int Strength { get; set; } = 1;
         public int Agility { get; set; } = 1;
         public int Luck { get; set; } = 1;
