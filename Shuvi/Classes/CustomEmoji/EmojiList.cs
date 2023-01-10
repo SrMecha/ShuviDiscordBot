@@ -21,7 +21,9 @@ namespace Shuvi.Classes.CustomEmoji
                 { "healthFull", "<:health_full:1030948349022588958>" },
                 { "choosePoint", "<a:right_point:1031199297301131285>" },
                 { "magicFull", "<:magic_full:1050772671002071160>" },
-                { "magicEmpty", "<:magic_empty:1050772733828530218>" }
+                { "magicEmpty", "<:magic_empty:1050772733828530218>" },
+                { "lineMiddle", "<:LineMiddle:1062300869808369726>" },
+                { "lineEnd", "<:LineEnd:1062300873113468938>" }
             };
             foreach (var (emoteKey, emoteCode) in emotesBase)
                 if (Emote.TryParse(emoteCode, out var emote))

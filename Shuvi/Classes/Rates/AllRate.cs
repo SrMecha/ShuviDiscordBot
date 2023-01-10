@@ -26,12 +26,14 @@ namespace Shuvi.Classes.Rates
             _allDrop = drop.Items;
             _min = drop.Min;
             _max = drop.Max;
+            All = _allDrop.Values.Sum();
         }
         public AllRate()
         {
             _allDrop = new();
             _min = 1;
             _max = 1;
+            All = 0;
         }
         public IDropInventory GetRandom()
         {

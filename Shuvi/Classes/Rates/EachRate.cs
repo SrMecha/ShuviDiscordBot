@@ -13,6 +13,10 @@ namespace Shuvi.Classes.Rates
         {
             _drop = drop;
         }
+        public EachRate()
+        {
+            _drop = new();
+        }
         public IDropInventory GetRandom()
         {
             var random = new Random();
