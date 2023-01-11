@@ -2,10 +2,8 @@
 using MongoDB.Bson;
 using Shuvi.Classes.CustomEmbeds;
 using Shuvi.Classes.Items;
-using Shuvi.Extensions;
 using Shuvi.Interfaces.Inventory;
 using Shuvi.Interfaces.Items;
-using System.Linq;
 
 namespace Shuvi.Classes.Inventory
 {
@@ -21,17 +19,10 @@ namespace Shuvi.Classes.Inventory
         }
         public void AddItems(IDropInventory drop)
         {
-            foreach (var item in drop)
+            foreach (var (id, amount) in drop)
             {
-                if (_localInventory.ContainsKey(item.Key))
-                    _localInventory[item.Key] += item.Value;
-                else
-                    _localInventory.Add(item.Key, item.Value);
+                AddItem(id, amount);
             }
-        }
-        public IItem GetItem(ObjectId id)
-        {
-            return ItemFactory.CreateItem(AllItemsData.GetItemData(id), _localInventory.GetValueOrDefault(id, 0));
         }
         public List<SelectMenuOptionBuilder> GetItemsSelectMenu(int index)
         {
@@ -59,7 +50,7 @@ namespace Shuvi.Classes.Inventory
         public Embed GetItemsEmbed(int index)
         {
             var itemsString = "";
-            for (int i = index * 10; i <= _localInventory.Count - 1; i++)
+            for (int i = index * 10; i < _localInventory.Count && i < index * 10 + 10; i++)
             {
                 itemsString += $"\n**#{i + 1}** {AllItemsData.GetItemData(_localInventory.Keys.ElementAt(i)).Name} x{_localInventory.Values.ElementAt(i)}";
             }
@@ -70,29 +61,15 @@ namespace Shuvi.Classes.Inventory
                     .WithFooter($"Страница {index + 1}/{GetTotalEmbeds()}")
                     .Build();
         }
-        public Embed GetItemEmbed(ObjectId id)
-        {
-            var item = ItemFactory.CreateItem(AllItemsData.GetItemData(id), _localInventory.GetValueOrDefault(id, 0));
-            var bonuses = "";
-            var needs = "";
-            if (item.Type.WithBonuses())
-            {
-                bonuses = $"**Бонусы:**\n{item.GetBonusesInfo()}";
-                needs = $"**Требования:**\n{item.GetNeedsInfo()}";
-            }
-
-            return new BotEmbedBuilder()
-                    .WithAuthor("Просмотр предмета")
-                    .WithDescription($"**Название:** {item.Name}\n**Тип:** {item.Type.ToRusString()}\n" +
-                    $"**Ранг:** {item.Rank.ToRusString()}\n**Максимум в инвентаре:** {(item.Max < 0 ? "бесконечно" : item.Max)}\n**У вас есть:** {item.Amount}\n\n" +
-                    $"**Описание:**\n{item.Description}\n{(item.CanTrade ? "Можно обменять" : "Нельзя обменять")}\n\n{bonuses}\n{needs}")
-                    .WithFooter($"ID: {item.Id}")
-                    .WithColor(item.Rank.GetColor())
-                    .Build();
-        }
         public int GetTotalEmbeds()
         {
             return ((_localInventory.Count + 9) / 10) < 1 ? 1 : (_localInventory.Count + 9) / 10;
+        }
+        public bool HaveItem(ObjectId id, int amount)
+        {
+            if (!_localInventory.ContainsKey(id))
+                return false;
+            return _localInventory.GetValueOrDefault(id, 0) >= amount;
         }
         public Dictionary<string, int> GetInvetoryCache()
         {

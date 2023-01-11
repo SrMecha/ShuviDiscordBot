@@ -1,7 +1,6 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson;
 using Shuvi.Enums;
-using Shuvi.Interfaces.Characteristics;
 using Shuvi.Classes.Characteristics;
 
 namespace Shuvi.Classes.Items
@@ -19,5 +18,8 @@ namespace Shuvi.Classes.Items
         public int Max { get; set; } = -1;
         public CharacteristicBonuses Bonuses { get; set; } = new();
         public Dictionary<ItemNeeds, int> Needs { get; set; } = new();
+        public string Charactteristic { get; set; } = string.Empty;
+        public int Amount { get; set; } = 0;
+        public ChestDrop Drop { get; set; } = new();
     }
 }

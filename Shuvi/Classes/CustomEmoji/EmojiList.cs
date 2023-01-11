@@ -12,8 +12,8 @@ namespace Shuvi.Classes.CustomEmoji
             IDictionary<string, string> emotesBase = new Dictionary<string, string>
             {
                 { "_", "<:404:1036314484790280232>" },
-                { "goodMark", "<:canceled:1031196187870629898>" },
-                { "badMark", "<:checked:1031196185794449470>" },
+                { "goodMark", "<:checked:1031196185794449470>" },
+                { "badMark", "<:canceled:1031196187870629898>" },
                 { "money", "<:dispoint:1015999481034068048>" },
                 { "energyEmpty", "<:energy_empty:1030943969863024730>" },
                 { "energyFull", "<:energy_full:1030943971532349491>" },
@@ -21,7 +21,9 @@ namespace Shuvi.Classes.CustomEmoji
                 { "healthFull", "<:health_full:1030948349022588958>" },
                 { "choosePoint", "<a:right_point:1031199297301131285>" },
                 { "magicFull", "<:magic_full:1050772671002071160>" },
-                { "magicEmpty", "<:magic_empty:1050772733828530218>" }
+                { "magicEmpty", "<:magic_empty:1050772733828530218>" },
+                { "lineMiddle", "<:LineMiddle:1062300869808369726>" },
+                { "lineEnd", "<:LineEnd:1062300873113468938>" }
             };
             foreach (var (emoteKey, emoteCode) in emotesBase)
                 if (Emote.TryParse(emoteCode, out var emote))

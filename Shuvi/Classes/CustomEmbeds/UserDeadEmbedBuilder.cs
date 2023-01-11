@@ -14,7 +14,8 @@ namespace Shuvi.Classes.CustomEmbeds
         public static Embed Simple(string asassinName)
         {
             return new UserDeadEmbedBuilder()
-                .WithDescription($"К сожалению вы умерли. Вас убил противник {asassinName}. Может быть в следующий раз вам повезет больше.")
+                .WithDescription($"К сожалению вы умерли. Вас убил противник {asassinName}. " +
+                $"Вы потеряли все свои вещи, деньги и славу. Может быть в следующий раз вам повезет больше.")
                 .Build();
         }
     }

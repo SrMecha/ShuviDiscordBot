@@ -8,7 +8,7 @@ using Shuvi.Classes.CustomEmbeds;
 using Shuvi.Classes.Interactions;
 using Shuvi.Classes.Items;
 using Shuvi.StaticServices.AdminCheck;
-using static MongoDB.Bson.Serialization.Serializers.SerializerHelper;
+using Shuvi.StaticServices.UserTop;
 
 namespace Shuvi.Modules.SlashCommands
 {
@@ -16,6 +16,8 @@ namespace Shuvi.Modules.SlashCommands
     {
         private readonly DatabaseManagerService _database;
         private readonly DiscordShardedClient _client;
+
+        public string Version { get; } = "0.1.0a";
 
         public InfoCommandModule(IServiceProvider provider)
         {
@@ -29,7 +31,10 @@ namespace Shuvi.Modules.SlashCommands
             await DeferAsync();
             var param = new InteractionParameters(await GetOriginalResponseAsync(), null);
             var embed = new BotEmbedBuilder()
-                .WithDescription($"Шард №{Context.Client.GetShardFor(Context.Guild).ShardId}\nСерверов: {Context.Client.Guilds.Count}\n")
+                .WithDescription($"**Игроков:** {UserTopManager.UsersAmount}\n" +
+                $"**Серверов:** {Context.Client.Guilds.Count}\n\n**Полезные ссылки:** " +
+                $"[Вики](https://shuvidev.gitbook.io/shuvi/) | [Сервер поддержки](https://discord.gg/Thq3Bjvn2t)")
+                .WithFooter($"Текущая версия: {Version}")
                 .Build();
             MessageComponent components;
             if (AdminCheckManager.IsAdmin(Context.User.Id))
@@ -85,7 +90,8 @@ namespace Shuvi.Modules.SlashCommands
                         pageNow--;
                         break;
                     case "choose":
-                        await ViewItemAsync(param, new ObjectId(param.Interaction.Data.Values.First()));
+                        await ItemFactory.CreateItem(new ObjectId(param.Interaction.Data.Values.First()), 1)
+                            .ViewItemAsync(_client, param, Context.User);
                         break;
                     case ">":
                         pageNow++;
@@ -93,23 +99,6 @@ namespace Shuvi.Modules.SlashCommands
                     default:
                         break;
                 }
-            }
-        }
-
-        public async Task ViewItemAsync(InteractionParameters param, ObjectId itemId)
-        {
-            var embed = AllItemsData.GetItemEmbed(itemId);
-            var components = new ComponentBuilder()
-                    .WithButton("Назад", "back", ButtonStyle.Danger)
-                    .Build();
-            await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = components; });
-            if (param.Interaction != null)
-                await param.Interaction.DeferAsync();
-            param.Interaction = await WaitFor.UserButtonInteraction(_client, param.Message, Context.User.Id);
-            if (param.Interaction == null)
-            {
-                await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = new ComponentBuilder().Build(); });
-                return;
             }
         }
     }

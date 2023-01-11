@@ -70,28 +70,6 @@ namespace Shuvi.Classes.Items
                     .WithFooter($"Страница {index + 1}/{(_itemsDataArray.Count + 9) / 10}")
                     .Build();
         }
-
-        public static Embed GetItemEmbed(ObjectId id)
-        {
-            IItem item = ItemFactory.CreateItem(_itemsData.GetValueOrDefault(id, new ItemData()), 0);
-            string bonuses = "";
-            string needs = "";
-            if (item.Type.WithBonuses())
-            {
-                bonuses = $"**Бонусы:**\n{item.GetBonusesInfo()}";
-                needs = $"**Требования:**\n{item.GetNeedsInfo()}";
-            }
-
-            return new BotEmbedBuilder()
-                    .WithAuthor("Просмотр предмета")
-                    .WithDescription($"**Название:** {item.Name}\n**Тип:** {item.Type.ToRusString()}\n" +
-                    $"**Ранг:** {item.Rank.ToRusString()}\n**Максимум в инвентаре:** {(item.Max < 0 ? "бесконечно" : item.Max)}\n\n" +
-                    $"**Описание:**\n{item.Description}\n{(item.CanTrade ? "Можно обменять" : "Нельзя обменять")}\n\n{bonuses}\n{needs}")
-                    .WithFooter($"ID: {item.Id}")
-                    .WithColor(item.Rank.GetColor())
-                    .Build();
-        }
-
         public static int GetTotalEmbeds()
         {
             return (_itemsDataArray.Count + 9) / 10;

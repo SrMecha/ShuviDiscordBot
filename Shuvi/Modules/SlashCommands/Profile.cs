@@ -15,6 +15,8 @@ using Shuvi.Enums;
 using Shuvi.Classes.Characteristics;
 using MongoDB.Driver;
 using Shuvi.Classes.User;
+using System;
+using System.Collections.Generic;
 
 namespace Shuvi.Modules.SlashCommands
 {
@@ -236,7 +238,8 @@ namespace Shuvi.Modules.SlashCommands
                     case "exit":
                         return;
                     case "choose":
-                        await ItemPartAsync(param, dbUser, new ObjectId(param.Interaction.Data.Values.First()));
+                        await dbUser.Inventory.GetItem(new ObjectId(param.Interaction.Data.Values.First()))
+                            .ViewItemAsync(_client, param, dbUser, Context.User);
                         break;
                     case ">":
                         pageNow++;
@@ -247,42 +250,56 @@ namespace Shuvi.Modules.SlashCommands
             } while (param.Interaction != null);
             return;
         }
-        public async Task ItemPartAsync(InteractionParameters param, IDatabaseUser dbUser, ObjectId itemId)
-        {
-            var embed = dbUser.Inventory.GetItemEmbed(itemId).ToEmbedBuilder()
-                .WithAuthor($"Просмотр предмета")
-                .WithFooter($"{Context.User.Username} | {Context.User.Id}", Context.User.GetAvatarUrl())
-                .WithColor(UserEmbedBuilder.StandartColor)
-                .Build();
-            var components = new ComponentBuilder()
-                .WithButton("Назад", "back", ButtonStyle.Danger)
-                .Build();
-            await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = components; });
-            if (param.Interaction != null)
-                await param.Interaction.DeferAsync();
-            param.Interaction = await WaitFor.UserButtonInteraction(_client, param.Message, Context.User.Id);
-        }
         public async Task EquipmnetPartAsync(InteractionParameters param, IDatabaseUser dbUser, IUser discordUser)
         {
-            EquipmentItem? helmet = dbUser.Equipment.Head == null ? null : (EquipmentItem?)ItemFactory.CreateItem((ObjectId)dbUser.Equipment.Head, 0);
-            EquipmentItem? armor = dbUser.Equipment.Body == null ? null : (EquipmentItem?)ItemFactory.CreateItem((ObjectId)dbUser.Equipment.Body, 0);
-            EquipmentItem? leggings = dbUser.Equipment.Legs == null ? null : (EquipmentItem?)ItemFactory.CreateItem((ObjectId)dbUser.Equipment.Legs, 0);
-            EquipmentItem? boots = dbUser.Equipment.Foots == null ? null : (EquipmentItem?)ItemFactory.CreateItem((ObjectId)dbUser.Equipment.Foots, 0);
-            var embed = new UserEmbedBuilder(discordUser)
-                .WithAuthor($"Экипировка")
-                .AddField($"Шлем: {(helmet == null ? "Нету" : helmet.Name)}", $"{(helmet == null ? "** **" : helmet.GetBonusesInfo())}", true)
-                .AddField($"Броня: {(armor == null ? "Нету" : armor.Name)}", $"{(armor == null ? "** **" : armor.GetBonusesInfo())}", true)
-                .AddField("** **", "** **", false)
-                .AddField($"Поножи: {(leggings == null ? "Нету" : leggings.Name)}", $"{(leggings == null ? "** **" : leggings.GetBonusesInfo())}", true)
-                .AddField($"Ботинки: {(boots == null ? "Нету" : boots.Name)}", $"{(boots == null ? "** **" : boots.GetBonusesInfo())}", true)
-                .Build();
-            var components = new ComponentBuilder()
-                .WithButton("Назад", "back", ButtonStyle.Danger)
-                .Build();
-            await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = components; });
-            if (param.Interaction != null)
-                await param.Interaction.DeferAsync();
-            param.Interaction = await WaitFor.UserButtonInteraction(_client, param.Message, Context.User.Id);
+            var options = new List<SelectMenuOptionBuilder>()
+            {
+                new SelectMenuOptionBuilder("Оружие", "1"),
+                new SelectMenuOptionBuilder("Шлем", "2"),
+                new SelectMenuOptionBuilder("Броня", "3"),
+                new SelectMenuOptionBuilder("Поножи", "4"),
+                new SelectMenuOptionBuilder("Обувь", "5"),
+            };
+            do
+            {
+                var weapon = dbUser.Equipment.GetEquipmentItem(ItemType.Weapon);
+                var helmet = dbUser.Equipment.GetEquipmentItem(ItemType.Helmet);
+                var armor = dbUser.Equipment.GetEquipmentItem(ItemType.Armor);
+                var leggings = dbUser.Equipment.GetEquipmentItem(ItemType.Leggings);
+                var boots = dbUser.Equipment.GetEquipmentItem(ItemType.Boots);
+                var embed = new UserEmbedBuilder(discordUser)
+                    .WithAuthor($"Экипировка")
+                    .WithDescription($"**Оружие:** {(weapon == null ? "Нету\n" : $"{weapon.Name}\n{weapon.GetBonusesInfo()}")}\n" +
+                    $"**Шлем:** {(helmet == null ? "Нету\n" : $"{helmet.Name}\n{helmet.GetBonusesInfo()}")}\n" +
+                    $"**Броня:** {(armor == null ? "Нету\n" : $"{armor.Name}\n{armor.GetBonusesInfo()}")}\n" +
+                    $"**Поножи:** {(leggings == null ? "Нету\n" : $"{leggings.Name}\n{leggings.GetBonusesInfo()}")}\n" +
+                    $"**Обувь:** {(boots == null ? "Нету\n" : $"{boots.Name}\n{boots.GetBonusesInfo()}")}\n")
+                    .Build();
+                var components = new ComponentBuilder()
+                    .WithSelectMenu("choose", options, "Снять предмет.")
+                    .WithButton("Назад", "back", ButtonStyle.Danger)
+                    .Build();
+                await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = components; });
+                if (param.Interaction != null)
+                    await param.Interaction.DeferAsync();
+                param.Interaction = await WaitFor.UserButtonInteraction(_client, param.Message, Context.User.Id);
+                if (param.Interaction == null)
+                {
+                    await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = new ComponentBuilder().Build(); });
+                    return;
+                }
+                switch (param.Interaction.Data.CustomId)
+                {
+                    case "choose":
+                        var type = (ItemType)int.Parse(param.Interaction.Data.Values.First());
+                        dbUser.Equipment.SetEquipment(type, null);
+                        await dbUser.UpdateUser(new UpdateDefinitionBuilder<UserData>().Set<ObjectId?>(type.ToEngString(), null));
+                        break;
+                    default:
+                        return;
+                }
+            } while (param.Interaction != null);
+            return;
         }
         public async Task StatisticsPartAsync(InteractionParameters param, IDatabaseUser dbUser, IUser discordUser)
         {

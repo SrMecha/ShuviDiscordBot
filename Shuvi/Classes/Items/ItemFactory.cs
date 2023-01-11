@@ -16,8 +16,8 @@ namespace Shuvi.Classes.Items
                 ItemType.Leggings => new EquipmentItem(itemDocument, amount),
                 ItemType.Boots => new EquipmentItem(itemDocument, amount),
                 ItemType.Simple => new SimpleItem(itemDocument, amount),
-                ItemType.Potion => new UsefullItem(itemDocument, amount),
-                ItemType.Chest => new UsefullItem(itemDocument, amount),
+                ItemType.Potion => new PotionItem(itemDocument, amount),
+                ItemType.Chest => new ChestItem(itemDocument, amount),
                 _ => new SimpleItem(itemDocument, amount)
             };
         }
@@ -32,8 +32,8 @@ namespace Shuvi.Classes.Items
                 ItemType.Leggings => new EquipmentItem(itemData, amount),
                 ItemType.Boots => new EquipmentItem(itemData, amount),
                 ItemType.Simple => new SimpleItem(itemData, amount),
-                ItemType.Potion => new UsefullItem(itemData, amount),
-                ItemType.Chest => new UsefullItem(itemData, amount),
+                ItemType.Potion => new PotionItem(itemData, amount),
+                ItemType.Chest => new ChestItem(itemData, amount),
                 _ => new SimpleItem(itemData, amount)
             };
         }

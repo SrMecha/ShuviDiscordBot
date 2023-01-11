@@ -1,4 +1,6 @@
-﻿using Shuvi.Classes.ActionChances;
+﻿using MongoDB.Driver;
+using Shuvi.Classes.ActionChances;
+using Shuvi.Classes.User;
 using Shuvi.Enums;
 using Shuvi.Interfaces.ActionChances;
 using Shuvi.Interfaces.Characteristics;
@@ -26,6 +28,7 @@ namespace Shuvi.Interfaces.User
         public IUserStatistics Statistics { get; init; }
         public IUserLocation Location { get; init; }
 
+        public Task UpdateUser(UpdateDefinition<UserData> updateConfig);
         public void SetSpell(string name);
         public void SetRace(UserRaces race);
         public void SetProfession(UserProfessions profession);

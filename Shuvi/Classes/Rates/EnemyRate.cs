@@ -5,23 +5,38 @@ namespace Shuvi.Classes.Rates
 {
     public class EnemyRate : IIdRate
     {
-        private readonly List<ObjectId> _allDrop;
+        private readonly Dictionary<ObjectId, int> _allDrop;
+
+        public int All { get; init; }
 
         public EnemyRate(Dictionary<ObjectId, int> allDrop)
         {
-            _allDrop = new();
-            foreach (var (itemId, count) in allDrop)
-                for (int i = 0; i <= count; i++)
-                    _allDrop.Add(itemId);
+            _allDrop = allDrop;
+            All = _allDrop.Values.Sum();
         }
         public EnemyRate()
         {
             _allDrop = new();
+            All = 0;
         }
         public ObjectId GetRandom()
         {
             var random = new Random();
-            return _allDrop.ElementAt(random.Next(0, _allDrop.Count));
+            var needCount = random.Next(0, _allDrop.Values.Sum() + 1);
+            var count = 0;
+            foreach (var (id, amount) in _allDrop)
+            {
+                count += amount;
+                if (needCount <= count)
+                {
+                    return id;
+                }
+            }
+            return _allDrop.Keys.First();
+        }
+        public IEnumerator<KeyValuePair<ObjectId, int>> GetEnumerator()
+        {
+            return _allDrop.GetEnumerator();
         }
     }
     

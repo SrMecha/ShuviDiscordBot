@@ -4,46 +4,46 @@ using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Shuvi.Services;
 using MongoDB.Bson;
+using Shuvi.Classes.CustomEmbeds;
 using Shuvi.Classes.Interactions;
-using Shuvi.Interfaces.User;
+using Shuvi.Classes.Items;
+using Shuvi.StaticServices.AdminCheck;
+using Shuvi.StaticServices.UserTop;
 
 namespace Shuvi.Modules.SlashCommands
 {
-    public class InventoryCommandModule : InteractionModuleBase<ShardedInteractionContext>
+    public class TopCommandModule : InteractionModuleBase<ShardedInteractionContext>
     {
         private readonly DatabaseManagerService _database;
         private readonly DiscordShardedClient _client;
 
-        public InventoryCommandModule(IServiceProvider provider)
+        public TopCommandModule(IServiceProvider provider)
         {
             _database = provider.GetRequiredService<DatabaseManagerService>();
             _client = provider.GetRequiredService<DiscordShardedClient>();
         }
 
-        [SlashCommand("inventory", "Посмотреть инвентарь")]
-        public async Task InventoryCommandAsync()
+        [SlashCommand("top", "Посмотреть топ по рейтингу.")]
+        public async Task TopCommandAsync()
         {
             await DeferAsync();
-            var param = new InteractionParameters(await GetOriginalResponseAsync(), null);
-            IDatabaseUser dbUser = await _database.Users.GetUser(Context.User.Id);
-            await ViewAllItemsAsync(param, dbUser);
+            var message = await GetOriginalResponseAsync();
+            var param = new InteractionParameters(message, message.Interaction as SocketMessageComponent);
+            await ViewTopAsync(param);
         }
-
-        public async Task ViewAllItemsAsync(InteractionParameters param, IDatabaseUser dbUser)
+        public async Task ViewTopAsync(InteractionParameters param)
         {
-            int maxPage = dbUser.Inventory.GetTotalEmbeds();
+            int maxPage = UserTopManager.GetTotalPages();
             int pageNow = 0;
             Embed embed;
             MessageComponent components;
             do
             {
-                embed = dbUser.Inventory.GetItemsEmbed(pageNow);
+                embed = UserTopManager.GetEmbed(pageNow);
                 components = new ComponentBuilder()
                         .WithButton("<", "<", ButtonStyle.Primary, disabled: pageNow <= 0)
                         .WithButton("Выйти", "exit", ButtonStyle.Danger)
                         .WithButton(">", ">", ButtonStyle.Primary, disabled: pageNow >= maxPage - 1)
-                        .WithSelectMenu("choose", dbUser.Inventory.GetItemsSelectMenu(pageNow),
-                        "Выберите предмет для просмотра", disabled: dbUser.Inventory.Count == 0)
                         .Build();
                 await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = components; });
                 if (param.Interaction != null)
@@ -62,10 +62,6 @@ namespace Shuvi.Modules.SlashCommands
                     case "exit":
                         await DeleteOriginalResponseAsync();
                         return;
-                    case "choose":
-                        await dbUser.Inventory.GetItem(new ObjectId(param.Interaction.Data.Values.First()))
-                           .ViewItemAsync(_client, param, dbUser, Context.User);
-                        break;
                     case ">":
                         pageNow++;
                         break;
@@ -73,8 +69,6 @@ namespace Shuvi.Modules.SlashCommands
                         break;
                 }
             } while (param.Interaction != null);
-            await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = new ComponentBuilder().Build(); });
-            return;
         }
     }
 }
