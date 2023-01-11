@@ -57,13 +57,21 @@ namespace Shuvi.Modules.SlashCommands
                     );
                 return;
             }
+            if (_map.GetRegion(dbUser.Location.MapRegion).GetLocation(dbUser.Location.MapLocation).Enemies.Count < 1)
+            {
+                var embed = new UserEmbedBuilder(Context.User)
+                    .WithDescription("Кажеться, в этой локации не на кого поохотиться. Попробуйте поискать врагов в другой локации.")
+                    .Build();
+                await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; });
+                return;
+            }
             UserCommandsCheck.Add(Context.User.Id, ActiveCommands.Hunt);
             await FightPrepareAsync(param, dbUser);
             UserCommandsCheck.Remove(Context.User.Id, ActiveCommands.Hunt);
         }
         public async Task FightPrepareAsync(InteractionParameters param, IDatabaseUser dbUser)
         {
-            var enemies = _map.GetRegion(dbUser.Location.MapRegion).GetLocation(dbUser.Location.MapRegion).EnemiesWithChance;
+            var enemies = _map.GetRegion(dbUser.Location.MapRegion).GetLocation(dbUser.Location.MapLocation).EnemiesWithChance;
             IEnemy? enemy;
             while (true)
             {
