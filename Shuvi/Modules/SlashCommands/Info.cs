@@ -17,8 +17,6 @@ namespace Shuvi.Modules.SlashCommands
         private readonly DatabaseManagerService _database;
         private readonly DiscordShardedClient _client;
 
-        public string Version { get; } = "0.1.0a";
-
         public InfoCommandModule(IServiceProvider provider)
         {
             _database = provider.GetRequiredService<DatabaseManagerService>();
@@ -34,7 +32,7 @@ namespace Shuvi.Modules.SlashCommands
                 .WithDescription($"**Игроков:** {UserTopManager.UsersAmount}\n" +
                 $"**Серверов:** {Context.Client.Guilds.Count}\n\n**Полезные ссылки:** " +
                 $"[Вики](https://shuvidev.gitbook.io/shuvi/) | [Сервер поддержки](https://discord.gg/Thq3Bjvn2t)")
-                .WithFooter($"Текущая версия: {Version}")
+                .WithFooter($"Текущая версия: {_database.Info.Version}")
                 .Build();
             MessageComponent components;
             if (AdminCheckManager.IsAdmin(Context.User.Id))
