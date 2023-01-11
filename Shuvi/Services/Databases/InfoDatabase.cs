@@ -19,6 +19,7 @@ namespace Shuvi.Services.Databases
             _infoCollection = infoCollection;
             Map = LoadMap();
             AdminCheckManager.SetAdmins(LoadAdmins());
+            GetVersion();
         }
         private WorldMap LoadMap()
         {
@@ -43,9 +44,9 @@ namespace Shuvi.Services.Databases
                 new UpdateDefinitionBuilder<BsonDocument>().Set("AdminIds", AdminCheckManager.Data.AdminIds)
                 );
         }
-        public async Task GetVersion()
+        public void GetVersion()
         {
-            Version = (string)(await _infoCollection.Find(new BsonDocument { { "_id", "Logs" } }).SingleAsync())["Version"];
+            Version = (string)_infoCollection.Find(new BsonDocument { { "_id", "Bot" } }).Single()["Version"];
         }
         public async Task SetVersion(string version)
         {
