@@ -3,6 +3,7 @@ using MongoDB.Driver;
 using MongoDB.Bson.Serialization;
 using Shuvi.Classes.Map;
 using Shuvi.StaticServices.AdminCheck;
+using Shuvi.StaticServices.Logs;
 
 namespace Shuvi.Services.Databases
 {
@@ -29,6 +30,10 @@ namespace Shuvi.Services.Databases
         private AdminsData LoadAdmins()
         {
             return BsonSerializer.Deserialize<AdminsData>(_infoCollection.Find(new BsonDocument { { "_id", "Admins" } }).Single());
+        }
+        public LogsData LoadLogs()
+        {
+            return BsonSerializer.Deserialize<LogsData>(_infoCollection.Find(new BsonDocument { { "_id", "Logs" } }).Single());
         }
         public async Task SetAdmins()
         {

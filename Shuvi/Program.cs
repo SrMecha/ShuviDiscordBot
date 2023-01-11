@@ -5,6 +5,7 @@ using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Shuvi.Classes.CustomEmoji;
 using Shuvi.Services;
+using Shuvi.StaticServices.Logs;
 
 namespace Shuvi
 {
