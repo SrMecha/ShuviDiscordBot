@@ -260,6 +260,7 @@ namespace Shuvi.Modules.SlashCommands
                 new SelectMenuOptionBuilder("Поножи", "4"),
                 new SelectMenuOptionBuilder("Обувь", "5"),
             };
+            MessageComponent components;
             do
             {
                 var weapon = dbUser.Equipment.GetEquipmentItem(ItemType.Weapon);
@@ -275,10 +276,15 @@ namespace Shuvi.Modules.SlashCommands
                     $"**Поножи:** {(leggings == null ? "Нету\n" : $"{leggings.Name}\n{leggings.GetBonusesInfo()}")}\n" +
                     $"**Обувь:** {(boots == null ? "Нету\n" : $"{boots.Name}\n{boots.GetBonusesInfo()}")}\n")
                     .Build();
-                var components = new ComponentBuilder()
-                    .WithSelectMenu("choose", options, "Снять предмет.")
-                    .WithButton("Назад", "back", ButtonStyle.Danger)
-                    .Build();
+                if (Context.User.Id == dbUser.Id)
+                    components = new ComponentBuilder()
+                        .WithSelectMenu("choose", options, "Снять предмет.")
+                        .WithButton("Назад", "back", ButtonStyle.Danger)
+                        .Build();
+                else
+                    components = new ComponentBuilder()
+                        .WithButton("Назад", "back", ButtonStyle.Danger)
+                        .Build();
                 await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = components; });
                 if (param.Interaction != null)
                     await param.Interaction.DeferAsync();
