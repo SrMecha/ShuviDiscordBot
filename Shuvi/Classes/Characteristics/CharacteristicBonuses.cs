@@ -40,11 +40,11 @@ namespace Shuvi.Classes.Characteristics
         }
         public void Sum(ICharacteristics bonuses)
         {
-            Strength = bonuses.Strength;
-            Agility = bonuses.Agility;
-            Luck = bonuses.Luck;
-            Intellect = bonuses.Intellect;
-            Endurance = bonuses.Endurance;
+            Strength += bonuses.Strength;
+            Agility += bonuses.Agility;
+            Luck += bonuses.Luck;
+            Intellect += bonuses.Intellect;
+            Endurance += bonuses.Endurance;
         }
         public void Clear()
         {

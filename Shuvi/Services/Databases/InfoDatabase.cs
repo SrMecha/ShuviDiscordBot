@@ -12,12 +12,14 @@ namespace Shuvi.Services.Databases
         private readonly IMongoCollection<BsonDocument> _infoCollection;
 
         public WorldMap Map { get; init; }
+        public string Version { get; private set; } = "NoData";
 
         public InfoDatabase(IMongoCollection<BsonDocument> infoCollection)
         {
             _infoCollection = infoCollection;
             Map = LoadMap();
             AdminCheckManager.SetAdmins(LoadAdmins());
+            GetVersion();
         }
         private WorldMap LoadMap()
         {
@@ -40,6 +42,18 @@ namespace Shuvi.Services.Databases
             await _infoCollection.UpdateOneAsync(
                 new BsonDocument { { "_id", "Admins" } }, 
                 new UpdateDefinitionBuilder<BsonDocument>().Set("AdminIds", AdminCheckManager.Data.AdminIds)
+                );
+        }
+        public void GetVersion()
+        {
+            Version = (string)_infoCollection.Find(new BsonDocument { { "_id", "Bot" } }).Single()["Version"];
+        }
+        public async Task SetVersion(string version)
+        {
+            Version = version;
+            await _infoCollection.UpdateOneAsync(
+                new BsonDocument { { "_id", "Bot" } },
+                new UpdateDefinitionBuilder<BsonDocument>().Set("Varsion", version)
                 );
         }
     }
