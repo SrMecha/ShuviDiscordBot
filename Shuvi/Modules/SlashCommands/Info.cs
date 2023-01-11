@@ -8,7 +8,6 @@ using Shuvi.Classes.CustomEmbeds;
 using Shuvi.Classes.Interactions;
 using Shuvi.Classes.Items;
 using Shuvi.StaticServices.AdminCheck;
-using static MongoDB.Bson.Serialization.Serializers.SerializerHelper;
 
 namespace Shuvi.Modules.SlashCommands
 {

@@ -4,6 +4,7 @@ using Shuvi.Classes.User;
 using Shuvi.Enums;
 using Shuvi.Interfaces.User;
 using Shuvi.Services.Caches;
+using Shuvi.StaticServices.UserTop;
 
 namespace Shuvi.Services.Databases
 {
@@ -17,6 +18,7 @@ namespace Shuvi.Services.Databases
             _userCollection = userCollection;
             _cacheUsers = new();
             StartCacheCleaner();
+            StartLoadTop();
         }
         public async Task<IDatabaseUser> AddUser(ulong id)
         {
@@ -109,8 +111,23 @@ namespace Shuvi.Services.Databases
             _ = Task.Run(async () => {
                 while (true)
                 {
-                    await Task.Delay(600);
+                    await Task.Delay(new TimeSpan(0, 10, 0));
                     _cacheUsers.DeleteNotUsedCache();
+                }
+            });
+        }
+        public void StartLoadTop()
+        {
+            _ = Task.Run(async () => {
+                while (true)
+                {
+                    UserTopManager.LoadTop(
+                        await _userCollection.Find(new BsonDocument())
+                        .SortByDescending(x => x.Rating)
+                        .Limit(100)
+                        .ToListAsync()
+                    );
+                    await Task.Delay(new TimeSpan(0, 5, 0));
                 }
             });
         }

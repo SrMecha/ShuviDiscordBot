@@ -50,7 +50,7 @@ namespace Shuvi.Classes.Inventory
         public Embed GetItemsEmbed(int index)
         {
             var itemsString = "";
-            for (int i = index * 10; i <= _localInventory.Count - 1; i++)
+            for (int i = index * 10; i < _localInventory.Count && i < index * 10 + 10; i++)
             {
                 itemsString += $"\n**#{i + 1}** {AllItemsData.GetItemData(_localInventory.Keys.ElementAt(i)).Name} x{_localInventory.Values.ElementAt(i)}";
             }
