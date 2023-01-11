@@ -8,6 +8,7 @@ using Shuvi.Classes.CustomEmbeds;
 using Shuvi.Classes.Interactions;
 using Shuvi.Classes.Items;
 using Shuvi.StaticServices.AdminCheck;
+using Shuvi.StaticServices.UserTop;
 
 namespace Shuvi.Modules.SlashCommands
 {
@@ -15,6 +16,8 @@ namespace Shuvi.Modules.SlashCommands
     {
         private readonly DatabaseManagerService _database;
         private readonly DiscordShardedClient _client;
+
+        public string Version { get; } = "0.1.0a";
 
         public InfoCommandModule(IServiceProvider provider)
         {
@@ -28,7 +31,10 @@ namespace Shuvi.Modules.SlashCommands
             await DeferAsync();
             var param = new InteractionParameters(await GetOriginalResponseAsync(), null);
             var embed = new BotEmbedBuilder()
-                .WithDescription($"Шард №{Context.Client.GetShardFor(Context.Guild).ShardId}\nСерверов: {Context.Client.Guilds.Count}\n")
+                .WithDescription($"**Игроков:** {UserTopManager.UsersAmount}\n" +
+                $"**Серверов:** {Context.Client.Guilds.Count}\n\n**Полезные ссылки:** " +
+                $"[Вики](https://shuvidev.gitbook.io/shuvi/) | [Сервер поддержки](https://discord.gg/Thq3Bjvn2t)")
+                .WithFooter($"Текущая версия: {Version}")
                 .Build();
             MessageComponent components;
             if (AdminCheckManager.IsAdmin(Context.User.Id))

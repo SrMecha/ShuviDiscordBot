@@ -14,7 +14,9 @@ namespace Shuvi.StaticServices.UserTop
         private static List<string>? _top;
         private static long? _lastUpdate;
 
-        public static void LoadTop(List<UserData> usersData)
+        public static long UsersAmount { get; private set; } = 0;
+
+        public static void LoadTop(List<UserData> usersData, long userAmount)
         {
             var result = new List<string>();
             for (int i = 0; i < usersData.Count; i++)
@@ -22,6 +24,7 @@ namespace Shuvi.StaticServices.UserTop
                 var data = usersData[i];
                 result.Add($"**#{i + 1}** <@{data.Id}> | {data.Rating}");
             }
+            UsersAmount = userAmount;
             _top = result;
             _lastUpdate = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds();
         }

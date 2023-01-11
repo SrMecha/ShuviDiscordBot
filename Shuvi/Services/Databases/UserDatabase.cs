@@ -125,7 +125,8 @@ namespace Shuvi.Services.Databases
                         await _userCollection.Find(new BsonDocument())
                         .SortByDescending(x => x.Rating)
                         .Limit(100)
-                        .ToListAsync()
+                        .ToListAsync(),
+                        await _userCollection.Find(new BsonDocument()).CountDocumentsAsync()
                     );
                     await Task.Delay(new TimeSpan(0, 5, 0));
                 }
