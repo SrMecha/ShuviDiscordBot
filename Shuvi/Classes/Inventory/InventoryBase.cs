@@ -48,7 +48,8 @@ namespace Shuvi.Classes.Inventory
         }
         public IItem GetItemAt(int index)
         {
-            throw new NotImplementedException();
+            var (id, amount) = _localInventory.ElementAt(index);
+            return ItemFactory.CreateItem(id, amount);
         }
         public IEnumerable<TItem> GetItems<TItem>() where TItem : IItem
         {
