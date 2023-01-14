@@ -53,7 +53,7 @@ namespace Shuvi.Services.Databases
             Version = version;
             await _infoCollection.UpdateOneAsync(
                 new BsonDocument { { "_id", "Bot" } },
-                new UpdateDefinitionBuilder<BsonDocument>().Set("Varsion", version)
+                new UpdateDefinitionBuilder<BsonDocument>().Set("Version", version)
                 );
         }
     }
