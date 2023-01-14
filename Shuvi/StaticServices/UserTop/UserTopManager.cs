@@ -50,7 +50,7 @@ namespace Shuvi.StaticServices.UserTop
                 result.Add(_top![i]);
             }
             return new BotEmbedBuilder()
-                    .WithAuthor("Все предметы:")
+                    .WithAuthor("Топ по рейтингу")
                     .WithDescription($"{string.Join("\n", result)}\n\nОбновлено <t:{_lastUpdate}:R>")
                     .WithFooter($"Страница {index + 1}/{GetTotalPages()}")
                     .Build();
