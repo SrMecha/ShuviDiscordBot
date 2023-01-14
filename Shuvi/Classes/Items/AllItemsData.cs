@@ -37,7 +37,7 @@ namespace Shuvi.Classes.Items
         public static List<SelectMenuOptionBuilder> GetItemsSelectMenu(int index)
         {
             List<SelectMenuOptionBuilder> result = new();
-            for (int i = index * 10; i <= _itemsDataArray.Count - 1; i++)
+            for (int i = index * 10; i < _itemsDataArray.Count && i < index * 10 + 10; i++)
             {
                 string itemDescription = _itemsDataArray[i].Description;
                 if (itemDescription.Length > 70)
@@ -60,7 +60,7 @@ namespace Shuvi.Classes.Items
         public static Embed GetItemsEmbed(int index)
         {
             string itemsString = "";
-            for (int i = index * 10; i <= _itemsDataArray.Count - 1; i++)
+            for (int i = index * 10; i < _itemsDataArray.Count && i < index * 10 + 10; i++)
             {
                 itemsString += $"\n**#{i + 1}** {_itemsDataArray[i].Name} ";
             }
