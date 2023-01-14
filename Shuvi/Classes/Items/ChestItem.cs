@@ -68,7 +68,7 @@ namespace Shuvi.Classes.Items
         {
             Amount -= 1;
             var dispoints = new Random().Next(_dispointsMin, _dispointsMax + 1);
-            var drop = _drop.GetRandom();
+            var drop = _drop.GetRandom(dbUser.Inventory);
             dbUser.Wallet.AddDispoints(dispoints);
             dbUser.Inventory.AddItems(drop);
             dbUser.Inventory.RemoveItem(Id, 1);
