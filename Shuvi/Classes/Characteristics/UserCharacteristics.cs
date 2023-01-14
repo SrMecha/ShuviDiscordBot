@@ -27,6 +27,14 @@ namespace Shuvi.Classes.Characteristics
                 $"**Интеллект:** {Intellect} {(bonuses.Intellect != 0 ? "| " + (bonuses.Intellect > 0 ? $"+{bonuses.Intellect}" : bonuses.Intellect) : "")}\n" +
                 $"**Выносливость:** {Endurance} {(bonuses.Endurance != 0 ? "| " + (bonuses.Endurance > 0 ? $"+{bonuses.Endurance}" : bonuses.Endurance) : "")}";
         }
+        public string ToRusString(ICharacteristics bonuses, int intellect)
+        {
+            return $"**Сила:** {(Strength > intellect ? "?" : Strength)}\n" +
+                $"**Ловкость:** {(Agility > intellect ? "?" : Agility)}\n" +
+                $"**Удача:** {(Luck > intellect ? "?" : Luck)}\n" +
+                $"**Интеллект:** {(Intellect > intellect ? "?" : Intellect)}\n" +
+                $"**Выносливость:** {(Endurance > intellect ? "?" : Endurance)}";
+        }
         public void Add(ICharacteristics characteristics)
         {
             Strength += characteristics.Strength;

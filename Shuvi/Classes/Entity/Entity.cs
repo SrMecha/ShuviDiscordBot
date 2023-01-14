@@ -19,7 +19,7 @@ namespace Shuvi.Classes.Entity
 
         public string Name { get; protected init; } = string.Empty;
         public Rank Rank { get; protected init; } = Rank.E;
-        public ICharacteristics Characteristics { get; protected init; } = new UserCharacteristics();
+        public IUserCharacteristics Characteristics { get; protected init; } = new UserCharacteristics();
         public ISpell Spell { get; protected init; } = SpellFactory.GetSpell("");
         public IStaticHealth Health { get; protected init; } = new StaticHealth(100, 100);
         public IStaticMana Mana { get; protected init; } = new StaticMana(10, 10);

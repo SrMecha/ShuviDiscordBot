@@ -83,8 +83,8 @@ namespace Shuvi.Modules.SlashCommands
                     .WithDescription($"Вы встретили {enemy.Name}!\n" +
                     $"**Энергии осталось:** {dbUser.Energy.GetCurrentEnergy()}/{dbUser.Energy.Max}")
                     .AddField(enemy.Name,
-                    ((UserCharacteristics)enemy.Characteristics).ToRusString(enemy.EffectBonuses) +
-                    $"\n{enemy.Mana.ToString()}\n{enemy.Health.ToString()}",
+                    enemy.Characteristics.ToRusString(enemy.EffectBonuses, dbUser.Characteristic.Intellect) +
+                    $"\n{enemy.Mana.ToString(dbUser.Characteristic.Intellect)}\n{enemy.Health.ToString(dbUser.Characteristic.Intellect)}",
                     true)
                     .AddField("Дополнительно:",
                     $"**Заклинание:** {enemy.Spell.Info.Name}",
