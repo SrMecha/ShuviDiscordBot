@@ -94,6 +94,7 @@ namespace Shuvi.Services.Databases
                 .Set("MaxMana", user.Mana.Max)
                 .Set("MaxHealth", user.Health.Max)
                 .Set("HealthRegenTime", user.Health.RegenTime)
+                .Set("ManaRegenTime", user.Mana.RegenTime)
                 .Set("EnergyRegenTime", user.Energy.RegenTime)
                 .Set("LiveTime", user.Statistics.LiveTime)
                 .Set("DeathCount", user.Statistics.DeathCount)

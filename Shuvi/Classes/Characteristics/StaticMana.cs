@@ -29,5 +29,10 @@ namespace Shuvi.Classes.Characteristics
         {
             return $"**Мана:** {Now}/{Max}";
         }
+        public string ToString(int intellect)
+        {
+            var isHide = Max / CharacteristicSettings.ManaPerUpPoint > intellect;
+            return $"**Мана:** {(isHide ? "?" : Now)}/{(isHide ? "?" : Max)}";
+        }
     }
 }

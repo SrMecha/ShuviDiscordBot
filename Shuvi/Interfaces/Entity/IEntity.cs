@@ -10,7 +10,7 @@ namespace Shuvi.Interfaces.Entity
     {
         public string Name { get; }
         public Rank Rank { get; }
-        public ICharacteristics Characteristics { get; }
+        public IUserCharacteristics Characteristics { get; }
         public ISpell Spell { get; }
         public IStaticHealth Health { get; }
         public IStaticMana Mana { get; }

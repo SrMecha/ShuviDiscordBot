@@ -55,7 +55,32 @@ namespace Shuvi.Classes.Rates
             }
             return result;
         }
-        public IEnumerator<KeyValuePair<ObjectId, int>> GetEnumerator()
+        public IDropInventory GetRandom(IInventoryBase inventory)
+        {
+            var random = new Random();
+            var result = new DropInventory();
+            for (var i = 1; i <= random.Next(_min, _max + 1); i++)
+            {
+                var needCount = random.Next(0, _allDrop.Values.Sum() + 1);
+                var count = 0;
+                foreach (var (id, amount) in _allDrop)
+                {
+                    count += amount;
+                    if (needCount <= count)
+                    {
+                        {
+                            var item = inventory.GetItem(id);
+                            var getAmount = item.Amount + result.GetItem(id).Amount;
+                            if (item.Max == -1 || getAmount + 1 <= item.Max)
+                                result.AddItem(item.Id, 1);
+                        }
+                        break;
+                    }
+                }
+            }
+            return result;
+        }
+    public IEnumerator<KeyValuePair<ObjectId, int>> GetEnumerator()
         {
             return _allDrop.GetEnumerator();
         }

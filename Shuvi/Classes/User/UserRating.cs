@@ -32,7 +32,7 @@ namespace Shuvi.Classes.User
         }
         public IRatingResult AddPoints(int amount, Rank rank)
         {
-            if (Rank < rank)
+            if (Rank > rank)
                 return new RatingResult(Rank, Rank, "Ранг побежденного существа слишком мало для полечения очков рейтинга.");
             Points += amount;
             var rankBefore = Rank;

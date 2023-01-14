@@ -7,5 +7,6 @@
         public void ReduceMana(int amount);
         public void RestoreMana(int amount);
         public string ToString();
+        public string ToString(int intellect);
     }
 }

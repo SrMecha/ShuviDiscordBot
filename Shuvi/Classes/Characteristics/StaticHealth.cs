@@ -29,5 +29,10 @@ namespace Shuvi.Classes.Characteristics
         {
             return $"**Жизни:** {Now}/{Max}";
         }
+        public string ToString(int intellect)
+        {
+            var isHide = Max / CharacteristicSettings.HealthPerUpPoint > intellect;
+            return $"**Жизни:** {(isHide ? "?" : Now)}/{(isHide ? "?" : Max)}";
+        }
     }
 }

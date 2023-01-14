@@ -186,6 +186,7 @@ namespace Shuvi.Modules.SlashCommands
                             ));
                         dbUser.Mana.SetMaxMana(dbUser.Mana.Max + charactersticToAdd[5]);
                         dbUser.Health.SetMaxHealth(dbUser.Health.Max + charactersticToAdd[6]);
+                        dbUser.Energy.UpdateMaxEnergy(dbUser.Characteristic.Endurance);
                         await _database.Users.UpdateUser(
                             Context.User.Id,
                             new UpdateDefinitionBuilder<UserData>()
