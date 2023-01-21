@@ -8,5 +8,8 @@ namespace Shuvi.Classes.Shop
         [BsonElement("_id")]
         public ObjectId Id { get; set; } = ObjectId.Empty;
         public string Name { get; set; } = "Икея";
+        public string Description { get; set; } = "Ебаная икея.";
+        public List<ProductData> Sale { get; set; } = new();
+        public List<ProductData> Buy { get; set; } = new();
     }
 }

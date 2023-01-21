@@ -1,6 +1,7 @@
 ﻿using Discord;
 using MongoDB.Bson;
 using Shuvi.Interfaces.Items;
+using Shuvi.Interfaces.Shop;
 
 namespace Shuvi.Interfaces.Inventory
 {
@@ -9,6 +10,7 @@ namespace Shuvi.Interfaces.Inventory
         public List<SelectMenuOptionBuilder> GetItemsSelectMenu(int index);
         public Embed GetItemsEmbed(int index);
         public void AddItems(IDropInventory drop);
+        public void AddItems(IShopBasket shopBasket);
         public bool HaveItem(ObjectId id, int amount);
         public Dictionary<string, int> GetInvetoryCache();
         public int GetTotalEmbeds();

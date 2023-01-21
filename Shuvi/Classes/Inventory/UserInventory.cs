@@ -2,8 +2,10 @@
 using MongoDB.Bson;
 using Shuvi.Classes.CustomEmbeds;
 using Shuvi.Classes.Items;
+using Shuvi.Classes.Shop;
 using Shuvi.Interfaces.Inventory;
 using Shuvi.Interfaces.Items;
+using Shuvi.Interfaces.Shop;
 
 namespace Shuvi.Classes.Inventory
 {
@@ -24,10 +26,20 @@ namespace Shuvi.Classes.Inventory
                 AddItem(id, amount);
             }
         }
+        public void AddItems(IShopBasket shopBasket)
+        {
+            foreach (var (product, amount) in shopBasket)
+            {
+                if (_localInventory.GetValueOrDefault(product.Id, 0) + amount == 0)
+                    _localInventory.Remove(product.Id);
+                else
+                    AddItem(product.Id, amount);
+            }
+        }
         public List<SelectMenuOptionBuilder> GetItemsSelectMenu(int index)
         {
             var result = new List<SelectMenuOptionBuilder>();
-            for (int i = index * 10; i <= _localInventory.Count - 1; i++)
+            for (int i = index * 10; i < _localInventory.Count && i < index * 10 + 10; i++)
             {
                 var item = AllItemsData.GetItemData(_localInventory.Keys.ElementAt(i));
                 var itemDescription = item.Description;

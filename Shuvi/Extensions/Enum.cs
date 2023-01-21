@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Shuvi.Classes.CustomEmoji;
 using Shuvi.Classes.Skills;
 using Shuvi.Enums;
 using Shuvi.Interfaces.Skills;
@@ -180,6 +181,16 @@ namespace Shuvi.Extensions
                 UserProfessions.NoProfession => new VoidSkill(),
                 UserProfessions.Proofer => new ProoferSkill(),
                 _ => new VoidSkill()
+            };
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+        public static IEmote GetEmoji(this MoneyType target)
+        {
+            return target switch
+            {
+                MoneyType.Simple => EmojiList.Get("money"),
+                MoneyType.Dispoints => EmojiList.Get("dispoints"),
+                _ => EmojiList.Get("")
             };
         }
     }
