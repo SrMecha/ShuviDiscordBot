@@ -94,7 +94,7 @@ namespace Shuvi.Modules.SlashCommands
                         isLocationChanged = true;
                         travelLocationId = int.Parse(param.Interaction.Data.Values.First());
                         travelLocation = travelRegion.GetLocation(travelLocationId);
-                        if (travelLocationId == dbUser.Location.MapLocation)
+                        if (travelLocationId == dbUser.Location.MapLocation && !isRegionChanged)
                         {
                             isLocationChanged = false;
                         }
