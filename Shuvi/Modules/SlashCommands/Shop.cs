@@ -9,6 +9,8 @@ using Shuvi.Classes.Interactions;
 using Shuvi.Interfaces.Shop;
 using Shuvi.Extensions;
 using Shuvi.Classes.CustomEmoji;
+using Shuvi.Enums;
+using Shuvi.StaticServices.UserCheck;
 
 namespace Shuvi.Modules.SlashCommands
 {
@@ -30,7 +32,16 @@ namespace Shuvi.Modules.SlashCommands
             await DeferAsync();
             var param = new InteractionParameters(await GetOriginalResponseAsync(), null);
             var users = new CustomContext(await _database.Users.GetUser(Context.User.Id), Context.User);
+            if (UserCommandsCheck.IsUseCommands(Context.User.Id, ActiveCommands.Hunt))
+            {
+                await ModifyOriginalResponseAsync(
+                    msg => { msg.Embed = UserCommandsCheck.GetErrorEmbed(Context.User.Id, ActiveCommands.Hunt); }
+                    );
+                return;
+            }
+            UserCommandsCheck.Add(Context.User.Id, ActiveCommands.Shop);
             await ViewAllShopsAsync(param, users);
+            UserCommandsCheck.Remove(Context.User.Id, ActiveCommands.Shop);
         }
 
         public async Task ViewAllShopsAsync(InteractionParameters param, CustomContext users)

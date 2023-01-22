@@ -10,7 +10,8 @@ namespace Shuvi.StaticServices.UserCheck
         private static readonly Dictionary<ActiveCommands, string> _errors= new() 
         {
             {ActiveCommands.Hunt, "Вы не можете выполнить данное действие, пока у вас активна команда охоты." },
-            {ActiveCommands.Upgrade, "Вы не можете выполнить данное действие, пока у вас активна команда улучшения." }
+            {ActiveCommands.Upgrade, "Вы не можете выполнить данное действие, пока у вас активна команда улучшения." },
+            {ActiveCommands.Shop, "Вы не можете выполнить данное действие, пока у вас активна команда магазина." }
         };
 
         public static void Add(ulong id, ActiveCommands command)
