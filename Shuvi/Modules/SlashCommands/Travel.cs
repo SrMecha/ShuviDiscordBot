@@ -8,12 +8,6 @@ using Shuvi.Classes.Interactions;
 using Shuvi.Classes.Map;
 using Shuvi.Interfaces.User;
 using Shuvi.Extensions;
-using Shuvi.Classes.CustomEmoji;
-using MongoDB.Bson;
-using Shuvi.Classes.Items;
-using Shuvi.Classes.ActionChances;
-using Shuvi.Classes.Enemy;
-using Shuvi.Classes.Rates;
 using MongoDB.Driver;
 using Shuvi.Classes.User;
 
@@ -71,7 +65,7 @@ namespace Shuvi.Modules.SlashCommands
                     .Build();
                 await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = components; });
                 if (param.Interaction != null)
-                    await param.Interaction.DeferAsync();
+                    await param.Interaction.TryDeferAsync();
                 param.Interaction = await WaitFor.UserButtonInteraction(_client, param.Message, Context.User.Id);
                 if (param.Interaction == null)
                 {
@@ -100,7 +94,7 @@ namespace Shuvi.Modules.SlashCommands
                         isLocationChanged = true;
                         travelLocationId = int.Parse(param.Interaction.Data.Values.First());
                         travelLocation = travelRegion.GetLocation(travelLocationId);
-                        if (travelLocationId == dbUser.Location.MapLocation)
+                        if (travelLocationId == dbUser.Location.MapLocation && !isRegionChanged)
                         {
                             isLocationChanged = false;
                         }

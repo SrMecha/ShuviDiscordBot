@@ -16,6 +16,7 @@ using Shuvi.Classes.CustomEmoji;
 using Microsoft.VisualBasic;
 using MongoDB.Driver;
 using Shuvi.Classes.User;
+using Shuvi.Extensions;
 
 namespace Shuvi.Modules.SlashCommands
 {
@@ -84,7 +85,7 @@ namespace Shuvi.Modules.SlashCommands
                     .Build();
                 await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = components; });
                 if (param.Interaction != null)
-                    await param.Interaction.DeferAsync();
+                    await param.Interaction.TryDeferAsync();
                 param.Interaction = await WaitFor.UserButtonInteraction(_client, param.Message, Context.User.Id);
                 if (param.Interaction == null)
                 {

@@ -12,6 +12,7 @@ using Shuvi.Interfaces.User;
 using Shuvi.Classes.Rates;
 using MongoDB.Bson;
 using Shuvi.Classes.CustomEmoji;
+using Shuvi.Enums;
 
 namespace Shuvi.Classes.Items
 {
@@ -69,7 +70,7 @@ namespace Shuvi.Classes.Items
             Amount -= 1;
             var dispoints = new Random().Next(_dispointsMin, _dispointsMax + 1);
             var drop = _drop.GetRandom(dbUser.Inventory);
-            dbUser.Wallet.AddDispoints(dispoints);
+            dbUser.Wallet.Add(MoneyType.Dispoints, dispoints);
             dbUser.Inventory.AddItems(drop);
             dbUser.Inventory.RemoveItem(Id, 1);
             await dbUser.UpdateUser(new UpdateDefinitionBuilder<UserData>()
@@ -88,7 +89,7 @@ namespace Shuvi.Classes.Items
                 .Build();
                 await param.Message.ModifyAsync(msg => { msg.Embed = GetEmbed(dbUser, discordUser); msg.Components = components; });
                 if (param.Interaction != null)
-                    await param.Interaction.DeferAsync();
+                    await param.Interaction.TryDeferAsync();
                 param.Interaction = await WaitFor.UserButtonInteraction(client, param.Message, dbUser.Id);
                 if (param.Interaction == null)
                 {

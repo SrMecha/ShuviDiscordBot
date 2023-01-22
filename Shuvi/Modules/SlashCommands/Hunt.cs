@@ -17,6 +17,7 @@ using MongoDB.Driver;
 using Shuvi.Classes.User;
 using Shuvi.StaticServices.UserCheck;
 using Shuvi.Enums;
+using Shuvi.Extensions;
 
 namespace Shuvi.Modules.SlashCommands
 {
@@ -60,7 +61,8 @@ namespace Shuvi.Modules.SlashCommands
             if (_map.GetRegion(dbUser.Location.MapRegion).GetLocation(dbUser.Location.MapLocation).Enemies.Count < 1)
             {
                 var embed = new UserEmbedBuilder(Context.User)
-                    .WithDescription("Кажеться, в этой локации не на кого поохотиться. Попробуйте поискать врагов в другой локации.")
+                    .WithDescription("Кажется, в этой локации не на кого поохотиться. Попробуйте поискать врагов в другой локации." +
+                    "\nКарта мира: `/map`\nПерейти в локацию: `/travel`")
                     .Build();
                 await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; });
                 return;
@@ -98,7 +100,7 @@ namespace Shuvi.Modules.SlashCommands
                     .Build();
                 await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = components; });
                 if (param.Interaction != null)
-                    await param.Interaction.DeferAsync();
+                    await param.Interaction.TryDeferAsync();
                 param.Interaction = await WaitFor.UserButtonInteraction(_client, param.Message, Context.User.Id);
                 if (param.Interaction == null)
                 {
@@ -292,7 +294,7 @@ namespace Shuvi.Modules.SlashCommands
                 .AddField("** - - - - - - - - - - - - - - - - - - - - - - - - - - - - -**", "** **", false)
                 .AddField(enemy.Name, $"{((UserCharacteristics)enemy.Characteristics).ToRusString(enemy.EffectBonuses)}\n" +
                 $"{enemy.Mana.ToString()}\n{enemy.Health.ToString()}", true)
-                .AddField("Дополнительно:", $"**Заклинание:** {player.Spell.Info.Name}", true)
+                .AddField("Дополнительно:", $"**Заклинание:** {enemy.Spell.Info.Name}", true)
                 .Build();
         }
     }

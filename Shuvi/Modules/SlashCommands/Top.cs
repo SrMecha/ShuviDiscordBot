@@ -9,6 +9,7 @@ using Shuvi.Classes.Interactions;
 using Shuvi.Classes.Items;
 using Shuvi.StaticServices.AdminCheck;
 using Shuvi.StaticServices.UserTop;
+using Shuvi.Extensions;
 
 namespace Shuvi.Modules.SlashCommands
 {
@@ -47,7 +48,7 @@ namespace Shuvi.Modules.SlashCommands
                         .Build();
                 await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = components; });
                 if (param.Interaction != null)
-                    await param.Interaction.DeferAsync();
+                    await param.Interaction.TryDeferAsync();
                 param.Interaction = await WaitFor.UserButtonInteraction(_client, param.Message, Context.User.Id);
                 if (param.Interaction == null)
                 {

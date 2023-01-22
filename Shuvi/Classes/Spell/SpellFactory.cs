@@ -7,7 +7,7 @@ namespace Shuvi.Classes.Spell
     {
         public static Dictionary<string, ISpell> Spells { get; } = new()
         {
-            
+            {"FrozenWave", new FrozenWave() }
         };
 
         public static ISpell GetSpell(string spellName)

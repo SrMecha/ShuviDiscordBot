@@ -1,14 +1,15 @@
-﻿namespace Shuvi.Interfaces.User
+﻿using Shuvi.Enums;
+
+namespace Shuvi.Interfaces.User
 {
     public interface IUserWallet
     {
         public int Money { get; }
         public int Dispoints { get; }
-        public void SetMoney(int amount);
-        public void AddMoney(int amount);
-        public void RemoveMoney(int amount);
-        public void SetDispoints(int amount);
-        public void AddDispoints(int amount);
-        public void RemoveDispoints(int amount);
+        public void Remove(MoneyType type, int amount);
+        public void Add(MoneyType type, int amount);
+        public void Set(MoneyType type, int amount);
+        public int Get(MoneyType type);
+        public void Join(IUserWallet wallet);
     }
 }

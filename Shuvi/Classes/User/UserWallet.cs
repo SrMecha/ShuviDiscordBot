@@ -1,4 +1,5 @@
-﻿using Shuvi.Interfaces.User;
+﻿using Shuvi.Enums;
+using Shuvi.Interfaces.User;
 
 namespace Shuvi.Classes.User
 {
@@ -12,31 +13,60 @@ namespace Shuvi.Classes.User
             Money = money;
             Dispoints = dispoints;
         }
-        public void AddMoney(int amount)
+        public UserWallet()
         {
-            Money += amount;
+            Money = 0;
+            Dispoints = 0;
         }
-        public void RemoveMoney(int amount)
+        public void Remove(MoneyType type, int amount)
         {
-            Money -= amount;
+            switch (type)
+            {
+                case MoneyType.Simple:
+                    Money -= amount;
+                    break;
+                case MoneyType.Dispoints:
+                    Dispoints -= amount;
+                    break;
+            }
         }
-        public void AddDispoints(int amount)
+        public void Add(MoneyType type, int amount)
         {
-            Dispoints += amount;
+            switch (type)
+            {
+                case MoneyType.Simple:
+                    Money += amount;
+                    break;
+                case MoneyType.Dispoints:
+                    Dispoints += amount;
+                    break;
+            }
         }
-        public void RemoveDispoints(int amount)
+        public void Set(MoneyType type, int amount)
         {
-            Dispoints -= amount;
+            switch (type)
+            {
+                case MoneyType.Simple:
+                    Money = amount; 
+                    break;
+                case MoneyType.Dispoints:
+                    Dispoints = amount;
+                    break;
+            }
         }
-
-        public void SetMoney(int amount)
+        public int Get(MoneyType type)
         {
-            Money = amount;
+            return type switch
+            {
+                MoneyType.Simple => Money,
+                MoneyType.Dispoints => Dispoints,
+                _ => throw new NotImplementedException()
+            };
         }
-
-        public void SetDispoints(int amount)
+        public void Join(IUserWallet wallet)
         {
-            Dispoints = amount;
+            Money += wallet.Money;
+            Dispoints += wallet.Dispoints;
         }
     }
 }
