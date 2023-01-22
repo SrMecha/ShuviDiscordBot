@@ -18,7 +18,7 @@ namespace Shuvi.Classes.Map
         }
         public MapRegion GetRegion(int index)
         {
-            if (Regions.Count - 1 > index)
+            if (index >= Regions.Count)
                 return new MapRegion { };
             return Regions[index];
         }
