@@ -66,7 +66,8 @@ namespace Shuvi.Modules.SlashCommands
                     .AddField($"**Ранг:** {dbUser.Rating.Rank.ToRusString()}",
                     $"**Рейтинг:** {dbUser.Rating.Points}{(dbUser.Rating.Rank.CanRankUp() ? "/" + (Rank)(dbUser.Rating.Rank + 1).GetNeedRating() : ' ')}\n" +
                     $"**Раса:** {dbUser.Race.ToRusString()}\n**Профессия:** {dbUser.Profession.ToRusString()}\n" +
-                    $"**Диспоинты:** {dbUser.Wallet.Money:n0} {EmojiList.Get("money")}",
+                    $"**Золото:** {dbUser.Wallet.Money:n0} {EmojiList.Get("money")}\n" +
+                    $"**Диспоинты:** {dbUser.Wallet.Dispoints:n0} {EmojiList.Get("dispoints")}",
                     true)
                     .AddField("Характеристики:",
                     ((UserCharacteristics)dbUser.Characteristic).ToRusString(new CharacteristicBonuses(dbUser.Equipment)),
