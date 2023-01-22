@@ -29,7 +29,7 @@ namespace Shuvi.Classes.Items
             var result = "";
             foreach (var (bonus, amount) in Bonuses)
             {
-                result += $"{bonus.ToRusString()} {amount}+\n";
+                result += $"{bonus.ToRusString()} {amount.WithSign()}\n";
             }
             if (result == "")
             {
@@ -64,6 +64,13 @@ namespace Shuvi.Classes.Items
             }
             return result;
         }
+        private bool CanEquip(IDatabaseUser dbUser)
+        {
+            foreach (var (need, amount) in Needs)
+                if (!MeetNeeds(dbUser, need, amount))
+                    return false;
+            return true;
+        }
         public override Embed GetEmbed()
         {
             return new BotEmbedBuilder()
@@ -96,7 +103,7 @@ namespace Shuvi.Classes.Items
             {
                 var components = new ComponentBuilder()
                 .WithButton("Назад", "back", ButtonStyle.Danger)
-                .WithButton("Надеть", "equip", ButtonStyle.Success, disabled: dbUser.Equipment.GetEquipment(Type) == Id)
+                .WithButton("Надеть", "equip", ButtonStyle.Success, disabled: dbUser.Equipment.GetEquipment(Type) == Id || !CanEquip(dbUser))
                 .Build();
                 await param.Message.ModifyAsync(msg => { msg.Embed = GetEmbed(dbUser, discordUser); msg.Components = components; });
                 if (param.Interaction != null)
