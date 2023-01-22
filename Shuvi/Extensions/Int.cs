@@ -8,7 +8,7 @@ namespace Shuvi.Extensions
         [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         public static string WithSign(this int target)
         {
-            return target > 0 ? $"+{target}" : target.ToString();
+            return target > 0 ? $"+{target}" : target == 0 ? string.Empty : target.ToString();
         }
     }
 }

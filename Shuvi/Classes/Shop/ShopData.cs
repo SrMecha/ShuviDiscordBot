@@ -5,7 +5,7 @@ namespace Shuvi.Classes.Shop
 {
     public sealed class ShopData
     {
-        [BsonElement("_id")]
+        [BsonId]
         public ObjectId Id { get; set; } = ObjectId.Empty;
         public string Name { get; set; } = "Икея";
         public string Description { get; set; } = "Ебаная икея.";

@@ -62,7 +62,7 @@ namespace Shuvi.Services.Databases
             user.Health.SetMaxHealth(100);
             user.Energy.UpdateMaxEnergy(1);
             user.Characteristic.Reset();
-            user.Wallet.SetMoney(0);
+            user.Wallet.Set(MoneyType.Simple, 0);
             user.Inventory.Clear();
             user.Statistics.AddDeathCount(1);
             user.SetProfession(UserProfessions.NoProfession);

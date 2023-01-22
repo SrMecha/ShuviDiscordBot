@@ -8,12 +8,10 @@ namespace Shuvi.Services.Databases
     {
         private readonly IMongoCollection<ShopData> _shopCollection;
 
-        public Dictionary<ObjectId, ShopData> Shops { get; init; }
-
         public ShopDatabase(IMongoCollection<ShopData> shopCollection)
         {
             _shopCollection = shopCollection;
-            Shops = LoadShops();
+            AllShopsData.LoadShops(LoadShops());
         }
         private Dictionary<ObjectId, ShopData> LoadShops()
         {

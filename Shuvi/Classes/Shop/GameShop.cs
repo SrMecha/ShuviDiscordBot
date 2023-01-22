@@ -1,5 +1,6 @@
 ﻿using MongoDB.Driver;
 using Shuvi.Classes.User;
+using Shuvi.Enums;
 using Shuvi.Interfaces.Shop;
 using Shuvi.Interfaces.User;
 
@@ -24,11 +25,11 @@ namespace Shuvi.Classes.Shop
             Info = new ShopInfo(data.Name, data.Description);
             ShopBasket = new ShopBasket();
             Selling = new SellingPart(Info, ShopBasket, data.Sale);
-            Purchasing = new PurchasingPart(Info, ShopBasket, data.Sale);
+            Purchasing = new PurchasingPart(Info, ShopBasket, data.Buy);
         }
         public void Reset()
         {
-            ShopBasket = new ShopBasket();
+            ShopBasket.Clear();
         }
         public async Task Confirm(IDatabaseUser user)
         {

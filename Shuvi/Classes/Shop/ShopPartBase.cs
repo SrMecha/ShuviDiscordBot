@@ -28,6 +28,8 @@ namespace Shuvi.Classes.Shop
             var productsInfo = new List<string>();
             for (int i = page * 10; i < _products.Count && i < page * 10 + 10; i++)
                 productsInfo.Add($"{(arrowIndex == i - 10 * page ? EmojiList.Get("choosePoint") : "")}{_products[i].Name} | {_products[i].Amount}");
+            if (productsInfo.Count < 1)
+                productsInfo.Add("Пусто.");
             return new UserEmbedBuilder(context.DiscordUser)
                 .WithAuthor($"Магазин {_shopInfo.Name}")
                 .AddField("Магазин:", string.Join("\n", productsInfo), true)
@@ -39,6 +41,8 @@ namespace Shuvi.Classes.Shop
             var productsInfo = new List<string>();
             for (int i = page * 10; i < _products.Count && i < page * 10 + 10; i++)
                 productsInfo.Add($"{_products[i].Name} | {_products[i].Amount}");
+            if (productsInfo.Count < 1)
+                productsInfo.Add("Пусто.");
             return new UserEmbedBuilder(context.DiscordUser)
                 .WithAuthor($"Магазин {_shopInfo.Name}")
                 .AddField("Магазин:", string.Join("\n", productsInfo), true)
@@ -68,6 +72,10 @@ namespace Shuvi.Classes.Shop
                 result.Add(new SelectMenuOptionBuilder("None", "None", "Nahuia ti bota slomal"));
             }
             return result;        
+        }
+        public bool HaveProducts()
+        {
+            return _products.Count > 0;
         }
         public int GetTotalEmbeds()
         {

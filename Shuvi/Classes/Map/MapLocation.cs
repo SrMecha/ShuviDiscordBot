@@ -1,6 +1,10 @@
-﻿using MongoDB.Bson;
+﻿using Discord;
+using MongoDB.Bson;
+using Shuvi.Classes.Items;
 using Shuvi.Classes.Rates;
+using Shuvi.Classes.Shop;
 using Shuvi.Enums;
+using Shuvi.Interfaces.Shop;
 
 namespace Shuvi.Classes.Map
 {
@@ -21,6 +25,36 @@ namespace Shuvi.Classes.Map
         {
             EnemiesWithChance = new EnemyRate(Enemies);
             MineDropWithChance = new EachRate(MineDrop);
+        }
+        public List<ShopData> GetShopsData()
+        {
+            return AllShopsData.GetShopsData(Shops);
+        }
+        public IShop GetShop(ObjectId id)
+        {
+            return AllShopsData.GetShop(id);
+        }
+        public List<SelectMenuOptionBuilder> GetShopsSelectMenu()
+        {
+            var result = new List<SelectMenuOptionBuilder>();
+            foreach(var shop in GetShopsData())
+            {
+                var shopDescription = shop.Description;
+                if (shopDescription.Length > 70)
+                {
+                    shopDescription = $"{shopDescription[..70]}...";
+                }
+                result.Add(new SelectMenuOptionBuilder(
+                    shop.Name,
+                    shop.Id.ToString(),
+                    shopDescription
+                    ));
+            }
+            if (result.Count < 1)
+            {
+                result.Add(new SelectMenuOptionBuilder("None", "None", "Nahuia ti bota slomal"));
+            }
+            return result;
         }
     }
 }

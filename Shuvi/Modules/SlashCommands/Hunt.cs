@@ -60,7 +60,8 @@ namespace Shuvi.Modules.SlashCommands
             if (_map.GetRegion(dbUser.Location.MapRegion).GetLocation(dbUser.Location.MapLocation).Enemies.Count < 1)
             {
                 var embed = new UserEmbedBuilder(Context.User)
-                    .WithDescription("Кажеться, в этой локации не на кого поохотиться. Попробуйте поискать врагов в другой локации.")
+                    .WithDescription("Кажется, в этой локации не на кого поохотиться. Попробуйте поискать врагов в другой локации." +
+                    "\nКарта мира: `/map`\nПерейти в локацию: `/travel`")
                     .Build();
                 await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; });
                 return;

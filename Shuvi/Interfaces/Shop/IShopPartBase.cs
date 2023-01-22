@@ -11,6 +11,7 @@ namespace Shuvi.Interfaces.Shop
         public List<SelectMenuOptionBuilder> GetSelectMenuOptions(int page);
         public IItem GetItem(int itemIndex);
         public IItem GetItem(int page, int arrowIndex);
+        public bool HaveProducts();
         public int GetTotalEmbeds();
     }
 }
