@@ -294,7 +294,7 @@ namespace Shuvi.Modules.SlashCommands
                 .AddField("** - - - - - - - - - - - - - - - - - - - - - - - - - - - - -**", "** **", false)
                 .AddField(enemy.Name, $"{((UserCharacteristics)enemy.Characteristics).ToRusString(enemy.EffectBonuses)}\n" +
                 $"{enemy.Mana.ToString()}\n{enemy.Health.ToString()}", true)
-                .AddField("Дополнительно:", $"**Заклинание:** {player.Spell.Info.Name}", true)
+                .AddField("Дополнительно:", $"**Заклинание:** {enemy.Spell.Info.Name}", true)
                 .Build();
         }
     }
