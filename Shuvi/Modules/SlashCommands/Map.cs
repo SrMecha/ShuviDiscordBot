@@ -148,7 +148,9 @@ namespace Shuvi.Modules.SlashCommands
                     .WithAuthor($"{region.Name} | {location.Name}")
                     .WithDescription($"{location.Description}\n" +
                     $"**Рекомендуемый ранг:** {location.RecomendedRank.ToRusString()}\n\n")
-                    .AddField("Магазины", "```В разработке```", true)
+                    .AddField("Магазины", 
+                    $"```{(location.Shops.Count > 0 ? string.Join("\n", location.GetShopsData().Select(x => x.Name)) : "Нету")}```", 
+                    true)
                     .AddField("Подземелья", "```В разработке```", true)
                     .WithImageUrl(location.PictureURL)
                     .Build(),
