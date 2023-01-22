@@ -6,6 +6,7 @@ using Shuvi.Services;
 using MongoDB.Bson;
 using Shuvi.Classes.Interactions;
 using Shuvi.Interfaces.User;
+using Shuvi.Extensions;
 
 namespace Shuvi.Modules.SlashCommands
 {
@@ -47,7 +48,7 @@ namespace Shuvi.Modules.SlashCommands
                         .Build();
                 await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = components; });
                 if (param.Interaction != null)
-                    await param.Interaction.DeferAsync();
+                    await param.Interaction.TryDeferAsync();
                 param.Interaction = await WaitFor.UserButtonInteraction(_client, param.Message, Context.User.Id);
                 if (param.Interaction == null)
                 {

@@ -80,7 +80,7 @@ namespace Shuvi.Classes.Items
                 .Build();
             await param.Message.ModifyAsync(msg => { msg.Embed = GetEmbed(); msg.Components = components; });
             if (param.Interaction != null)
-                await param.Interaction.DeferAsync();
+                await param.Interaction.TryDeferAsync();
             param.Interaction = await WaitFor.UserButtonInteraction(client, param.Message, discordUser.Id);
         }
         public virtual async Task ViewItemAsync(DiscordShardedClient client, InteractionParameters param, IDatabaseUser dbUser, IUser discordUser)
@@ -90,7 +90,7 @@ namespace Shuvi.Classes.Items
                 .Build();
             await param.Message.ModifyAsync(msg => { msg.Embed = GetEmbed(dbUser, discordUser); msg.Components = components; });
             if (param.Interaction != null)
-                await param.Interaction.DeferAsync();
+                await param.Interaction.TryDeferAsync();
             param.Interaction = await WaitFor.UserButtonInteraction(client, param.Message, dbUser.Id);
         }
     }

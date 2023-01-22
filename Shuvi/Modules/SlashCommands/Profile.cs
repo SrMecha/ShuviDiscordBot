@@ -87,7 +87,7 @@ namespace Shuvi.Modules.SlashCommands
                     .Build();
                 await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = components; });
                 if (param.Interaction != null)
-                    await param.Interaction.DeferAsync();
+                    await param.Interaction.TryDeferAsync();
                 param.Interaction = await WaitFor.UserButtonInteraction(_client, param.Message, Context.User.Id);
                 if (param.Interaction == null)
                 {
@@ -154,7 +154,7 @@ namespace Shuvi.Modules.SlashCommands
                     .Build();
                 await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = components; });
                 if (param.Interaction != null)
-                    await param.Interaction.DeferAsync();
+                    await param.Interaction.TryDeferAsync();
                 param.Interaction = await WaitFor.UserButtonInteraction(_client, param.Message, Context.User.Id);
                 if (param.Interaction == null)
                 {
@@ -225,7 +225,7 @@ namespace Shuvi.Modules.SlashCommands
                     .Build();
                 await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = components; });
                 if (param.Interaction != null)
-                    await param.Interaction.DeferAsync();
+                    await param.Interaction.TryDeferAsync();
                 param.Interaction = await WaitFor.UserButtonInteraction(_client, param.Message, Context.User.Id);
                 if (param.Interaction == null)
                 {
@@ -289,7 +289,7 @@ namespace Shuvi.Modules.SlashCommands
                         .Build();
                 await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = components; });
                 if (param.Interaction != null)
-                    await param.Interaction.DeferAsync();
+                    await param.Interaction.TryDeferAsync();
                 param.Interaction = await WaitFor.UserButtonInteraction(_client, param.Message, Context.User.Id);
                 if (param.Interaction == null)
                 {
@@ -327,7 +327,7 @@ namespace Shuvi.Modules.SlashCommands
                 .Build();
             await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = components; });
             if (param.Interaction != null)
-                await param.Interaction.DeferAsync();
+                await param.Interaction.TryDeferAsync();
             param.Interaction = await WaitFor.UserButtonInteraction(_client, param.Message, Context.User.Id);
         }
         public async Task MapPartAsync(InteractionParameters param, IDatabaseUser dbUser, IUser discordUser)
@@ -343,7 +343,7 @@ namespace Shuvi.Modules.SlashCommands
                 .Build();
             await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = components; });
             if (param.Interaction != null)
-                await param.Interaction.DeferAsync();
+                await param.Interaction.TryDeferAsync();
             param.Interaction = await WaitFor.UserButtonInteraction(_client, param.Message, Context.User.Id);
         }
     }

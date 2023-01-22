@@ -89,7 +89,7 @@ namespace Shuvi.Classes.Items
                 .Build();
                 await param.Message.ModifyAsync(msg => { msg.Embed = GetEmbed(dbUser, discordUser); msg.Components = components; });
                 if (param.Interaction != null)
-                    await param.Interaction.DeferAsync();
+                    await param.Interaction.TryDeferAsync();
                 param.Interaction = await WaitFor.UserButtonInteraction(client, param.Message, dbUser.Id);
                 if (param.Interaction == null)
                 {
