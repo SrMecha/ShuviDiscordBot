@@ -93,7 +93,7 @@ namespace Shuvi.Classes.Inventory
         public void Clear()
         {
             for (int i = _localInventory.Count - 1; i > 0; i--)
-                if (!GetItemAt(i).CanLoose)
+                if (GetItemAt(i).CanLoose)
                     RemoveItem(_localInventory.Keys.ElementAt(i));
         }
     }
