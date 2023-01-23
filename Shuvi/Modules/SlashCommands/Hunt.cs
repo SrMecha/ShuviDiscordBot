@@ -89,7 +89,7 @@ namespace Shuvi.Modules.SlashCommands
                     $"\n{enemy.Mana.ToString(dbUser.Characteristic.Intellect)}\n{enemy.Health.ToString(dbUser.Characteristic.Intellect)}",
                     true)
                     .AddField("Дополнительно:",
-                    $"**Заклинание:** {enemy.Spell.Info.Name}",
+                    $"**Заклинание:** {enemy.Spell.Info.Name}\n**Ранг:** 「{enemy.Rank.ToRusString()}」",
                     true)
                     .Build();
                 var components = new ComponentBuilder()
