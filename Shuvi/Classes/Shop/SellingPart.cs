@@ -5,6 +5,7 @@ using Shuvi.Classes.Interactions;
 using Shuvi.Enums;
 using Shuvi.Extensions;
 using Shuvi.Interfaces.Shop;
+using static MongoDB.Driver.WriteConcern;
 
 namespace Shuvi.Classes.Shop
 {
@@ -26,6 +27,13 @@ namespace Shuvi.Classes.Shop
         public void Sell(int page, int arrowIndex, CustomContext context, int amount = 1)
         {
             _shopBasket.SellItem(_products[page * 10 + arrowIndex], amount);
+        }
+        public int GetMaxSell(int page, int arrowIndex, CustomContext context)
+        {
+            if (_products.Count < 1)
+                return 0;
+            var product = _products[page * 10 + arrowIndex];
+            return (context.DatabaseUser.Inventory.GetItem(product.Id).Amount + _shopBasket.GetAmount(product)) / product.Amount;
         }
         public override Embed GetEmbed(CustomContext context, int page, int arrowIndex)
         {
