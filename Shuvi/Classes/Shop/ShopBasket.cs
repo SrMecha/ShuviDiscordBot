@@ -62,8 +62,10 @@ namespace Shuvi.Classes.Shop
         {
             return new UserEmbedBuilder(context.DiscordUser)
                 .WithAuthor($"Вы покинули магазин.")
-                .WithDescription($"Золото: {context.DatabaseUser.Wallet.Money} {Wallet.Money.WithSign()}" +
-                $"\nДиспоинты: {context.DatabaseUser.Wallet.Dispoints} {Wallet.Dispoints.WithSign()}")
+                .WithDescription($"Золото: {context.DatabaseUser.Wallet.Money - Wallet.Money} -> " +
+                $"{context.DatabaseUser.Wallet.Money} {MoneyType.Simple.GetEmoji()}" +
+                $"\nДиспоинты: {context.DatabaseUser.Wallet.Dispoints - Wallet.Dispoints} -> " +
+                $"{context.DatabaseUser.Wallet.Dispoints} {MoneyType.Dispoints.GetEmoji()}")
                 .AddField("Итоги:", GetItemsInfo(), true)
                 .Build();
         }
