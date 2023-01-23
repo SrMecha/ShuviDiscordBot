@@ -3,6 +3,7 @@ using MongoDB.Bson;
 using Shuvi.Classes.CustomEmbeds;
 using Shuvi.Classes.Items;
 using Shuvi.Classes.Shop;
+using Shuvi.Interfaces.Equipment;
 using Shuvi.Interfaces.Inventory;
 using Shuvi.Interfaces.Items;
 using Shuvi.Interfaces.Shop;
@@ -65,6 +66,22 @@ namespace Shuvi.Classes.Inventory
             for (int i = index * 10; i < _localInventory.Count && i < index * 10 + 10; i++)
             {
                 itemsString += $"\n**#{i + 1}** {AllItemsData.GetItemData(_localInventory.Keys.ElementAt(i)).Name} x{_localInventory.Values.ElementAt(i)}";
+            }
+            if (itemsString == "") itemsString = "У вас нету предметов.";
+            return new BotEmbedBuilder()
+                    .WithAuthor("Все предметы:")
+                    .WithDescription(itemsString)
+                    .WithFooter($"Страница {index + 1}/{GetTotalEmbeds()}")
+                    .Build();
+        }
+        public Embed GetItemsEmbed(int index, IEquipment equipment)
+        {
+            var itemsString = "";
+            for (int i = index * 10; i < _localInventory.Count && i < index * 10 + 10; i++)
+            {
+                var itemData = AllItemsData.GetItemData(_localInventory.Keys.ElementAt(i));
+                itemsString += $"\n**#{i + 1}** {itemData.Name} x{_localInventory.Values.ElementAt(i)} " +
+                    $"{(itemData.Id == equipment.GetEquipment(itemData.Type) ? "(надето)" : string.Empty)}";
             }
             if (itemsString == "") itemsString = "У вас нету предметов.";
             return new BotEmbedBuilder()

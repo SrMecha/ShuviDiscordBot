@@ -38,7 +38,7 @@ namespace Shuvi.Modules.SlashCommands
             MessageComponent components;
             do
             {
-                embed = dbUser.Inventory.GetItemsEmbed(pageNow);
+                embed = dbUser.Inventory.GetItemsEmbed(pageNow, dbUser.Equipment);
                 components = new ComponentBuilder()
                         .WithButton("<", "<", ButtonStyle.Primary, disabled: pageNow <= 0)
                         .WithButton("Выйти", "exit", ButtonStyle.Danger)
