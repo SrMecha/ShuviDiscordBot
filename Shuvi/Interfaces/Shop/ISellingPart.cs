@@ -8,5 +8,6 @@ namespace Shuvi.Interfaces.Shop
     {
         public bool CanSell(int page, int arrowIndex, CustomContext context, int amount = 1);
         public void Sell(int page, int arrowIndex, CustomContext context, int amount = 1);
+        public int GetMaxSell(int page, int arrowIndex, CustomContext context);
     }
 }

@@ -185,7 +185,7 @@ namespace Shuvi.Modules.SlashCommands
             foreach (var (id, chance) in enemies)
             {
                 var enemy = AllEnemiesData.GetData(id);
-                result.Add($"{enemy.Name} {(chance / (float)enemies.All):P2}");
+                result.Add($"{enemy.Name} 「Ранг {enemy.Rank.ToRusString()}」 {chance / (float)enemies.All:P2}");
             }
             return result.Count == 0 ? "Нету" : string.Join("\n", result);
         }

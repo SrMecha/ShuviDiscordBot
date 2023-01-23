@@ -211,7 +211,7 @@ namespace Shuvi.Modules.SlashCommands
             int pageNow = 0;
             do
             {
-                var embed = dbUser.Inventory.GetItemsEmbed(pageNow).ToEmbedBuilder()
+                var embed = dbUser.Inventory.GetItemsEmbed(pageNow, dbUser.Equipment).ToEmbedBuilder()
                     .WithAuthor($"Инвентарь")
                     .WithFooter($"{Context.User.Username} | {Context.User.Id}", Context.User.GetAvatarUrl())
                     .WithColor(UserEmbedBuilder.StandartColor)

@@ -32,10 +32,10 @@ namespace Shuvi.Modules.SlashCommands
             await DeferAsync();
             var param = new InteractionParameters(await GetOriginalResponseAsync(), null);
             var users = new CustomContext(await _database.Users.GetUser(Context.User.Id), Context.User);
-            if (UserCommandsCheck.IsUseCommands(Context.User.Id, ActiveCommands.Hunt))
+            if (UserCommandsCheck.IsUseCommands(Context.User.Id, ActiveCommands.Shop))
             {
                 await ModifyOriginalResponseAsync(
-                    msg => { msg.Embed = UserCommandsCheck.GetErrorEmbed(Context.User.Id, ActiveCommands.Hunt); }
+                    msg => { msg.Embed = UserCommandsCheck.GetErrorEmbed(Context.User.Id, ActiveCommands.Shop); }
                     );
                 return;
             }
@@ -111,9 +111,9 @@ namespace Shuvi.Modules.SlashCommands
                     .WithButton("Покупка", "purchasing", ButtonStyle.Primary, row: 0, disabled: true, emote: EmojiList.Get("choosePoint"))
                     .WithButton("Продажа", "selling", ButtonStyle.Primary, row: 0, disabled: false)
                     .WithSelectMenu("choose", shop.Purchasing.GetSelectMenuOptions(page), "Выберите предмет.", disabled: !shop.Purchasing.HaveProducts())
-                    .WithButton("+1", "1", ButtonStyle.Success, row: 2, disabled: !shop.Purchasing.CanBuy(page, arrow, users, 1))
-                    .WithButton("+2", "2", ButtonStyle.Success, row: 2, disabled: !shop.Purchasing.CanBuy(page, arrow, users, 2))
-                    .WithButton("+5", "5", ButtonStyle.Success, row: 2, disabled: !shop.Purchasing.CanBuy(page, arrow, users, 5))
+                    .WithButton("x1", "1", ButtonStyle.Success, row: 2, disabled: !shop.Purchasing.CanBuy(page, arrow, users, 1))
+                    .WithButton("x2", "2", ButtonStyle.Success, row: 2, disabled: !shop.Purchasing.CanBuy(page, arrow, users, 2))
+                    .WithButton("x5", "5", ButtonStyle.Success, row: 2, disabled: !shop.Purchasing.CanBuy(page, arrow, users, 5))
                     .WithButton("<", "<", ButtonStyle.Primary, row: 3, disabled: page < 1)
                     .WithButton("Инфо", "info", ButtonStyle.Primary, row: 3, disabled: !shop.Purchasing.HaveProducts())
                     .WithButton(">", ">", ButtonStyle.Primary, row: 3, disabled: page >= maxPage)
@@ -183,9 +183,11 @@ namespace Shuvi.Modules.SlashCommands
                     .WithButton("Покупка", "purchasing", ButtonStyle.Primary, row: 0, disabled: false)
                     .WithButton("Продажа", "selling", ButtonStyle.Primary, row: 0, disabled: true, emote: EmojiList.Get("choosePoint"))
                     .WithSelectMenu("choose", shop.Selling.GetSelectMenuOptions(page), "Выберите предмет.", disabled: !shop.Selling.HaveProducts())
-                    .WithButton("-1", "1", ButtonStyle.Success, row: 2, disabled: !shop.Selling.CanSell(page, arrow, users, 1))
-                    .WithButton("-2", "2", ButtonStyle.Success, row: 2, disabled: !shop.Selling.CanSell(page, arrow, users, 2))
-                    .WithButton("-5", "5", ButtonStyle.Success, row: 2, disabled: !shop.Selling.CanSell(page, arrow, users, 5))
+                    .WithButton("x1", "1", ButtonStyle.Success, row: 2, disabled: !shop.Selling.CanSell(page, arrow, users, 1))
+                    .WithButton("x2", "2", ButtonStyle.Success, row: 2, disabled: !shop.Selling.CanSell(page, arrow, users, 2))
+                    .WithButton("x5", "5", ButtonStyle.Success, row: 2, disabled: !shop.Selling.CanSell(page, arrow, users, 5))
+                    .WithButton($"x{shop.Selling.GetMaxSell(page, arrow, users)}", shop.Selling.GetMaxSell(page, arrow, users).ToString(), 
+                    ButtonStyle.Success, row: 2, disabled: !shop.Selling.CanSell(page, arrow, users, 1))
                     .WithButton("<", "<", ButtonStyle.Primary, row: 3, disabled: page < 1)
                     .WithButton("Инфо", "info", ButtonStyle.Primary, row: 3, disabled: !shop.Selling.HaveProducts())
                     .WithButton(">", ">", ButtonStyle.Primary, row: 3, disabled: page >= maxPage)
@@ -212,9 +214,6 @@ namespace Shuvi.Modules.SlashCommands
                         return;
                     case "choose":
                         arrow = int.Parse(param.Interaction.Data.Values.First());
-                        break;
-                    case "1" or "2" or "5":
-                        shop.Selling.Sell(page, arrow, users, int.Parse(param.Interaction.Data.CustomId));
                         break;
                     case "<":
                         page -= 1;
@@ -243,6 +242,9 @@ namespace Shuvi.Modules.SlashCommands
                         });
                         _part = "break";
                         return;
+                    default:
+                        shop.Selling.Sell(page, arrow, users, int.Parse(param.Interaction.Data.CustomId));
+                        break;
                 }
             }
         }
