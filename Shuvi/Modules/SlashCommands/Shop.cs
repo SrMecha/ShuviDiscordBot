@@ -39,9 +39,17 @@ namespace Shuvi.Modules.SlashCommands
                     );
                 return;
             }
-            UserCommandsCheck.Add(Context.User.Id, ActiveCommands.Shop);
-            await ViewAllShopsAsync(param, users);
-            UserCommandsCheck.Remove(Context.User.Id, ActiveCommands.Shop);
+            try
+            {
+                UserCommandsCheck.Add(Context.User.Id, ActiveCommands.Shop);
+                await ViewAllShopsAsync(param, users);
+                UserCommandsCheck.Remove(Context.User.Id, ActiveCommands.Shop);
+            }
+            catch
+            {
+                UserCommandsCheck.Remove(Context.User.Id, ActiveCommands.Shop);
+                throw;
+            }
         }
 
         public async Task ViewAllShopsAsync(InteractionParameters param, CustomContext users)

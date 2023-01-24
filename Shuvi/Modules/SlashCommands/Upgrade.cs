@@ -43,10 +43,18 @@ namespace Shuvi.Modules.SlashCommands
                     );
                 return;
             }
-            UserCommandsCheck.Add(Context.User.Id, ActiveCommands.Upgrade);
-            var dbUser = await _database.Users.GetUser(Context.User.Id);
-            await MainUpgradeCommandAsync(param, dbUser);
-            UserCommandsCheck.Remove(Context.User.Id, ActiveCommands.Upgrade);
+            try
+            {
+                UserCommandsCheck.Add(Context.User.Id, ActiveCommands.Upgrade);
+                var dbUser = await _database.Users.GetUser(Context.User.Id);
+                await MainUpgradeCommandAsync(param, dbUser);
+                UserCommandsCheck.Remove(Context.User.Id, ActiveCommands.Upgrade);
+            }
+            catch
+            {
+                UserCommandsCheck.Remove(Context.User.Id, ActiveCommands.Upgrade);
+                throw;
+            }
         }
 
         public async Task MainUpgradeCommandAsync(InteractionParameters param, IDatabaseUser dbUser)
