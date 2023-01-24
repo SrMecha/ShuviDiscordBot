@@ -67,9 +67,17 @@ namespace Shuvi.Modules.SlashCommands
                 await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; });
                 return;
             }
-            UserCommandsCheck.Add(Context.User.Id, ActiveCommands.Hunt);
-            await FightPrepareAsync(param, dbUser);
-            UserCommandsCheck.Remove(Context.User.Id, ActiveCommands.Hunt);
+            try
+            {
+                UserCommandsCheck.Add(Context.User.Id, ActiveCommands.Hunt);
+                await FightPrepareAsync(param, dbUser);
+                UserCommandsCheck.Remove(Context.User.Id, ActiveCommands.Hunt);
+            }
+            catch
+            {
+                UserCommandsCheck.Remove(Context.User.Id, ActiveCommands.Hunt);
+                throw;
+            }
         }
         public async Task FightPrepareAsync(InteractionParameters param, IDatabaseUser dbUser)
         {
