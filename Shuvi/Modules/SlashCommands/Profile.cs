@@ -4,7 +4,6 @@ using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Shuvi.Services;
 using MongoDB.Bson;
-using Shuvi.Classes.Items;
 using Shuvi.Classes.Interactions;
 using Shuvi.Classes.CustomEmbeds;
 using Shuvi.Classes.Map;
@@ -15,8 +14,7 @@ using Shuvi.Enums;
 using Shuvi.Classes.Characteristics;
 using MongoDB.Driver;
 using Shuvi.Classes.User;
-using System;
-using System.Collections.Generic;
+using Shuvi.Classes.Spell;
 
 namespace Shuvi.Modules.SlashCommands
 {
@@ -44,13 +42,17 @@ namespace Shuvi.Modules.SlashCommands
             MessageComponent components;
             if (discordUser.Id == Context.User.Id)
             {
-                components = new ComponentBuilder()
+                var temp = new ComponentBuilder()
                     .WithButton("Экипировка", "equipment", ButtonStyle.Primary, row: 0)
                     .WithButton("Локация", "location", ButtonStyle.Primary, row: 0)
                     .WithButton("Статистика", "statistics", ButtonStyle.Primary, row: 0)
                     .WithButton("Инвентарь", "inventory", ButtonStyle.Primary, row: 1)
-                    .WithButton("Улучшения", "upgrade", ButtonStyle.Primary, row: 1)
-                    .Build();
+                    .WithButton("Улучшения", "upgrade", ButtonStyle.Primary, row: 1);
+                if (dbUser.Profession == UserProfessions.NoProfession)
+                {
+                    temp.WithButton("Выберите профессию", "profession", ButtonStyle.Success, row: 2);
+                }
+                components = temp.Build();
             }
             else
             {
@@ -111,12 +113,142 @@ namespace Shuvi.Modules.SlashCommands
                     case "upgrade":
                         await UpgradePartAsync(param, dbUser);
                         break;
+                    case "profession":
+                        await ProfessionPartAsync(param, dbUser);
+                        break;
                     default:
                         break;
                 }
             } while (param.Interaction != null);
             await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = new ComponentBuilder().Build(); });
             return;
+        }
+        public async Task SpellPartAsync(InteractionParameters param, IDatabaseUser dbUser)
+        {
+            while (true)
+            {
+                var options = new List<SelectMenuOptionBuilder>();
+                var spellsDescription = new List<string>();
+                foreach (var (id, spell) in SpellFactory.GetSpellsWithId(dbUser.Race))
+                {
+                    spellsDescription.Add(spell.Info.Name);
+                    options.Add(new SelectMenuOptionBuilder(spell.Info.Name, id));
+                }
+                var embed = new UserEmbedBuilder(Context.User)
+                    .WithAuthor("Заклинание")
+                    .WithDescription($"Выберите заклинание:\n\n{string.Join("\n", spellsDescription)}")
+                    .Build();
+                var components = new ComponentBuilder()
+                    .WithSelectMenu("choose", options, "Выберите профессию")
+                    .WithButton("Выйти", "exit", ButtonStyle.Danger)
+                    .Build();
+                await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = components; });
+                if (param.Interaction != null)
+                    await param.Interaction.TryDeferAsync();
+                param.Interaction = await WaitFor.UserButtonInteraction(_client, param.Message, Context.User.Id);
+                if (param.Interaction == null)
+                {
+                    await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = new ComponentBuilder().Build(); });
+                    return;
+                }
+                switch (param.Interaction.Data.CustomId)
+                {
+                    case "exit":
+                        return;
+                    case "choose":
+                        await SpellViewPartAsync(param, dbUser, param.Interaction.Data.Values.First());
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        public async Task SpellViewPartAsync(InteractionParameters param, IDatabaseUser dbUser, string spellId)
+        {
+            var options = new List<SelectMenuOptionBuilder>();
+            var spellsDescription = new List<string>();
+            foreach (var (id, spell) in SpellFactory.GetSpellsWithId(dbUser.Race))
+            {
+                spellsDescription.Add(spell.Info.Name);
+                options.Add(new SelectMenuOptionBuilder(spell.Info.Name, id));
+            }
+            var embed = new UserEmbedBuilder(Context.User)
+                .WithAuthor("Заклинание")
+                .WithDescription($"Выберите заклинание:\n\n{string.Join("\n", spellsDescription)}")
+                .Build();
+            var components = new ComponentBuilder()
+                .WithSelectMenu("choose", options, "Выберите профессию")
+                .WithButton("Выйти", "exit", ButtonStyle.Danger)
+                .Build();
+            await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = components; });
+            if (param.Interaction != null)
+                await param.Interaction.TryDeferAsync();
+            param.Interaction = await WaitFor.UserButtonInteraction(_client, param.Message, Context.User.Id);
+            if (param.Interaction == null)
+            {
+                await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = new ComponentBuilder().Build(); });
+                return;
+            }
+            switch (param.Interaction.Data.CustomId)
+            {
+                case "exit":
+                    return;
+                case "choose":
+                    var choosedProfession = (UserProfessions)int.Parse(param.Interaction.Data.Values.First());
+                    dbUser.SetProfession(choosedProfession);
+                    await dbUser.UpdateUser(new UpdateDefinitionBuilder<UserData>().Set(x => x.Profession, choosedProfession));
+                    embed = new UserEmbedBuilder(Context.User)
+                        .WithDescription($"Вы выбрали профессию {choosedProfession.ToRusString()}")
+                        .Build();
+                    await param.Interaction.RespondAsync(embed: embed, ephemeral: true);
+                    return;
+                default:
+                    break;
+            }
+
+        }
+        public async Task ProfessionPartAsync(InteractionParameters param, IDatabaseUser dbUser)
+        {
+            var embedBuilder = new UserEmbedBuilder(Context.User)
+                .WithAuthor("Профессия")
+                .WithDescription("Выберите желаемую профессию. __Будьте внимательны, потом вы не сможете ее поменять__.");
+            var options = new List<SelectMenuOptionBuilder>();
+            foreach(var profession in dbUser.Race.GetProfessions())
+            {
+                var skill = profession.GetSkill();
+                embedBuilder.AddField(profession.ToRusString(), $"**Способность:** {skill.Info.Name}\n{skill.Info.Description}");
+                options.Add(new SelectMenuOptionBuilder(profession.ToRusString(), ((int)profession).ToString()));
+            }
+            var components = new ComponentBuilder()
+                .WithSelectMenu("choose", options, "Выберите профессию")
+                .WithButton("Выйти", "exit", ButtonStyle.Danger)
+                .Build();
+            var embed = embedBuilder.Build();
+            await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = components; });
+            if (param.Interaction != null)
+                await param.Interaction.TryDeferAsync();
+            param.Interaction = await WaitFor.UserButtonInteraction(_client, param.Message, Context.User.Id);
+            if (param.Interaction == null)
+            {
+                await ModifyOriginalResponseAsync(msg => { msg.Embed = embed; msg.Components = new ComponentBuilder().Build(); });
+                return;
+            }
+            switch (param.Interaction.Data.CustomId)
+            {
+                case "exit":
+                    return;
+                case "choose":
+                    var choosedProfession = (UserProfessions)int.Parse(param.Interaction.Data.Values.First());
+                    dbUser.SetProfession(choosedProfession);
+                    await dbUser.UpdateUser(new UpdateDefinitionBuilder<UserData>().Set(x => x.Profession, choosedProfession));
+                    embed = new UserEmbedBuilder(Context.User)
+                        .WithDescription($"Вы выбрали профессию {choosedProfession.ToRusString()}")
+                        .Build();
+                    await param.Interaction.RespondAsync(embed: embed, ephemeral: true);
+                    return;
+                default:
+                    break;
+            }
         }
         public async Task UpgradePartAsync(InteractionParameters param, IDatabaseUser dbUser)
         {

@@ -3,7 +3,7 @@ using Shuvi.Interfaces.Entity;
 using Shuvi.Interfaces.Skills;
 using Shuvi.Interfaces.Status;
 
-namespace Shuvi.Classes.Skills
+namespace Shuvi.Classes.Skills.SkillList
 {
     public class VoidSkill : ISkill
     {
@@ -12,11 +12,11 @@ namespace Shuvi.Classes.Skills
 
         public string GetStatus(IEntity owner)
         {
-            return "**Способность:** Нету";
+            return $"**Способность:** {Info.Name}";
         }
         public void Update(IEntity owner)
         {
-            
+
         }
         public IActionResult UseSkill(IEntity owner, IEntity target)
         {
