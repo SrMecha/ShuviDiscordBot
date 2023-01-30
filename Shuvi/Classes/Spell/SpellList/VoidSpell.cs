@@ -8,7 +8,7 @@ namespace Shuvi.Classes.Spell.SpellList
 {
     public class VoidSpell : SpellBase, ISpell
     {
-        public override ISpellInfo Info { get; private set; } = new SpellInfo("Без заклинания", "Без описания", 0, new() { UserRaces.ExMachina });
+        public ISpellInfo Info { get; private set; } = new SpellInfo("Без заклинания", "Без описания", 0, new() { UserRaces.ExMachina });
 
         public override IActionResult Cast(IEntity player, IEntity target)
         {
