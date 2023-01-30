@@ -9,7 +9,7 @@ namespace Shuvi.Classes.Spell.SpellList
 {
     public class FrozenWave : SpellBase, ISpell
     {
-        public override ISpellInfo Info { get; private set; } = new SpellInfo("Ледяная волна",
+        public ISpellInfo Info { get; private set; } = new SpellInfo("Ледяная волна",
             "Возводит впереди себя огромную ледяную дорогу, способная за считаные секунды заморозить врага.", 10, new());
 
         public override IActionResult Cast(IEntity player, IEntity target)
