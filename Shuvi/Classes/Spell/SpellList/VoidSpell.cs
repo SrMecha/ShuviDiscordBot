@@ -6,15 +6,15 @@ using Shuvi.Interfaces.Status;
 
 namespace Shuvi.Classes.Spell.SpellList
 {
-    public class VoidSpell : ISpell
+    public class VoidSpell : SpellBase, ISpell
     {
-        public ISpellInfo Info { get; private set; } = new SpellInfo("Без заклинания", "Без описания", 0, new() { UserRaces.ExMachina });
+        public override ISpellInfo Info { get; private set; } = new SpellInfo("Без заклинания", "Без описания", 0, new() { UserRaces.ExMachina });
 
-        public IActionResult Cast(IEntity player, IEntity target)
+        public override IActionResult Cast(IEntity player, IEntity target)
         {
             return new ActionResult("У вас нету заклинания");
         }
-        public bool CanCast(IEntity player)
+        public override bool CanCast(IEntity player)
         {
             return false;
         }

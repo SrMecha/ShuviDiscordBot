@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Shuvi.Classes.CustomEmoji;
 using Shuvi.Classes.Skills;
+using Shuvi.Classes.Skills.SkillList;
 using Shuvi.Enums;
 using Shuvi.Interfaces.Skills;
 using System.Runtime.CompilerServices;
@@ -160,7 +161,8 @@ namespace Shuvi.Extensions
             return target switch
             {
                 UserProfessions.NoProfession => "Нету",
-                UserProfessions.Proofer => "Разведчик",
+                UserProfessions.Prufer => "Проверщик",
+                UserProfessions.Kampfer => "Боевик",
                 _ => "Нету"
             };
         }
@@ -173,13 +175,22 @@ namespace Shuvi.Extensions
                 _ => "Неизвестный"
             };
         }
+        public static IEnumerable<UserProfessions> GetProfessions(this UserRaces target)
+        {
+            return target switch
+            {
+                UserRaces.ExMachina => new UserProfessions[2] { UserProfessions.Prufer, UserProfessions.Kampfer },
+                _ => Array.Empty<UserProfessions>()
+            };
+        }
         [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         public static ISkill GetSkill(this UserProfessions target)
         {
             return target switch
             {
                 UserProfessions.NoProfession => new VoidSkill(),
-                UserProfessions.Proofer => new ProoferSkill(),
+                UserProfessions.Prufer => new PruferSkill(),
+                UserProfessions.Kampfer => new KampferSkill(),
                 _ => new VoidSkill()
             };
         }
