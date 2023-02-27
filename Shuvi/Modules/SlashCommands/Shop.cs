@@ -194,7 +194,7 @@ namespace Shuvi.Modules.SlashCommands
                     .WithButton("x1", "1", ButtonStyle.Success, row: 2, disabled: !shop.Selling.CanSell(page, arrow, users, 1))
                     .WithButton("x2", "2", ButtonStyle.Success, row: 2, disabled: !shop.Selling.CanSell(page, arrow, users, 2))
                     .WithButton("x5", "5", ButtonStyle.Success, row: 2, disabled: !shop.Selling.CanSell(page, arrow, users, 5))
-                    .WithButton($"x{shop.Selling.GetMaxSell(page, arrow, users)}", shop.Selling.GetMaxSell(page, arrow, users).ToString(), 
+                    .WithButton($"x{shop.Selling.GetMaxSell(page, arrow, users)}", $"+{shop.Selling.GetMaxSell(page, arrow, users).ToString()}", 
                     ButtonStyle.Success, row: 2, disabled: !shop.Selling.CanSell(page, arrow, users, 1))
                     .WithButton("<", "<", ButtonStyle.Primary, row: 3, disabled: page < 1)
                     .WithButton("Инфо", "info", ButtonStyle.Primary, row: 3, disabled: !shop.Selling.HaveProducts())
