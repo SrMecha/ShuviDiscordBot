@@ -27,7 +27,7 @@ namespace Shuvi.Classes.Skills.SkillList
                 Endurance = (int)(owner.Characteristics.Endurance / 100.0f * 20)
             }
             ));
-            return new ActionResult($"{owner.Name} активировал навык「Оценка」.");
+            return new ActionResult($"{owner.Name} активировал навык「Боевой режим」.");
         }
     }
 }
