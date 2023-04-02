@@ -30,7 +30,8 @@ namespace Shuvi
             var config = new DiscordSocketConfig
             {
                 TotalShards = 1,
-                GatewayIntents = GatewayIntents.AllUnprivileged
+                GatewayIntents = GatewayIntents.AllUnprivileged,
+                AlwaysDownloadUsers = false
             };
 
             ServiceProvider services = BuildServices(config, mongoKey);
